@@ -1,5 +1,5 @@
-const temperature = 0.5;
-const max_tokens = 100;
+const temperature = 0;
+const max_tokens = 20;
 const top_p = 1;
 
 const API_KEY = process.env.OPENAI_API_KEY;
@@ -86,6 +86,21 @@ export async function winCheck(guess: string, word: string): Promise<boolean> {
                     {
                         role: "assistant",
                         content: "win"
+                    }, {
+                        role: "user",
+                        content: "Is your character Tony Stark, also known as Iron Man? Correct Word: iron man",
+                    },
+                    {
+                        role: "assistant",
+                        content: "win"
+                    },
+                    {
+                        role: "user",
+                        content: "Is your animal an elefant? Correct Word: elephant",
+                    },
+                    {
+                        role: "assistant",
+                        content: "win"
                     },
                     {
                         role: "user",
@@ -99,6 +114,7 @@ export async function winCheck(guess: string, word: string): Promise<boolean> {
         });
 
         const data = await response.json();
+        //console.log("Data: ", data, response)
         console.log(guess, word, data.choices[0].message.content);
         if (data.choices[0].message.content === "win") {
             return true;

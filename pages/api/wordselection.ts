@@ -80,6 +80,7 @@ export async function selectWord(category: string) {
 
         const data = await response.json();
         const word = data.choices[0].message.content;
+        console.log("AI chose the word: " + word)
         return word;
     } catch (error) {
         console.error("Error selecting word:", error);
