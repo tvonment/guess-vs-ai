@@ -22,6 +22,7 @@ export default function Home() {
 
 
   const handlePrompty = async () => {
+    setShowButtons(true); // Show buttons after sending the question
     const newMessage = { role: "user", content: input };
     setMessages([...messages, newMessage]); // Add user message to messages
     const response = await fetch('/api/gameround', {
@@ -46,7 +47,6 @@ export default function Home() {
     } else {
       setMessages([...messages, newMessage, ...aiMessages]); // Add AI response to messages
       setInput(""); // Clear input field
-      setShowButtons(true); // Show buttons after sending the question
     }
   };
 
@@ -165,7 +165,6 @@ export default function Home() {
                 setInput("");
                 setUserId("");
                 setUserWord("");
-                setCategory("");
                 setIsWordLocked(false);
                 setShowButtons(false);
                 setWinner("");
