@@ -85,11 +85,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (userwin || aiwin) {
             chatHistory.push({ role: "system", content: "Game Over" });
             await container.items.upsert({ id: userId, messages: chatHistory, userWord: dbitem.userWord, aiWord: dbitem.aiWord, category: dbitem.category, winner: userwin ? "human" : "ai" });
+            res.status(200).json({ result: [aiMessage, guess], aiWin: aiwin, userWin: userwin, aiWord: dbitem.aiWord });
         } else {
             // Persist updated chat history in Cosmos DB
             await container.items.upsert({ id: userId, messages: chatHistory, userWord: dbitem.userWord, aiWord: dbitem.aiWord, category: dbitem.category });
+            res.status(200).json({ result: [aiMessage, guess], aiWin: aiwin, userWin: userwin });
         }
-        res.status(200).json({ result: [aiMessage, guess], aiWin: aiwin, userWin: userwin });
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {

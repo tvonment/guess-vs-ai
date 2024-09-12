@@ -17,6 +17,7 @@ export default function Home() {
   const [isWordLocked, setIsWordLocked] = useState(false); // State for locking character
   const [showButtons, setShowButtons] = useState(false); // State for showing buttons
   const [winner, setWinner] = useState(""); // State for winner
+  const [aiWord, setAiWord] = useState(""); // State for AIs chosen word after someone wins.
   const chatWindowRef = useRef<HTMLDivElement>(null); // Ref for chat window
 
 
@@ -37,15 +38,16 @@ export default function Home() {
     if (userWin) {
       console.log("You win!");
       setWinner("human");
-    }
-
-    if (aiWin) {
+      setAiWord(data.aiWord)
+    } else if (aiWin) {
       console.log("AI wins!");
       setWinner("ai");
+      setAiWord(data.aiWord)
+    } else {
+      setMessages([...messages, newMessage, ...aiMessages]); // Add AI response to messages
+      setInput(""); // Clear input field
+      setShowButtons(true); // Show buttons after sending the question
     }
-    setMessages([...messages, newMessage, ...aiMessages]); // Add AI response to messages
-    setInput(""); // Clear input field
-    setShowButtons(true); // Show buttons after sending the question
   };
 
   const handleWordLock = async () => {
@@ -155,6 +157,7 @@ export default function Home() {
         </div>
         {winner != "" ? (
           <div className="flex flex-col items-center mb-4">
+            <p className="text-lg mb-2">AI&apos;s chosen word was: {aiWord}</p>
             <img src={`/images/${winner}win-${Math.floor(Math.random() * 3) + 1}.png`} alt="Winner" className="w-100 h-100 mb-4" />
             <button
               onClick={() => {
