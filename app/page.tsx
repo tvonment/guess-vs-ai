@@ -111,7 +111,7 @@ export default function Home() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <main className="bg-white p-6 rounded-lg shadow-lg w-full">
         <h1 className="text-2xl font-bold mb-4 text-center">Guess vs AI</h1>
-        <p className="text-lg mb-6 text-center">Play a game of guess what against an AI.</p>
+        <p className="text-lg mb-6 text-center">Play a game of <strong>guess what</strong> against an AI.</p>
 
         <div className="mb-4 flex items-center justify-center">
           <label className="mr-2">Category:</label>
