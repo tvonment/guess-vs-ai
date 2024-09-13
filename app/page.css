@@ -105,3 +105,54 @@ footer {
     text-align: center;
     color: #666;
 }
+
+/* Mobile styles */
+@media (max-width: 600px) {
+
+    /* Container styles */
+    .container {
+        padding: 10px;
+    }
+
+    /* Main content styles */
+    main {
+        padding: 15px;
+        box-shadow: none;
+        /* Remove shadow for a cleaner look on mobile */
+    }
+
+    /* Adjust font sizes */
+    h1 {
+        font-size: 1.5rem;
+        color: red
+    }
+
+    p {
+        font-size: 1rem;
+    }
+
+    /* Chat window styles */
+    .chat-window {
+        height: 50vh;
+        /* Adjust height for better fit on mobile */
+        padding: 10px;
+    }
+
+    /* Button styles */
+    button {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    /* Input styles */
+    input {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    /* Select styles */
+    select {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}
