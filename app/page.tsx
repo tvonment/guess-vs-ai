@@ -5,6 +5,9 @@ import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { faLock } from '@fortawesome/free-solid-svg-icons';
+import { Answer } from "@/enum/Answer";
+import { Category } from "@/enum/Categories";
+
 import "./page.css";
 import './globals.css'; // Ensure you have the global styles imported
 
@@ -13,7 +16,7 @@ export default function Home() {
   const [input, setInput] = useState(""); // State for input value
   const [userId, setUserId] = useState<string>(""); // State for user ID
   const [userWord, setUserWord] = useState(""); // State for character input
-  const [category, setCategory] = useState("character"); // State for character input
+  const [category, setCategory] = useState(Category.CHARACTER); // State for character input
   const [isWordLocked, setIsWordLocked] = useState(false); // State for locking character
   const [showButtons, setShowButtons] = useState(false); // State for showing buttons
   const [winner, setWinner] = useState(""); // State for winner
@@ -21,7 +24,7 @@ export default function Home() {
   const chatWindowRef = useRef<HTMLDivElement>(null); // Ref for chat window
 
 
-  const handlePrompty = async () => {
+  const handleHumanGuess = async () => {
     setShowButtons(true); // Show buttons after sending the question
     const newMessage = { role: "user", content: input };
     setMessages([...messages, newMessage]); // Add user message to messages
@@ -87,24 +90,23 @@ export default function Home() {
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
-      handlePrompty();
+      handleHumanGuess();
     }
   };
 
-  const handleButtonClick = async (answer: string) => {
-    const answerMessage = { role: "user", content: answer };
+  const handleAnswerClick = async (answer: string) => {
     // Call the /api/saveanswer endpoint to save the humens answer
     const response = await fetch('/api/saveanswer', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userId: userId, answer: answerMessage }),
+      body: JSON.stringify({ userId: userId, answer: answer }),
     });
     const data = await response.json();
-    const success = data.result;
-    if (success) {
-      setMessages([...messages, answerMessage]); // Add user message to messages
+    const responseMessage = data.result;
+    if (responseMessage) {
+      setMessages([...messages, responseMessage]); // Add user message to messages
       setShowButtons(false); // Hide buttons after selection
     }
   };
@@ -119,14 +121,15 @@ export default function Home() {
           <label className="mr-2">Category:</label>
           <select
             value={category}
-            onChange={(e) => setCategory(e.target.value)} // Update category value
+            onChange={(e) => setCategory(e.target.value as Category)} // Update category value
             className="p-2 border border-gray-300 rounded-lg"
             disabled={isWordLocked} // Disable dropdown if character is locked
           >
-            <option value="character">Character</option>
-            <option value="animal">Animal</option>
-            <option value="object">Object</option>
-            <option value="everything">Anything</option>
+            {Object.entries(Category).map(([key, value]) => (
+              <option key={key} value={value}>
+                {value}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -142,7 +145,7 @@ export default function Home() {
             readOnly={isWordLocked} // Make input readonly if character is locked
           />
           {!isWordLocked && (
-            <button onClick={handleWordLock} disabled={category == ""} className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded hover:bg-blue-600">
+            <button onClick={handleWordLock} className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded hover:bg-blue-600">
               <FontAwesomeIcon icon={faLock} />
             </button>
           )}
@@ -176,11 +179,11 @@ export default function Home() {
           </div>
         ) : showButtons ? (
           <div className="flex flex-wrap justify-center mb-4">
-            <button onClick={() => handleButtonClick("Yes")} className="m-1 p-2 bg-green-800 text-white rounded hover:bg-green-600">Yes</button>
-            <button onClick={() => handleButtonClick("Probably Yes")} className="m-1 p-2 bg-green-400 text-white rounded hover:bg-green-500">Probably Yes</button>
-            <button onClick={() => handleButtonClick("Probably No")} className="m-1 p-2 bg-red-400 text-white rounded hover:bg-red-500">Probably No</button>
-            <button onClick={() => handleButtonClick("No")} className="m-1 p-2 bg-red-800 text-white rounded hover:bg-red-600">No</button>
-            <button onClick={() => handleButtonClick("I Don't Know")} className="m-1 p-2 bg-gray-400 text-white rounded hover:bg-gray-500">I do not know</button>
+            <button onClick={() => handleAnswerClick(Answer.YES)} className="m-1 p-2 bg-green-800 text-white rounded hover:bg-green-600">{Answer.YES}</button>
+            <button onClick={() => handleAnswerClick(Answer.PROBABLY_YES)} className="m-1 p-2 bg-green-400 text-white rounded hover:bg-green-500">{Answer.PROBABLY_YES}</button>
+            <button onClick={() => handleAnswerClick(Answer.PROBABLY_NO)} className="m-1 p-2 bg-red-400 text-white rounded hover:bg-red-500">{Answer.PROBABLY_NO}</button>
+            <button onClick={() => handleAnswerClick(Answer.NO)} className="m-1 p-2 bg-red-800 text-white rounded hover:bg-red-600">{Answer.NO}</button>
+            <button onClick={() => handleAnswerClick(Answer.I_DONT_KNOW)} className="m-1 p-2 bg-gray-400 text-white rounded hover:bg-gray-500">{Answer.I_DONT_KNOW}</button>
           </div>
         ) : (
           <div className="flex">
@@ -194,7 +197,7 @@ export default function Home() {
               disabled={!isWordLocked} // Disable input if character is not locked
             />
             {isWordLocked && (
-              <button onClick={handlePrompty} className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded hover:bg-blue-600">
+              <button onClick={handleHumanGuess} className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded hover:bg-blue-600">
                 <FontAwesomeIcon icon={faPaperPlane} />
               </button>
             )}

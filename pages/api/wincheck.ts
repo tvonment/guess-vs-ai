@@ -3,7 +3,7 @@ const max_tokens = 20;
 const top_p = 1;
 
 const API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_API_URL = process.env.OPENAI_API_URL;
+const OPENAI_API_URL = process.env.OPENAI_GPT4OMINI_API_URL;
 
 const winCheckSystemMessage = "You are to verify if the guess is absolutely correct. Only answer with 'win' or 'no'. A correct question is not yet a win. The user has to guess the word correctly to win the game. Spelling issues are also ok!";
 
