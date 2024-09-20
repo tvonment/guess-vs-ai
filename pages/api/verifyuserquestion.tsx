@@ -1,5 +1,5 @@
-import { Message } from "./Message";
-import { addToHistory, getFilteredAiChatHistory } from "./cosmos";
+import { Answer } from "../../enum/Answer";
+import { getAiWord } from "./cosmos";
 
 const temperature = 0.5;
 const max_tokens = 100;
@@ -8,11 +8,17 @@ const top_p = 1;
 const API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_API_URL = process.env.OPENAI_GPT4O_API_URL;
 
-const verifySystemMessage = "Ask a question to narrow down the searched character or make a good guess!";
+const possibleAnswers = Object.entries(Answer).map(([key, value]) => value);
+const possibleAnswersString = possibleAnswers.join(", ");
 
-export async function makeGuess(userId: string): Promise<Message> {
-    console.log("Make Guess Request received");
-    console.log(`User ID: ${userId}`);
+export async function verifyUserQuestion(userId: string, userQuestion: string) {
+    const aiWord = await getAiWord(userId);
+    const verifySystemMessage = `Verify if the question is correct. The Word in question is ${aiWord}. Only answer with ${possibleAnswersString}.`
+
+    const userMessage = {
+        role: "user",
+        content: userQuestion
+    };
 
     const systemMessage = {
         role: "system",
@@ -20,10 +26,6 @@ export async function makeGuess(userId: string): Promise<Message> {
     };
 
     try {
-
-        const filteredChatHistory = await getFilteredAiChatHistory(userId);
-        console.log("AI Filtered Chat History:", filteredChatHistory);
-
         const response = await fetch(`${OPENAI_API_URL}`, {
             method: "POST",
             headers: {
@@ -31,7 +33,7 @@ export async function makeGuess(userId: string): Promise<Message> {
                 "api-key": `${API_KEY}`,
             },
             body: JSON.stringify({
-                messages: [...filteredChatHistory, systemMessage],
+                messages: [systemMessage, userMessage],
                 temperature: temperature,
                 max_tokens: max_tokens,
                 top_p: top_p
@@ -43,10 +45,11 @@ export async function makeGuess(userId: string): Promise<Message> {
         }
 
         const data = await response.json();
-        const aiGuess = data.choices[0].message;
-        return aiGuess
-    } catch (error: unknown) {
+        const aiMessage = data.choices[0].message;
+        return aiMessage;
+    }
+    catch (error: unknown) {
         console.error("Error:", error);
-        throw new Error("An error occurred");
+        return "An error occurred";
     }
 }
