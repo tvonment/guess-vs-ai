@@ -1,6 +1,6 @@
-import { getUsedCharacters } from "./cosmos";
+import { getUsedCharacters } from "./cosmosService";
 
-const temperature = 0.5;
+const temperature = 0.7;
 const max_tokens = 100;
 const top_p = 1;
 

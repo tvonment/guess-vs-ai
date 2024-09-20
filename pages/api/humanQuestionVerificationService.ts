@@ -1,5 +1,5 @@
 import { Answer } from "../../enum/Answer";
-import { getAiWord } from "./cosmos";
+import { getAiWord } from "./cosmosService";
 
 const temperature = 0.5;
 const max_tokens = 100;
@@ -11,7 +11,7 @@ const OPENAI_API_URL = process.env.OPENAI_GPT4O_API_URL;
 const possibleAnswers = Object.entries(Answer).map(([key, value]) => value);
 const possibleAnswersString = possibleAnswers.join(", ");
 
-export async function verifyUserQuestion(userId: string, userQuestion: string) {
+export async function verifyHumanQuestion(userId: string, userQuestion: string) {
     const aiWord = await getAiWord(userId);
     const verifySystemMessage = `Verify if the question is correct. The Word in question is ${aiWord}. Only answer with ${possibleAnswersString}.`
 

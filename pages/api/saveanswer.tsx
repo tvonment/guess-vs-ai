@@ -1,12 +1,5 @@
-import { CosmosClient } from "@azure/cosmos";
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { addToHistory } from "./cosmos";
-
-const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
-
-const client = new CosmosClient(COSMOS_DB_CONNECTION_STRING);
-const database = client.database("gvaDB");
-const container = database.container("chatContainer");
+import { addToHistory } from "./cosmosService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     console.log("SaveAnswer Request received");

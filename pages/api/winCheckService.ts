@@ -5,7 +5,7 @@ const top_p = 1;
 const API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_API_URL = process.env.OPENAI_GPT4OMINI_API_URL;
 
-const winCheckSystemMessage = "You are to verify if the guess is absolutely correct. Only answer with 'win' or 'no'. A correct question is not yet a win. The user has to guess the word correctly to win the game. Spelling issues are also ok!";
+const winCheckSystemMessage = "You are to verify if the guess is absolutely correct. Only answer with 'win' or 'no'. A correct question is not yet a win. The user has to guess the word correctly to win the game. Spelling issues are ok!";
 
 
 export async function winCheck(guess: string, word: string): Promise<boolean> {
@@ -114,8 +114,7 @@ export async function winCheck(guess: string, word: string): Promise<boolean> {
         });
 
         const data = await response.json();
-        //console.log("Data: ", data, response)
-        console.log(guess, word, data.choices[0].message.content);
+        console.log("WIN CHECK: ", guess, word, data.choices[0].message.content);
         if (data.choices[0].message.content === "win") {
             return true;
         } else {

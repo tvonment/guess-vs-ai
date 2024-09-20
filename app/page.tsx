@@ -18,6 +18,7 @@ export default function Home() {
   const [userWord, setUserWord] = useState(""); // State for character input
   const [category, setCategory] = useState(Category.CHARACTER); // State for character input
   const [isWordLocked, setIsWordLocked] = useState(false); // State for locking character
+  const [showInputField, setShowInputField] = useState(true); // State for showing buttons
   const [showButtons, setShowButtons] = useState(false); // State for showing buttons
   const [winner, setWinner] = useState(""); // State for winner
   const [aiWord, setAiWord] = useState(""); // State for AIs chosen word after someone wins.
@@ -25,7 +26,7 @@ export default function Home() {
 
 
   const handleHumanGuess = async () => {
-    setShowButtons(true); // Show buttons after sending the question
+    setShowInputField(false); // Show input field after sending
     const newMessage = { role: "user", content: input };
     setMessages([...messages, newMessage]); // Add user message to messages
     const response = await fetch('/api/gameround', {
@@ -36,6 +37,7 @@ export default function Home() {
       body: JSON.stringify({ userId: userId, text: input }), // Use input value
     });
     const data = await response.json();
+    setShowButtons(true); // Show buttons after sending the question
     const aiMessages = data.result;
     const userWin = data.userWin;
     const aiWin = data.aiWin;
@@ -61,7 +63,7 @@ export default function Home() {
     setUserId(generatedUserId);
 
     // Call the /api/start endpoint to retrieve chat history
-    const response = await fetch('/api/start', {
+    const response = await fetch('/api/startGame', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -69,10 +71,9 @@ export default function Home() {
       body: JSON.stringify({ userId: generatedUserId, category: category, userWord: userWord }),
     });
     const data = await response.json();
-
     // Set the retrieved chat history
-    if (data.messages) {
-      setMessages(data.messages);
+    if (data.result) {
+      setMessages(data.result);
     }
   };
 
@@ -95,8 +96,10 @@ export default function Home() {
   };
 
   const handleAnswerClick = async (answer: string) => {
+    setShowInputField(false); // Hide input field after selection
+    setShowButtons(false); // Hide buttons after selection
     // Call the /api/saveanswer endpoint to save the humens answer
-    const response = await fetch('/api/saveanswer', {
+    const response = await fetch('/api/saveAnswer', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -107,7 +110,7 @@ export default function Home() {
     const responseMessage = data.result;
     if (responseMessage) {
       setMessages([...messages, responseMessage]); // Add user message to messages
-      setShowButtons(false); // Hide buttons after selection
+      setShowInputField(true); // Show input field after selection
     }
   };
 
@@ -170,6 +173,7 @@ export default function Home() {
                 setUserWord("");
                 setIsWordLocked(false);
                 setShowButtons(false);
+                setShowInputField(true);
                 setWinner("");
               }}
               className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -185,7 +189,7 @@ export default function Home() {
             <button onClick={() => handleAnswerClick(Answer.NO)} className="m-1 p-2 bg-red-800 text-white rounded hover:bg-red-600">{Answer.NO}</button>
             <button onClick={() => handleAnswerClick(Answer.I_DONT_KNOW)} className="m-1 p-2 bg-gray-400 text-white rounded hover:bg-gray-500">{Answer.I_DONT_KNOW}</button>
           </div>
-        ) : (
+        ) : showInputField ? (
           <div className="flex">
             <input
               type="text"
@@ -202,6 +206,10 @@ export default function Home() {
               </button>
             )}
           </div>
+        ) : (
+          <p className="center-spinner">
+            <span className="loading-spinner"></span>
+          </p>
         )}
       </main>
       <footer>

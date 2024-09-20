@@ -1,7 +1,7 @@
-import { selectWord } from "./wordselection"; // Import the selectWord function
+import { selectWord } from "./aiWordSelectionService"; // Import the selectWord function
 import { NextApiRequest, NextApiResponse } from "next";
 import { Message } from "./Message";
-import { startGame } from "./cosmos";
+import { startGame } from "./cosmosService";
 import { GameStatus } from "./GameStatus";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -17,20 +17,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const aiWord = await selectWord(category);
     console.log(`AI's word: ${aiWord}`);
 
-    const systemMessageText = "You are playing a game of guess what. You play against a human and you are eager to win. You and the humen are asking questions in turn to narrow down a selected word from the category '" + category + "'! The player who finds it first winns. Your word, that the user has to guess is '" + aiWord + "'. Under no circumstances should you reveal your word to the user. Good luck!";
-
     try {
-        const chatHistory: Message[] = [];
-
-        const systemMessage = {
-            role: "system",
-            content: systemMessageText,
-        };
-
-        const game = new GameStatus(userId, [systemMessage], userWord, aiWord, category);
+        const startMessage: Message = { role: "assistant", content: `Alright, I've locked in my word from the '${category}' category. Your move—ask away, and let's see what you've got!` };
+        const game = new GameStatus(userId, [], userWord, aiWord, category);
         await startGame(game);
-
-        res.status(200).json({ result: chatHistory });
+        res.status(200).json({ result: [startMessage] });
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {
