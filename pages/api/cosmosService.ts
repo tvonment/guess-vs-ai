@@ -10,11 +10,7 @@ const client = new CosmosClient(COSMOS_DB_CONNECTION_STRING);
 const database = client.database("gvaDB");
 const container = database.container("chatContainer");
 
-export async function startGame(gameStatus: GameStatus) {
-    await container.items.create(gameStatus);
-}
-
-export async function getChatHistory(userId: string): Promise<Message[]> {
+async function getChatHistory(userId: string): Promise<Message[]> {
     // Retrieve chat history from Cosmos DB
     const historyQuery = `SELECT c.messages FROM c WHERE c.id = @userId`;
     const db = await container.items.query({
@@ -26,21 +22,36 @@ export async function getChatHistory(userId: string): Promise<Message[]> {
     return dbitem.messages as Message[]
 }
 
+async function getGameStatus(userId: string): Promise<GameStatus> {
+    try {
+        const statusQuery = `SELECT * FROM c WHERE c.id = @userId`;
+        const db = await container.items.query({
+            query: statusQuery,
+            parameters: [{ name: "@userId", value: userId }]
+        }).fetchNext();
+        return db.resources[0] as GameStatus;
+    } catch (error: unknown) {
+        console.error("Error:", error);
+        throw error;
+    }
+}
+
+export async function startGame(gameStatus: GameStatus) {
+    await container.items.create(gameStatus);
+}
+
 export async function getFilteredAiChatHistory(userId: string): Promise<Message[]> {
     // Retrieve chat history from Cosmos DB
-    const historyQuery = `SELECT * FROM c WHERE c.id = @userId`;
-    const db = await container.items.query({
-        query: historyQuery,
-        parameters: [{ name: "@userId", value: userId }]
-    }).fetchNext();
-    const dbitem: { id: string, messages: Message[], userWord: string, aiWord: string, category: string } = db.resources[0];
-    return dbitem.messages.filter(entry => {
+    const messages = await getChatHistory(userId);
+    return messages.filter(entry => {
         // remove special characters
-        entry.content = entry.content.replace(/[^a-zA-Z ]/g, "");
         if (entry.role === 'assistant') {
+            entry.content = entry.content.replace(/[^a-zA-Z ]/g, "");
             return !Object.values(Answer).includes(entry.content as Answer);
         } else if (entry.role === 'user') {
             return Object.values(Answer).includes(entry.content as Answer);
+        } else if (entry.role === 'system') {
+            return true;
         }
     });
 }
@@ -77,15 +88,6 @@ export async function getCategory(userId: string): Promise<Category> {
 
 export async function updateGameStatus(gameStatus: GameStatus) {
     await container.items.upsert(gameStatus);
-}
-
-export async function getGameStatus(userId: string): Promise<GameStatus> {
-    const statusQuery = `SELECT * FROM c WHERE c.id = @userId`;
-    const db = await container.items.query({
-        query: statusQuery,
-        parameters: [{ name: "@userId", value: userId }]
-    }).fetchNext();
-    return db.resources[0] as GameStatus;
 }
 
 export async function addToHistory(userId: string, message: Message, winner?: string): Promise<Message> {
