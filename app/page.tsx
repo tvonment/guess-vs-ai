@@ -101,7 +101,7 @@ export default function Home() {
     setShowInputField(false); // Hide input field after selection
     setShowButtons(false); // Hide buttons after selection
     // Call the /api/saveanswer endpoint to save the humens answer
-    const response = await fetch('/api/saveAnswer', {
+    const response = await fetch('/api/saveanswer', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
