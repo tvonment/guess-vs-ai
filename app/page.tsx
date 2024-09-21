@@ -59,6 +59,7 @@ export default function Home() {
 
   const handleWordLock = async () => {
     setIsWordLocked(true);
+    setShowInputField(false);
 
     // Initialize user after character is locked
     const generatedUserId = uuidv4();
@@ -76,6 +77,7 @@ export default function Home() {
     // Set the retrieved chat history
     if (data.result) {
       setMessages(data.result);
+      setShowInputField(true); // Show input field after locking
     }
   };
 
