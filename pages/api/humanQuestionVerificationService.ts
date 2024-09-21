@@ -8,12 +8,14 @@ const top_p = 1;
 const API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_API_URL = process.env.OPENAI_GPT4O_API_URL;
 
-const possibleAnswers = Object.entries(Answer).map(([key, value]) => value);
+const possibleAnswers = Object.entries(Answer).map(([, value]) => value);
 const possibleAnswersString = possibleAnswers.join(", ");
 
 export async function verifyHumanQuestion(userId: string, userQuestion: string) {
     const aiWord = await getAiWord(userId);
     const verifySystemMessage = `Verify if the question is correct. The Word in question is ${aiWord}. Only answer with ${possibleAnswersString}.`
+
+    console.log(possibleAnswersString);
 
     const userMessage = {
         role: "user",

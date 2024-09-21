@@ -7,6 +7,7 @@ import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { faLock } from '@fortawesome/free-solid-svg-icons';
 import { Answer } from "@/enum/Answer";
 import { Category } from "@/enum/Categories";
+import Image from 'next/image';
 
 import "./page.css";
 import './globals.css'; // Ensure you have the global styles imported
@@ -37,7 +38,6 @@ export default function Home() {
       body: JSON.stringify({ userId: userId, text: input }), // Use input value
     });
     const data = await response.json();
-    setShowButtons(true); // Show buttons after sending the question
     const aiMessages = data.result;
     const userWin = data.userWin;
     const aiWin = data.aiWin;
@@ -47,10 +47,12 @@ export default function Home() {
       setAiWord(data.aiWord)
     } else if (aiWin) {
       console.log("AI wins!");
+      setMessages([...messages, newMessage, ...aiMessages]); // Add AI response to messages
       setWinner("ai");
       setAiWord(data.aiWord)
     } else {
       setMessages([...messages, newMessage, ...aiMessages]); // Add AI response to messages
+      setShowButtons(true); // Show buttons after sending the question
       setInput(""); // Clear input field
     }
   };
@@ -163,8 +165,9 @@ export default function Home() {
         </div>
         {winner != "" ? (
           <div className="flex flex-col items-center mb-4">
+            <p className="text-lg mb-2"><strong>{winner === "human" ? "You win!" : "AI wins!"}</strong></p>
             <p className="text-lg mb-2">AI&apos;s chosen word was: {aiWord}</p>
-            <img src={`/images/${winner}win-${Math.floor(Math.random() * 3) + 1}.png`} alt="Winner" className="w-100 h-100 mb-4" />
+            <Image src={`/images/${winner}win-${Math.floor(Math.random() * 3) + 1}.png`} width={400} height={400} alt="Winner" className="w-100 h-100 mb-4" />
             <button
               onClick={() => {
                 setMessages([]);
