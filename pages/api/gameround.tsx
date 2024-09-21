@@ -14,7 +14,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const userwin = await winCheck(text, winningWords.aiWord);
 
         if (userwin) {
-            const systemResponse = await addToHistory(userId, { role: "system", content: "Game over!" }, "human");
+            const systemResponse = await addToHistory(userId, { role: "system", content: "Game over! - Human wins." }, "human");
+            console.log(systemResponse.content);
             const aiAnswer = { role: "assistant", content: "Congrats, you won!" };
             res.status(200).json({ result: [aiAnswer], aiWin: false, userWin: userwin, aiWord: winningWords.aiWord });
             return;
@@ -30,7 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const aiwin = await winCheck(guess.content, winningWords.userWord);
 
         if (aiwin) {
-            const systemResponse = await addToHistory(userId, { role: "system", content: "Game over!" }, "ai");
+            const systemResponse = await addToHistory(userId, { role: "system", content: "Game over! - AI wins." }, "ai");
+            console.log(systemResponse.content);
             res.status(200).json({ result: [aiAnswerResponse, guessResponse], aiWin: aiwin, userWin: userwin, aiWord: winningWords.aiWord });
         } else {
             res.status(200).json({ result: [aiAnswerResponse, guessResponse], aiWin: aiwin, userWin: userwin });
