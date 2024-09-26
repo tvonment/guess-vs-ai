@@ -3,8 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import { faLock } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsRotate, faPaperPlane, faLock, faUserLock } from '@fortawesome/free-solid-svg-icons';
 import { Answer } from "@/enum/Answer";
 import { Category } from "@/enum/Categories";
 import Image from 'next/image';
@@ -42,16 +41,22 @@ export default function Home() {
     const userWin = data.userWin;
     const aiWin = data.aiWin;
     if (userWin) {
-      console.log("You win!");
+      console.log("You won!");
       setWinner("human");
       setAiWord(data.aiWord)
     } else if (aiWin) {
-      console.log("AI wins!");
+      console.log("AI won!");
       setMessages([...messages, newMessage, ...aiMessages]); // Add AI response to messages
       setWinner("ai");
       setAiWord(data.aiWord)
     } else {
-      setMessages([...messages, newMessage, ...aiMessages]); // Add AI response to messages
+      let updatedMessages = [...messages, newMessage];
+      for (let i = 0; i < aiMessages.length; i++) {
+        updatedMessages = [...updatedMessages, aiMessages[i]];
+        setMessages([...updatedMessages]); // Update state with accumulated messages
+        await new Promise(r => setTimeout(r, 500));
+      }
+      //setMessages([...messages, newMessage, ...aiMessages]); // Add AI response to messages
       setShowButtons(true); // Show buttons after sending the question
       setInput(""); // Clear input field
     }
@@ -94,7 +99,7 @@ export default function Home() {
   }, [messages]); // Scroll to bottom when messages change
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && input) {
       handleHumanGuess();
     }
   };
@@ -119,13 +124,13 @@ export default function Home() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="background-container flex items-center justify-center min-h-screen bg-gray-100">
       <main className="bg-white p-6 rounded-lg shadow-lg w-full">
         <div className="flex justify-center mb-4">
           <Image src="/images/logo.webp" width={200} height={200} alt="Logo" className="w-100 h-100 mb-4" />
         </div>
         <p className="text-lg mb-6 text-center">Play a game of <strong>guess what</strong> against an AI.</p>
-        <div className="mb-4 flex items-center justify-center">
+        {!isWordLocked ? (<div className="mb-4 flex items-center justify-center">
           <label className="mr-2">Category:</label>
           <select
             value={category}
@@ -140,25 +145,29 @@ export default function Home() {
             ))}
           </select>
         </div>
-
-        <div className="mb-4 flex items-center justify-center">
-          <label className="mr-2">{`Your word:`}</label> {/* Dynamically update label text */}
-          <input
-            type="text"
-            value={userWord}
-            onChange={(e) => setUserWord(e.target.value)} // Update character input value
-            onKeyDown={handleWordKeyDown} // Add keydown event listener
-            placeholder={category ? `Enter a word from the ${category} category` : "You should select a category"} // Dynamic placeholder
-            className="flex-grow p-2 border border-gray-300 rounded-l-lg"
-            readOnly={isWordLocked} // Make input readonly if character is locked
-          />
-          {!isWordLocked && (
-            <button onClick={handleWordLock} className="w-10 h-10 flex items-center justify-center bg-blue-800 text-white rounded hover:bg-blue-600">
-              <FontAwesomeIcon icon={faLock} />
+        ) : (
+          <p className="text-right mb-4">Category: <strong>{category}</strong></p>
+        )}
+        {!isWordLocked ? (
+          <div className="mb-4 flex">
+            <input
+              type="text"
+              value={userWord}
+              onChange={(e) => setUserWord(e.target.value)} // Update character input value
+              onKeyDown={handleWordKeyDown} // Add keydown event listener
+              placeholder={category ? `Enter a word from the ${category} category` : "You should select a category"} // Dynamic placeholder
+              className="flex-grow p-2 border border-gray-300 rounded-l-lg"
+              readOnly={isWordLocked} // Make input readonly if character is locked
+            />
+            <button onClick={handleWordLock} className={`flex items-center justify-center rounded-r-lg px-4 ${!userWord ? 'bg-gray-300 text-gray-700 cursor-not-allowed' : 'bg-blue-800 text-white hover:bg-blue-600'}`}>
+              <FontAwesomeIcon icon={faUserLock} />
             </button>
-          )}
-        </div>
-        <div ref={chatWindowRef} className="chat-window border border-gray-300 p-4 h-64 overflow-y-scroll mb-4 bg-gray-50 rounded-lg">
+          </div>
+        ) : (
+          <p className="text-right mb-4">Your word is: <strong>{userWord}</strong></p>
+        )}
+        <hr />
+        <div ref={chatWindowRef} className="chat-window p-4 h-64 overflow-y-scroll mb-4">
           {messages.map((message, index) => (
             <div key={index} className={`message ${message.role}`}>
               {message.role === "assistant" && (
@@ -170,13 +179,14 @@ export default function Home() {
               )}
             </div>
           ))}
-
         </div>
+        {winner != "" && (
+          <hr />
+        )}
         {winner != "" ? (
           <div className="flex flex-col items-center mb-4">
             <p className="text-lg mb-2"><strong>{winner === "human" ? "You win!" : "AI wins!"}</strong></p>
             <p className="text-lg mb-2">AI&apos;s chosen word was: {aiWord}</p>
-            <Image src={`/images/${winner}win-${Math.floor(Math.random() * 3) + 1}.png`} width={400} height={400} alt="Winner" className="w-100 h-100 mb-4" />
             <button
               onClick={() => {
                 setMessages([]);
@@ -188,18 +198,19 @@ export default function Home() {
                 setShowInputField(true);
                 setWinner("");
               }}
-              className="p-2 bg-blue-500 text-white rounded hover:bg-blue-800"
+              className="flex items-center justify-center rounded-lg bg-blue-800 text-white hover:bg-blue-600 px-5 py-3 mb-3"
             >
-              Again!
+              <FontAwesomeIcon icon={faArrowsRotate} />
             </button>
+            <Image src={`/images/${winner}win-${Math.floor(Math.random() * 3) + 1}.png`} width={400} height={400} alt="Winner" className="w-100 h-100 mb-4" />
           </div>
         ) : showButtons ? (
           <div className="flex flex-wrap justify-center mb-4">
-            <button onClick={() => handleAnswerClick(Answer.YES)} className="m-1 p-2 bg-green-800 text-white rounded hover:bg-green-600">{Answer.YES}</button>
-            <button onClick={() => handleAnswerClick(Answer.PROBABLY_YES)} className="m-1 p-2 bg-green-400 text-white rounded hover:bg-green-500">{Answer.PROBABLY_YES}</button>
-            <button onClick={() => handleAnswerClick(Answer.PROBABLY_NO)} className="m-1 p-2 bg-red-400 text-white rounded hover:bg-red-500">{Answer.PROBABLY_NO}</button>
-            <button onClick={() => handleAnswerClick(Answer.NO)} className="m-1 p-2 bg-red-800 text-white rounded hover:bg-red-600">{Answer.NO}</button>
-            <button onClick={() => handleAnswerClick(Answer.I_DONT_KNOW)} className="m-1 p-2 bg-gray-400 text-white rounded hover:bg-gray-500">{Answer.I_DONT_KNOW}</button>
+            <button onClick={() => handleAnswerClick(Answer.YES)} className="m-1 p-2 bg-green-800 text-white rounded hover:bg-green-600 flex-1">{Answer.YES}</button>
+            <button onClick={() => handleAnswerClick(Answer.PROBABLY_YES)} className="m-1 p-2 bg-green-400 text-white rounded hover:bg-green-500 flex-1">{Answer.PROBABLY_YES}</button>
+            <button onClick={() => handleAnswerClick(Answer.PROBABLY_NO)} className="m-1 p-2 bg-red-400 text-white rounded hover:bg-red-500 flex-1">{Answer.PROBABLY_NO}</button>
+            <button onClick={() => handleAnswerClick(Answer.NO)} className="m-1 p-2 bg-red-800 text-white rounded hover:bg-red-600 flex-1">{Answer.NO}</button>
+            <button onClick={() => handleAnswerClick(Answer.I_DONT_KNOW)} className="m-1 p-2 bg-gray-400 text-white rounded hover:bg-gray-500 flex-1">{Answer.I_DONT_KNOW}</button>
           </div>
         ) : showInputField ? (
           <div className="flex">
@@ -212,11 +223,11 @@ export default function Home() {
               className="flex-grow p-2 border border-gray-300 rounded-l-lg"
               disabled={!isWordLocked} // Disable input if character is not locked
             />
-            {isWordLocked && (
-              <button onClick={handleHumanGuess} className="w-10 h-10 flex items-center justify-center bg-blue-800 text-white rounded hover:bg-blue-600">
-                <FontAwesomeIcon icon={faPaperPlane} />
-              </button>
-            )}
+            <button onClick={handleHumanGuess}
+              disabled={!isWordLocked || !input} // Disable button if character is not locked or input is empty
+              className={`flex items-center justify-center rounded-r-lg px-4 ${!isWordLocked || !input ? 'bg-gray-300 text-gray-700 cursor-not-allowed' : 'bg-blue-800 text-white hover:bg-blue-600'}`}>
+              <FontAwesomeIcon icon={faPaperPlane} />
+            </button>
           </div>
         ) : (
           <p className="center-spinner">
