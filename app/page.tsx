@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowsRotate, faPaperPlane, faLock, faUserLock } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsRotate, faPaperPlane, faUserLock } from '@fortawesome/free-solid-svg-icons';
 import { Answer } from "@/enum/Answer";
 import { Category } from "@/enum/Categories";
 import Image from 'next/image';
