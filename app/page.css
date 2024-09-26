@@ -55,24 +55,43 @@ main {
 /* Message styles */
 .message {
     margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 8px;
+    display: flex;
+    justify-content: flex-start;
+    /* Default to left for assistant */
     width: 100%;
 }
 
+/* Apply different background color only to the content */
+.message .message-content {
+    padding: 5px 10px;
+    border-radius: 8px;
+    display: inline-block;
+    /* Ensure the background wraps only the content */
+    max-width: 60%;
+}
+
+/* User message alignment */
 .message.user {
-    float: right;
-    /* background: #d1e7dd; */
-    align-self: flex-end;
+    justify-content: flex-end;
+    /* Push user messages to the right */
+}
+
+.message.user .message-content {
+    background-color: lightblue;
     text-align: right;
 }
 
+/* Assistant message alignment */
 .message.assistant {
-    float: left;
-    /* background: #f8d7da;*/
-    align-self: flex-start;
+    justify-content: flex-start;
+    /* Align assistant messages to the left */
+}
+
+.message.assistant .message-content {
+    background-color: rgba(255, 200, 100, 0.8);
     text-align: left;
 }
+
 
 /* Input field styles */
 input[type="text"] {

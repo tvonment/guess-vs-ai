@@ -121,9 +121,10 @@ export default function Home() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <main className="bg-white p-6 rounded-lg shadow-lg w-full">
-        <h1 className="text-2xl font-bold mb-4 text-center">Guess vs AI</h1>
+        <div className="flex justify-center mb-4">
+          <Image src="/images/logo.webp" width={200} height={200} alt="Logo" className="w-100 h-100 mb-4" />
+        </div>
         <p className="text-lg mb-6 text-center">Play a game of <strong>guess what</strong> against an AI.</p>
-
         <div className="mb-4 flex items-center justify-center">
           <label className="mr-2">Category:</label>
           <select
@@ -152,7 +153,7 @@ export default function Home() {
             readOnly={isWordLocked} // Make input readonly if character is locked
           />
           {!isWordLocked && (
-            <button onClick={handleWordLock} className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded hover:bg-blue-600">
+            <button onClick={handleWordLock} className="w-10 h-10 flex items-center justify-center bg-blue-800 text-white rounded hover:bg-blue-600">
               <FontAwesomeIcon icon={faLock} />
             </button>
           )}
@@ -160,7 +161,13 @@ export default function Home() {
         <div ref={chatWindowRef} className="chat-window border border-gray-300 p-4 h-64 overflow-y-scroll mb-4 bg-gray-50 rounded-lg">
           {messages.map((message, index) => (
             <div key={index} className={`message ${message.role}`}>
-              <strong>{message.role === "user" ? "You" : "AI"}:</strong> {message.content}
+              {message.role === "assistant" && (
+                <Image src={`/images/${message.role}-icon.png`} width={50} height={50} alt={message.role} className="w-10 h-10 mr-2" />
+              )}
+              <span className="message-content">{message.content}</span>
+              {message.role === "user" && (
+                <Image src={`/images/${message.role}-icon.png`} width={50} height={50} alt={message.role} className="w-10 h-10 ml-2" />
+              )}
             </div>
           ))}
 
@@ -181,7 +188,7 @@ export default function Home() {
                 setShowInputField(true);
                 setWinner("");
               }}
-              className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="p-2 bg-blue-500 text-white rounded hover:bg-blue-800"
             >
               Again!
             </button>
@@ -206,7 +213,7 @@ export default function Home() {
               disabled={!isWordLocked} // Disable input if character is not locked
             />
             {isWordLocked && (
-              <button onClick={handleHumanGuess} className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded hover:bg-blue-600">
+              <button onClick={handleHumanGuess} className="w-10 h-10 flex items-center justify-center bg-blue-800 text-white rounded hover:bg-blue-600">
                 <FontAwesomeIcon icon={faPaperPlane} />
               </button>
             )}
