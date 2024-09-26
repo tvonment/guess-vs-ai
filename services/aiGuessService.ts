@@ -1,4 +1,4 @@
-import { Message } from "./Message";
+import { Message } from "@/model/Message";
 import { getFilteredAiChatHistory, getCategory } from "./cosmosService";
 
 const temperature = 0.5;

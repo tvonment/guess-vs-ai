@@ -1,11 +1,11 @@
-import { makeGuess } from "./aiGuessService"; // Import the selectWord function
-import { verifyHumanQuestion } from "./humanQuestionVerificationService";
-import { winCheck } from "./winCheckService";
+import { makeGuess } from "@/services/aiGuessService"; // Import the selectWord function
+import { verifyHumanQuestion } from "@/services/humanQuestionVerificationService";
+import { winCheck } from "@/services/winCheckService";
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { addToHistory, getWinningWords } from "./cosmosService";
+import { addToHistory, getWinningWords } from "@/services/cosmosService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    console.log("GameRound Request received");
+    console.log("Guess Request received");
     const { text, userId } = req.body;
 
     try {

@@ -1,4 +1,4 @@
-import { Answer } from "../../enum/Answer";
+import { Answer } from "@/enum/Answer";
 import { getAiWord } from "./cosmosService";
 
 const temperature = 0.5;
