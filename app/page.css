@@ -1,17 +1,39 @@
 /* Container styles */
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background-color: #f0f0f0;
-    padding: 20px;
+.background-container {
+    background: linear-gradient(to bottom left, #2f3c5c, #fe521c);
+    background-size: 300% 300%;
+    animation: gradientMove 10s ease infinite;
 }
 
+
 @media (prefers-color-scheme: dark) {
-    .container {
-        background-color: #0a0a0a;
+    .background-container {
+        background: linear-gradient(to bottom left, #2f3c5c, #fe521c);
+        background-size: 300% 300%;
+        animation: gradientMove 8s ease infinite;
+    }
+}
+
+/* Keyframes for gradient animation */
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    25% {
+        background-position: 75% 25%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+
+    75% {
+        background-position: 25% 75%;
+    }
+
+    100% {
+        background-position: 0% 0%;
     }
 }
 
@@ -25,33 +47,6 @@ main {
     max-width: 800px;
 }
 
-/* Title styles */
-.title {
-    font-size: 2rem;
-    margin-bottom: 10px;
-    text-align: center;
-    color: #333;
-}
-
-/* Description styles */
-.description {
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-    text-align: center;
-    color: #666;
-}
-
-/* Chat window styles */
-.chat-window {
-    border: 1px solid #ccc;
-    padding: 10px;
-    height: 300px;
-    overflow-y: scroll;
-    margin-bottom: 20px;
-    background: #fafafa;
-    border-radius: 8px;
-}
-
 /* Message styles */
 .message {
     margin-bottom: 10px;
@@ -59,6 +54,19 @@ main {
     justify-content: flex-start;
     /* Default to left for assistant */
     width: 100%;
+    animation: messageArrival 0.5s ease-out;
+}
+
+@keyframes messageArrival {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Apply different background color only to the content */
@@ -92,30 +100,8 @@ main {
     text-align: left;
 }
 
-
-/* Input field styles */
-input[type="text"] {
-    width: calc(100% - 100px);
-    padding: 10px;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* Button styles */
-button {
-    padding: 10px 20px;
-    background: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-button:hover {
-    background: #0056b3;
+button:hover:not(:disabled) {
+    transform: scale(1.05);
 }
 
 /* Footer styles */
@@ -136,12 +122,13 @@ footer {
 }
 
 .loading-spinner {
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-left-color: #000;
+    border: 4px solid rgba(255, 242, 217, 0.8);
+    border-left-color: rgba(252, 196, 92, 0.8);
+    border-top-color: rgba(219, 124, 22, 0.8);
     border-radius: 50%;
     width: 24px;
     height: 24px;
-    animation: spin 1s linear infinite;
+    animation: spin 0.8s linear infinite;
     display: inline-block;
     margin-left: 8px;
 }
