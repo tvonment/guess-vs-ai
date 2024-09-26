@@ -1,8 +1,8 @@
-import { selectWord } from "./aiWordSelectionService"; // Import the selectWord function
+import { selectWord } from "@/services/aiWordSelectionService"; // Import the selectWord function
 import { NextApiRequest, NextApiResponse } from "next";
-import { Message } from "./Message";
-import { startGame } from "./cosmosService";
-import { GameStatus } from "./GameStatus";
+import { Message } from "@/model/Message";
+import { startGame } from "@/services/cosmosService";
+import { GameStatus } from "@/model/GameStatus";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     console.log("Start Request received");

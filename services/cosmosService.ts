@@ -1,8 +1,8 @@
 import { CosmosClient } from "@azure/cosmos";
-import { Message } from "./Message";
+import { Message } from "@/model/Message";
 import { Answer } from "@/enum/Answer";
 import { Category } from "@/enum/Categories";
-import { GameStatus } from "./GameStatus";
+import { GameStatus } from "@/model/GameStatus";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
 

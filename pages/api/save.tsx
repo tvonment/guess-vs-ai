@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { addToHistory } from "./cosmosService";
+import { addToHistory } from "@/services/cosmosService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    console.log("SaveAnswer Request received");
+    console.log("Save Request received");
 
     const { answer, userId } = req.body;
     const answerMessage = { role: "user", content: answer };

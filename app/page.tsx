@@ -30,7 +30,7 @@ export default function Home() {
     setShowInputField(false); // Show input field after sending
     const newMessage = { role: "user", content: input };
     setMessages([...messages, newMessage]); // Add user message to messages
-    const response = await fetch('/api/gameround', {
+    const response = await fetch('/api/guess', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export default function Home() {
     setUserId(generatedUserId);
 
     // Call the /api/start endpoint to retrieve chat history
-    const response = await fetch('/api/startGame', {
+    const response = await fetch('/api/start', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export default function Home() {
     setShowInputField(false); // Hide input field after selection
     setShowButtons(false); // Hide buttons after selection
     // Call the /api/saveanswer endpoint to save the humens answer
-    const response = await fetch('/api/saveanswer', {
+    const response = await fetch('/api/save', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
