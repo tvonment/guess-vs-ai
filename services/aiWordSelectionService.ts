@@ -12,6 +12,7 @@ export async function selectWord(category: Category) {
     console.log("Select Word Request received");
 
     const usedCharacters: string[] = await getUsedCharacters(category);
+    console.log("Used Characters:", usedCharacters);
 
     const systemMessageText = `We are going to play a game of word selection. You will play against a human. The human already chose a word from the category '${category.name}' - ${category.description}. You have to choose a word of your own. Try your best to get a word that is difficult to guess. These are the words that have already been used: ${usedCharacters.join(", ")}. Good luck!`;
 

@@ -5,7 +5,7 @@ const top_p = 1;
 const API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_API_URL = process.env.OPENAI_GPT4OMINI_API_URL;
 
-const winCheckSystemMessage = "You are to verify if the guess is a winning guess. Only answer with 'win' or 'no'. A correct question is not yet a win. The user has to guess the word correctly to win the game. Spelling issues are ok!";
+const winCheckSystemMessage = "You are to verify if the guess is a complete winning guess. Only answer with 'win' or 'no'. A correct question is not yet a win, even if it is close! The user has to guess the word correctly to win the game. Spelling issues are ok!";
 
 
 export async function winCheck(guess: string, word: string): Promise<boolean> {
@@ -104,7 +104,15 @@ export async function winCheck(guess: string, word: string): Promise<boolean> {
                     },
                     {
                         role: "user",
-                        content: "Does the character wear a suit of armor?"
+                        content: "Does the character wear a suit of armor? Correct Word: Iron Man"
+                    },
+                    {
+                        role: "assistant",
+                        content: "no"
+                    },
+                    {
+                        role: "user",
+                        content: "Is the character you're thinking of a hero or ally who has appeared in a Guardians of the Galaxy film? Correct Word: Manits"
                     },
                     {
                         role: "assistant",
