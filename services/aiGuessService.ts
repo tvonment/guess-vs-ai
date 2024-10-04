@@ -1,5 +1,6 @@
 import { Message } from "@/model/Message";
 import { getFilteredAiChatHistory, getCategory } from "./cosmosService";
+import { Category } from "@/model/Categories";
 
 const temperature = 0.5;
 const max_tokens = 100;
@@ -11,10 +12,10 @@ const OPENAI_API_URL = process.env.OPENAI_GPT4O_API_URL;
 export async function makeGuess(userId: string): Promise<Message> {
     console.log("Make Guess Request received");
 
-    const category = await getCategory(userId);
+    const category = await getCategory(userId) as Category;
 
-    const instructionSystemMessage = `You are playing a game of guess what. You play against a human and you are eager to win. Ask a question to narrow down the searched word from the category ${category} or make a good guess!`;
-    const guessSystemMessage = `Create a good question to get to your word from the category '${category}' or make a guess.`
+    const instructionSystemMessage = `You are playing a game of guess what. You play against a human and you are eager to win. Ask a question to narrow down the searched word from the category '${category.name}' or make a good guess!`;
+    const guessSystemMessage = `Create a good question to get to your word from the category '${category.name} - ${category.description}' or make a guess.`
 
     const startSystemMessage = {
         role: "system",

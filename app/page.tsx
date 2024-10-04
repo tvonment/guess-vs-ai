@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsRotate, faPaperPlane, faUserLock } from '@fortawesome/free-solid-svg-icons';
-import { Answer } from "@/enum/Answer";
-import { Category } from "@/enum/Categories";
+import { Answer } from "@/model/Answer";
+import { CategoryType, Category, Categories } from "@/model/Categories";
 import Image from 'next/image';
 
 import "./page.css";
@@ -16,7 +16,7 @@ export default function Home() {
   const [input, setInput] = useState(""); // State for input value
   const [userId, setUserId] = useState<string>(""); // State for user ID
   const [userWord, setUserWord] = useState(""); // State for character input
-  const [category, setCategory] = useState(Category.CHARACTER); // State for character input
+  const [category, setCategory] = useState(""); // State for character input
   const [isWordLocked, setIsWordLocked] = useState(false); // State for locking character
   const [showInputField, setShowInputField] = useState(true); // State for showing buttons
   const [showButtons, setShowButtons] = useState(false); // State for showing buttons
@@ -24,6 +24,13 @@ export default function Home() {
   const [aiWord, setAiWord] = useState(""); // State for AIs chosen word after someone wins.
   const chatWindowRef = useRef<HTMLDivElement>(null); // Ref for chat window
 
+  const groupedCategories = Categories.reduce((acc, category) => {
+    if (!acc[category.type]) {
+      acc[category.type] = [];
+    }
+    acc[category.type].push(category);
+    return acc;
+  }, {} as Record<CategoryType, Category[]>);
 
   const handleHumanGuess = async () => {
     setShowInputField(false); // Show input field after sending
@@ -76,7 +83,7 @@ export default function Home() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userId: generatedUserId, category: category, userWord: userWord }),
+      body: JSON.stringify({ userId: generatedUserId, categoryName: category, userWord: userWord }),
     });
     const data = await response.json();
     // Set the retrieved chat history
@@ -87,7 +94,7 @@ export default function Home() {
   };
 
   const handleWordKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && userWord) {
+    if (event.key === 'Enter' && userWord && category !== "") {
       handleWordLock();
     }
   };
@@ -134,14 +141,19 @@ export default function Home() {
           <label className="mr-2">Category:</label>
           <select
             value={category}
-            onChange={(e) => setCategory(e.target.value as Category)} // Update category value
+            onChange={(e) => setCategory(e.target.value as string)} // Update category value
             className="p-2 border border-gray-300 rounded-lg"
             disabled={isWordLocked} // Disable dropdown if character is locked
           >
-            {Object.entries(Category).map(([key, value]) => (
-              <option key={key} value={value}>
-                {value}
-              </option>
+            <option disabled value="">Select a category</option>
+            {Object.entries(groupedCategories).map(([type, categories]) => (
+              <optgroup key={type} label={type}>
+                {categories.map((category) => (
+                  <option key={category.name} value={category.name}>
+                    {category.name} - {category.description}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>
@@ -159,7 +171,7 @@ export default function Home() {
               className="flex-grow p-2 border border-gray-300 rounded-l-lg"
               readOnly={isWordLocked} // Make input readonly if character is locked
             />
-            <button onClick={handleWordLock} className={`flex items-center justify-center rounded-r-lg px-4 ${!userWord ? 'bg-gray-300 text-gray-700 cursor-not-allowed' : 'bg-blue-800 text-white hover:bg-blue-600'}`}>
+            <button onClick={handleWordLock} className={`flex items-center justify-center rounded-r-lg px-4 ${(!userWord || category === "") ? 'bg-gray-300 text-gray-700 cursor-not-allowed' : 'bg-blue-800 text-white hover:bg-blue-600'}`}>
               <FontAwesomeIcon icon={faUserLock} />
             </button>
           </div>

@@ -1,7 +1,7 @@
 import { CosmosClient } from "@azure/cosmos";
 import { Message } from "@/model/Message";
-import { Answer } from "@/enum/Answer";
-import { Category } from "@/enum/Categories";
+import { Answer } from "@/model/Answer";
+import { Category } from "@/model/Categories";
 import { GameStatus } from "@/model/GameStatus";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
@@ -105,7 +105,7 @@ export async function addToHistory(userId: string, message: Message, winner?: st
     }
 }
 
-export async function getUsedCharacters(category: string): Promise<string[]> {
+export async function getUsedCharacters(category: Category): Promise<string[]> {
     console.log("Get Used Characters Request received");
 
     try {
@@ -113,7 +113,7 @@ export async function getUsedCharacters(category: string): Promise<string[]> {
         const query = `SELECT c.aiWord FROM c WHERE c.category = @category`;
         const db = await container.items.query({
             query: query,
-            parameters: [{ name: "@category", value: category }]
+            parameters: [{ name: "@category", value: category.name }]
         }).fetchAll();
         const usedCharacters: { aiWord: string }[] = db.resources;
         const usedCharactersArray: string[] = usedCharacters.map((item) => item.aiWord);
