@@ -110,10 +110,10 @@ export async function getUsedCharacters(category: Category): Promise<string[]> {
 
     try {
         // Retrieve chat history from Cosmos DB
-        const query = `SELECT c.aiWord FROM c WHERE c.category = @category`;
+        const query = `SELECT c.aiWord FROM c WHERE c.category.name = @categoryName`;
         const db = await container.items.query({
             query: query,
-            parameters: [{ name: "@category", value: category.name }]
+            parameters: [{ name: "@categoryName", value: category.name }]
         }).fetchAll();
         const usedCharacters: { aiWord: string }[] = db.resources;
         const usedCharactersArray: string[] = usedCharacters.map((item) => item.aiWord);
