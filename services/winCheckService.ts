@@ -104,6 +104,14 @@ export async function winCheck(guess: string, word: string): Promise<boolean> {
                     },
                     {
                         role: "user",
+                        content: "Does the character wear a suit of armor?"
+                    },
+                    {
+                        role: "assistant",
+                        content: "no"
+                    },
+                    {
+                        role: "user",
                         content: guess + " Correct Word" + word
                     }
                 ],

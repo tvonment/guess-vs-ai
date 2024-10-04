@@ -1,4 +1,4 @@
-import { Category } from "@/enum/Categories"
+import { Category } from "@/model/Categories"
 import { Message } from "./Message"
 
 export class GameStatus {

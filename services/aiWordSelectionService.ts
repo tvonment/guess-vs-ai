@@ -1,3 +1,4 @@
+import { Category } from "@/model/Categories";
 import { getUsedCharacters } from "./cosmosService";
 
 const temperature = 0.7;
@@ -7,19 +8,19 @@ const top_p = 1;
 const API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_API_URL = process.env.OPENAI_GPT4O_API_URL;
 
-export async function selectWord(category: string) {
+export async function selectWord(category: Category) {
     console.log("Select Word Request received");
 
     const usedCharacters: string[] = await getUsedCharacters(category);
 
-    const systemMessageText = "We are going to play a game of word selection. You will play against a human. The human already chose a word from the category '" + category + "'. You have to choose a word of your own. Try your best to get a word that is difficult to guess. These are the words that have already been used: " + usedCharacters.join(", ") + ". Good luck!";
+    const systemMessageText = `We are going to play a game of word selection. You will play against a human. The human already chose a word from the category '${category.name}' - ${category.description}. You have to choose a word of your own. Try your best to get a word that is difficult to guess. These are the words that have already been used: ${usedCharacters.join(", ")}. Good luck!`;
 
     try {
         const response = await fetch(`${OPENAI_API_URL}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "api-key": `${API_KEY}`,
+                "api-key": `${API_KEY} `,
             },
             body: JSON.stringify({
                 messages: [
@@ -29,7 +30,7 @@ export async function selectWord(category: string) {
                     },
                     {
                         role: "user",
-                        content: "Choose a word from the category 'Animal'."
+                        content: "Choose a word from the category 'Any Animal'."
                     },
                     {
                         role: "assistant",
@@ -37,7 +38,7 @@ export async function selectWord(category: string) {
                     },
                     {
                         role: "user",
-                        content: "Choose a word from the category 'Object'."
+                        content: "Choose a word from the category 'University Object'."
                     },
                     {
                         role: "assistant",
@@ -53,7 +54,7 @@ export async function selectWord(category: string) {
                     },
                     {
                         role: "user",
-                        content: "Choose a word from the category 'Character'."
+                        content: "Choose a word from the category 'Harry Potter'."
                     },
                     {
                         role: "assistant",
@@ -61,7 +62,7 @@ export async function selectWord(category: string) {
                     },
                     {
                         role: "user",
-                        content: "Choose a word from the category 'Anything'."
+                        content: "Choose a word from the category 'University Object'."
                     },
                     {
                         role: "assistant",
@@ -69,7 +70,7 @@ export async function selectWord(category: string) {
                     },
                     {
                         role: "user",
-                        content: "Choose a word from the category '" + category + "'."
+                        content: "Choose a word from the category '" + category.name + "'."
                     }
                 ],
                 temperature: temperature,
