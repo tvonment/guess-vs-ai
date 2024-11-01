@@ -4,15 +4,51 @@ export enum CategoryType {
 }
 
 export const Categories: Category[] = [
-    { name: "Marvel Cinematic Universe", description: "A character from the MCU", type: CategoryType.Theme },
-    { name: "Star Wars", description: "A character from the Star Wars Universe", type: CategoryType.Theme },
-    { name: "Harry Potter", description: "A character from the Harry Potter Universe", type: CategoryType.Theme },
-    { name: "Disney Animal", description: "An animal from a Disney movie", type: CategoryType.Theme },
-    { name: "Kitchen Object", description: "An object you can find in a kitchen", type: CategoryType.Theme },
-    { name: "University Object", description: "An object you can find at a University", type: CategoryType.Theme },
-    { name: "Any Character", description: "Any person or fictional character", type: CategoryType.Advanced },
-    { name: "Any Animal", description: "An Animal of any kind.", type: CategoryType.Advanced },
-    { name: "Any Object", description: "An object of any kind.", type: CategoryType.Advanced },
+    {
+        name: "Marvel Cinematic Universe",
+        description: "Select a character from any movie or series within the Marvel Cinematic Universe.",
+        type: CategoryType.Theme
+    },
+    {
+        name: "Star Wars",
+        description: "Choose a character from the Star Wars saga, including films, series, and expanded universe.",
+        type: CategoryType.Theme
+    },
+    {
+        name: "Harry Potter",
+        description: "Pick a character from the Harry Potter universe, encompassing books and films.",
+        type: CategoryType.Theme
+    },
+    {
+        name: "Disney Animal",
+        description: "An animal character featured in any Disney animated or live-action movie.",
+        type: CategoryType.Theme
+    },
+    {
+        name: "Kitchen Object",
+        description: "An item commonly found in a kitchen setting.",
+        type: CategoryType.Theme
+    },
+    {
+        name: "University Object",
+        description: "An object typically found within a university environment, such as classrooms or laboratories.",
+        type: CategoryType.Theme
+    },
+    {
+        name: "Any Character",
+        description: "Any real or fictional person from history, literature, media, or imagination.",
+        type: CategoryType.Advanced
+    },
+    {
+        name: "Any Animal",
+        description: "Any species of animal, whether real or mythical.",
+        type: CategoryType.Advanced
+    },
+    {
+        name: "Any Object",
+        description: "Any inanimate item or artifact, regardless of its nature or use.",
+        type: CategoryType.Advanced
+    },
 ];
 
 export class Category {

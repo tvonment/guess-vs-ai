@@ -4,10 +4,10 @@ import { Message } from "@/model/Message";
 import { startGame } from "@/services/cosmosService";
 import { GameStatus } from "@/model/GameStatus";
 import { Category, Categories } from "@/model/Categories";
+import { characterCheck } from "@/services/characterCheckService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     console.log("Start Request received");
-
     const { userId } = req.body;
     const { categoryName } = req.body;
     const { userWord } = req.body;
@@ -15,7 +15,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log(`User ID: ${userId}`);
     console.log(`Category: ${category.name}`);
     console.log(`Users word: ${userWord}`);
-
+    const validWord = await characterCheck(userWord, category);
+    if (!validWord) {
+        res.status(200).json({ invalid: true });
+        return;
+    }
     const aiWord = await selectWord(category);
     console.log(`AI's word: ${aiWord}`);
 

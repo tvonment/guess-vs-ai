@@ -78,18 +78,30 @@ export default function Home() {
     setUserId(generatedUserId);
 
     // Call the /api/start endpoint to retrieve chat history
-    const response = await fetch('/api/start', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ userId: generatedUserId, categoryName: category, userWord: userWord }),
-    });
-    const data = await response.json();
-    // Set the retrieved chat history
-    if (data.result) {
-      setMessages(data.result);
-      setShowInputField(true); // Show input field after locking
+    try {
+      const response = await fetch('/api/start', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: generatedUserId, categoryName: category, userWord: userWord }),
+      });
+      const data = await response.json();
+      // Set the retrieved chat history
+      if (data.result) {
+        setMessages(data.result);
+        setShowInputField(true); // Show input field after locking
+      }
+
+      if (data.invalid) {
+        setMessages([...messages, { role: "assistant", content: `I'm sorry, I couldn't find the word you entered in the selected category: ${category}. Please try again.` }]);
+        setIsWordLocked(false);
+      }
+    } catch (error) {
+      console.error("Error starting game:", error);
+      if (error instanceof Error) {
+        setMessages([...messages, { role: "assistant", content: "I'm sorry, I'm having trouble starting the game. Please try again." }]);
+      }
     }
   };
 
@@ -142,7 +154,7 @@ export default function Home() {
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value as string)} // Update category value
-            className="p-2 border border-gray-300 rounded-lg"
+            className="p-2 border border-gray-300 rounded-lg max-w-xs"
             disabled={isWordLocked} // Disable dropdown if character is locked
           >
             <option disabled value="">Select a category</option>
