@@ -96,6 +96,7 @@ export default function Home() {
       if (data.invalid) {
         setMessages([...messages, { role: "assistant", content: `I'm sorry, I couldn't find the word you entered in the selected category: ${category}. Please try again.` }]);
         setIsWordLocked(false);
+        setShowInputField(true);
       }
     } catch (error) {
       console.error("Error starting game:", error);
