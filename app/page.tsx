@@ -22,6 +22,7 @@ export default function Home() {
   const [showButtons, setShowButtons] = useState(false); // State for showing buttons
   const [winner, setWinner] = useState(""); // State for winner
   const [aiWord, setAiWord] = useState(""); // State for AIs chosen word after someone wins.
+  const [errorMessage, setErrorMessage] = useState(""); // State for error message
   const chatWindowRef = useRef<HTMLDivElement>(null); // Ref for chat window
 
   const groupedCategories = Categories.reduce((acc, category) => {
@@ -89,12 +90,14 @@ export default function Home() {
       const data = await response.json();
       // Set the retrieved chat history
       if (data.result) {
+        setErrorMessage("");
         setMessages(data.result);
         setShowInputField(true); // Show input field after locking
       }
 
       if (data.invalid) {
-        setMessages([...messages, { role: "assistant", content: `I'm sorry, I couldn't find the word you entered in the selected category: ${category}. Please try again.` }]);
+        console.log("Invalid word", data);
+        setErrorMessage(data.message);
         setIsWordLocked(false);
         setShowInputField(true);
       }
@@ -102,6 +105,7 @@ export default function Home() {
       console.error("Error starting game:", error);
       if (error instanceof Error) {
         setMessages([...messages, { role: "assistant", content: "I'm sorry, I'm having trouble starting the game. Please try again." }]);
+        setErrorMessage(error.message);
       }
     }
   };
@@ -191,6 +195,11 @@ export default function Home() {
         ) : (
           <p className="text-right mb-4">Your word is: <strong>{userWord}</strong></p>
         )}
+        {errorMessage ? (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <p>{errorMessage}</p>
+          </div>
+        ) : null}
         <hr />
         <div ref={chatWindowRef} className="chat-window p-4 h-64 overflow-y-scroll mb-4">
           {messages.map((message, index) => (

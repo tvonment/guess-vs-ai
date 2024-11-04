@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log(`Users word: ${userWord}`);
     const validWord = await characterCheck(userWord, category);
     if (!validWord) {
-        res.status(200).json({ invalid: true });
+        res.status(200).json({ invalid: true, message: `The word you entered is not valid for the '${category.name}' category. Please try again.` });
         return;
     }
     const aiWord = await selectWord(category);
