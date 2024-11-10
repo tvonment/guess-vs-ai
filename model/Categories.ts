@@ -25,30 +25,15 @@ export const Categories: Category[] = [
         type: CategoryType.Theme
     },
     {
-        name: "Kitchen Object",
-        description: "An item commonly found in a kitchen setting.",
+        name: "NBA Player",
+        description: "An NBA player.",
         type: CategoryType.Theme
     },
     {
-        name: "University Object",
-        description: "An object typically found within a university environment, such as classrooms or laboratories.",
+        name: "Music Artist",
+        description: "A famous music artist or band.",
         type: CategoryType.Theme
-    },
-    {
-        name: "Any Character",
-        description: "Any real or fictional person from history, literature, media, or imagination.",
-        type: CategoryType.Advanced
-    },
-    {
-        name: "Any Animal",
-        description: "Any species of animal, whether real or mythical.",
-        type: CategoryType.Advanced
-    },
-    {
-        name: "Any Object",
-        description: "Any inanimate item or artifact, regardless of its nature or use.",
-        type: CategoryType.Advanced
-    },
+    }
 ];
 
 export class Category {

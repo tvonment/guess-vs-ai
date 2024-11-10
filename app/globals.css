@@ -7,14 +7,257 @@
   --foreground: #171717;
 }
 
+html,
+body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  flex-direction: column;
+  /* Ensures full viewport height */
+}
+
+main {
+  flex: 1;
+  /* Expands to fill available space, pushing footer to the bottom */
+  overflow: auto;
+  /* Ensures main content is scrollable if necessary */
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Container styles */
+.background-container {
+  background: linear-gradient(to bottom left, #141414, #4863A0);
+  background-size: 300% 300%;
+  animation: gradientMove 10s ease infinite;
+}
+
+
+@media (prefers-color-scheme: dark) {
+  .background-container {
+    background: linear-gradient(to bottom left, #141414, #4863A0);
+    background-size: 300% 300%;
+    animation: gradientMove 8s ease infinite;
+  }
+}
+
+/* Keyframes for gradient animation */
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  25% {
+    background-position: 75% 25%;
+  }
+
+  50% {
+    background-position: 100% 100%;
+  }
+
+  75% {
+    background-position: 25% 75%;
+  }
+
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+.btn-orange {
+  background-color: #fe9b39;
+  color: #141414;
+  padding: 0.5rem 1rem;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-orange:hover {
+  background-color: #ffa74f;
+}
+
+.btn-red {
+  background-color: #cb635f;
+  color: #141414;
+  padding: 0.5rem 1rem;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-red:hover {
+  background-color: #e69c99;
+}
+
+.btn-blue {
+  background-color: #4863A0;
+  color: #f7fefd;
+  padding: 0.5rem 1rem;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-blue:hover {
+  background-color: #a7bff6;
+}
+
+.box-blue {
+  background-color: #4863A0;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.box-orange {
+  background-color: #fe9b39;
+  color: #141414;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.box-red {
+  background-color: #cb635f;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.box-gray {
+  background-color: #9babb7;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+.category-button {
+  padding: 20px;
+  font-size: 1.2em;
+  text-align: center;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+/* Message styles */
+.message {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: flex-start;
+  /* Default to left for assistant */
+  width: 100%;
+  animation: messageArrival 0.5s ease-out;
+}
+
+@keyframes messageArrival {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply different background color only to the content */
+.message .message-content {
+  padding: 5px 10px;
+  border-radius: 8px;
+  display: inline-block;
+  /* Ensure the background wraps only the content */
+  max-width: 60%;
+}
+
+/* User message alignment */
+.message.user {
+  justify-content: flex-end;
+  /* Push user messages to the right */
+}
+
+.message.user .message-content {
+  background-color: lightblue;
+  text-align: right;
+}
+
+/* Assistant message alignment */
+.message.assistant {
+  justify-content: flex-start;
+  /* Align assistant messages to the left */
+}
+
+.message.assistant .message-content {
+  background-color: rgba(255, 200, 100, 0.8);
+  text-align: left;
+}
+
+button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  border: 4px solid rgba(255, 242, 217, 0.8);
+  border-left-color: rgba(252, 196, 92, 0.8);
+  border-top-color: rgba(219, 124, 22, 0.8);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.center-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.header {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  /* Transparent background */
+  position: sticky;
+  width: 100%;
+}
+
+.footer {
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  /* Transparent background */
+  position: sticky;
+  bottom: 0;
+  width: 100%;
 }
