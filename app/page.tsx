@@ -12,6 +12,7 @@ import GameOver from './components/GameOver';
 export default function MainPage() {
     const [currentPage, setCurrentPage] = useState<'home' | 'categoryselection' | 'wordselection' | 'game' | 'gameover'>('home');
     const [category, setCategory] = useState<Category>();
+    const [userWord, setUserWord] = useState<string>("");
     const [userId, setUserId] = useState<string>("");
     const [winner, setWinner] = useState<string>("");
     const [aiWord, setAiWord] = useState<string>("");
@@ -25,8 +26,9 @@ export default function MainPage() {
         setCurrentPage('wordselection');
     };
 
-    const handleOnStartGame = (userId: string) => {
+    const handleOnStartGame = (userId: string, userWord: string) => {
         setUserId(userId);
+        setUserWord(userWord);
         setCurrentPage('game');
     }
 
@@ -41,7 +43,7 @@ export default function MainPage() {
             {currentPage === 'home' && <Home onNavigate={handleStart} />}
             {currentPage === 'categoryselection' && <CategorySelection onNavigateBack={() => setCurrentPage('home')} onSetCategory={handleSetCategory} />}
             {currentPage === 'wordselection' && category && <WordSelection onNavigateBack={() => setCurrentPage('categoryselection')} onStartGame={handleOnStartGame} category={category} />}
-            {currentPage === 'game' && category && userId && <Game category={category} userId={userId} onSetWinner={handleGameOver} />}
+            {currentPage === 'game' && category && userId && <Game category={category} userId={userId} userWord={userWord} onSetWinner={handleGameOver} />}
             {currentPage === 'gameover' && <GameOver winner={winner} aiWord={aiWord} onNavigate={() => setCurrentPage('categoryselection')} />}
         </>
     );

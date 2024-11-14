@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #141414;
+  --foreground: #141414;
 }
 
 html,
@@ -74,6 +74,26 @@ main {
   100% {
     background-position: 0% 0%;
   }
+}
+
+.btn:hover {
+  opacity: 0.8;
+}
+
+.bg-green {
+  background-color: #48a05c;
+}
+
+.bg-light-green {
+  background-color: #7ec78f;
+}
+
+.bg-red {
+  background-color: #cb635f;
+}
+
+.bg-light-red {
+  background-color: #e69c99;
 }
 
 .btn-orange {
@@ -237,6 +257,11 @@ button:hover:not(:disabled) {
   margin-left: 8px;
 }
 
+.icon-margin {
+  margin: 0 1rem;
+  /* Adjust the value as needed */
+}
+
 .center-spinner {
   display: flex;
   justify-content: center;
@@ -255,7 +280,8 @@ button:hover:not(:disabled) {
 
 .footer {
   padding: 1rem;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #f7fefd;
   /* Transparent background */
   position: sticky;
   bottom: 0;

@@ -2,17 +2,18 @@ import { Category } from "@/model/Categories";
 import { Answer } from "@/model/Answer";
 import { useState, useRef, useEffect } from "react";
 import { Message } from "@/model/Message";
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faCircleStop, faPaperPlane, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Image from 'next/image';
 
 type GameProps = {
     category: Category;
     userId: string;
+    userWord: string;
     onSetWinner: (winner: string, aiWord: string) => void;
 };
 
-export default function Game({ category, userId, onSetWinner }: GameProps) {
+export default function Game({ category, userId, userWord, onSetWinner }: GameProps) {
 
     const [counter, setCounter] = useState(1); // State for error message
     const [input, setInput] = useState(""); // State for error message
@@ -95,10 +96,14 @@ export default function Game({ category, userId, onSetWinner }: GameProps) {
     return (
         <main className="w-full grid grid-cols-5 gap-4 p-4">
             <div className="col-span-3 rounded-lg">
-                <div className="box-orange flex items-center h-20 mb-4">
-                    <p className="text-lg font-semibold">{category.name}</p>
+                <div className="box-orange flex items-center justify-center h-20 mb-4">
+                    <p className="text-lg font-semibold">
+                        <FontAwesomeIcon icon={category.icon} className="icon-margin" />
+                        {category.name}
+                        <FontAwesomeIcon icon={category.icon} className="icon-margin" />
+                    </p>
                 </div>
-                <div ref={chatWindowRef} className="box-gray chat-window p-4 h-64 overflow-y-scroll mb-4">
+                <div ref={chatWindowRef} className="box-gray chat-window p-4 flex-grow h-2/3 overflow-y-auto mb-4">
                     {messages.map((message, index) => (
                         <div key={index} className={`message ${message.role}`}>
                             {message.role === "assistant" && (
@@ -111,17 +116,17 @@ export default function Game({ category, userId, onSetWinner }: GameProps) {
                         </div>
                     ))}
                 </div>
-                <div className="w-full flex justify-center mb-4 w-100">
+                <div className="w-full flex justify-center mb-4">
                     {showButtons ? (
-                        <div className="flex flex-wrap justify-center mb-4">
-                            <button onClick={() => handleAnswerClick(Answer.YES)} className="m-1 p-2 bg-green-800 text-white rounded hover:bg-green-600 flex-1">{Answer.YES}</button>
-                            <button onClick={() => handleAnswerClick(Answer.PROBABLY_YES)} className="m-1 p-2 bg-green-400 text-white rounded hover:bg-green-500 flex-1">{Answer.PROBABLY_YES}</button>
-                            <button onClick={() => handleAnswerClick(Answer.PROBABLY_NO)} className="m-1 p-2 bg-red-400 text-white rounded hover:bg-red-500 flex-1">{Answer.PROBABLY_NO}</button>
-                            <button onClick={() => handleAnswerClick(Answer.NO)} className="m-1 p-2 bg-red-800 text-white rounded hover:bg-red-600 flex-1">{Answer.NO}</button>
-                            <button onClick={() => handleAnswerClick(Answer.I_DONT_KNOW)} className="m-1 p-2 bg-gray-400 text-white rounded hover:bg-gray-500 flex-1">{Answer.I_DONT_KNOW}</button>
-                        </div>
+                        <>
+                            <button onClick={() => handleAnswerClick(Answer.YES)} className="btn m-1 p-2 bg-green rounded flex-1">{Answer.YES}</button>
+                            <button onClick={() => handleAnswerClick(Answer.PROBABLY_YES)} className="btn m-1 p-2 bg-light-green rounded flex-1">{Answer.PROBABLY_YES}</button>
+                            <button onClick={() => handleAnswerClick(Answer.PROBABLY_NO)} className="btn m-1 p-2 bg-light-red rounded flex-1">{Answer.PROBABLY_NO}</button>
+                            <button onClick={() => handleAnswerClick(Answer.NO)} className="btn m-1 p-2 bg-red rounded flex-1">{Answer.NO}</button>
+                            <button onClick={() => handleAnswerClick(Answer.I_DONT_KNOW)} className="btn m-1 p-2 bg-gray-300 rounded flex-1">{Answer.I_DONT_KNOW}</button>
+                        </>
                     ) : showInputField ? (
-                        <div className="flex">
+                        <div className="w-full flex">
                             <input
                                 type="text"
                                 value={input}
@@ -146,8 +151,10 @@ export default function Game({ category, userId, onSetWinner }: GameProps) {
             <div className="col-span-2 rounded-lg">
                 <div className="flex gap-4 mb-4 h-20">
                     <div className="bg-white p-2 rounded-lg shadow flex-1 flex items-center justify-center">
-                        <p className="text-sm font-semibold">Your Word</p>
-                        <p className="text-sm font-semibold"></p>
+                        <div className="text-center">
+                            <p className="text-sm font-semibold">Your Word</p>
+                            <p className="text-sm">{userWord}</p>
+                        </div>
                     </div>
                     <div className="bg-white p-2 rounded-lg shadow flex-1 flex items-center justify-center">
                         <p className="text-sm font-semibold">Round: {counter}</p>
@@ -159,8 +166,17 @@ export default function Game({ category, userId, onSetWinner }: GameProps) {
                     rows={4}
                 ></textarea>
                 <div className="grid grid-cols-2 gap-4">
-                    <button className="btn-orange p-2 rounded-lg shadow">Hint</button>
-                    <button className="btn-red p-2 rounded-lg shadow">Give up</button>
+                    <button className="btn-orange p-2 rounded-lg shadow">
+                        <FontAwesomeIcon icon={faInfo} className="icon-margin" />
+                        Hint
+                        <FontAwesomeIcon icon={faInfo} className="icon-margin" />
+
+                    </button>
+                    <button className="btn-red p-2 rounded-lg shadow">
+                        <FontAwesomeIcon icon={faCircleStop} className="icon-margin" />
+                        Give up
+                        <FontAwesomeIcon icon={faCircleStop} className="icon-margin" />
+                    </button>
                 </div>
             </div>
         </main>
