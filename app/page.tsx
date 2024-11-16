@@ -7,7 +7,7 @@ import Game from './components/game/Game';
 import { Category } from '@/model/Categories';
 import WordSelection from './components/WordSelection';
 import GameOver from './components/GameOver';
-import Modal from './components/Modal';
+import Modal from './components/modal/Modal';
 import Faq from './components/modal/Faq';
 import TermsOfUse from './components/modal/TermsOfUse';
 import Contact from './components/modal/Contact';

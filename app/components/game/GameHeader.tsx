@@ -9,11 +9,9 @@ interface CategoryHeaderProps {
 export default function GameHeader({ category }: CategoryHeaderProps) {
     return (
         <div className="box-orange flex items-center justify-center h-20 mb-4">
-            <p className="text-lg font-semibold">
-                <FontAwesomeIcon icon={category.icon} className="icon-margin" />
-                {category.name}
-                <FontAwesomeIcon icon={category.icon} className="icon-margin" />
-            </p>
+            <FontAwesomeIcon icon={category.icon} className="icon-margin" />
+            <span className="mx-2 text-center">{category.name}</span>
+            <FontAwesomeIcon icon={category.icon} className="icon-margin" />
         </div>
     );
 }
