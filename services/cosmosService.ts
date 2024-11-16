@@ -128,3 +128,33 @@ export async function getUsedCharacters(category: Category): Promise<string[]> {
         return [];
     }
 }
+
+export async function finishGame(userId: string): Promise<string> {
+    console.log("Finish Request received");
+    const gameStatus = await getGameStatus(userId);
+    gameStatus.winner = "given up";
+
+    try {
+        await updateGameStatus(gameStatus);
+    } catch (error: unknown) {
+        console.error("Error:", error);
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error("An error occurred");
+        }
+    }
+
+    try {
+        const aiWord = await getAiWord(userId);
+        return aiWord;
+    } catch (error: unknown) {
+        console.error("Error:", error);
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error("An error occurred");
+        }
+        return "An error occurred";
+    }
+}
