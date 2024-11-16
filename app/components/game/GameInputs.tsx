@@ -1,6 +1,6 @@
 
 import { Answer } from '@/model/Answer';
-import { Player } from '@/model/Player';
+import { TurnState } from '@/model/TurnState';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
@@ -8,7 +8,7 @@ import { useState } from 'react';
 interface GameInputsProps {
     onHandleAnswerClick: (answer: Answer) => void;
     onHandleHumanGuess: (input: string) => void;
-    turn: Player;
+    turn: TurnState;
 }
 
 export default function GameInputs({ onHandleAnswerClick, onHandleHumanGuess, turn }: GameInputsProps) {
@@ -29,7 +29,7 @@ export default function GameInputs({ onHandleAnswerClick, onHandleHumanGuess, tu
 
     return (
         <div className="w-full flex justify-center mb-4">
-            {turn == Player.AI ? (
+            {turn == TurnState.AI ? (
                 <>
                     <button onClick={() => onHandleAnswerClick(Answer.YES)} className="btn m-1 p-2 bg-green rounded flex-1">{Answer.YES}</button>
                     <button onClick={() => onHandleAnswerClick(Answer.PROBABLY_YES)} className="btn m-1 p-2 bg-light-green rounded flex-1">{Answer.PROBABLY_YES}</button>
@@ -37,7 +37,7 @@ export default function GameInputs({ onHandleAnswerClick, onHandleHumanGuess, tu
                     <button onClick={() => onHandleAnswerClick(Answer.NO)} className="btn m-1 p-2 bg-red rounded flex-1">{Answer.NO}</button>
                     <button onClick={() => onHandleAnswerClick(Answer.I_DONT_KNOW)} className="btn m-1 p-2 bg-gray-300 rounded flex-1">{Answer.I_DONT_KNOW}</button>
                 </>
-            ) : turn == Player.HUMAN ? (
+            ) : turn == TurnState.HUMAN ? (
                 <div className="w-full flex">
                     <input
                         type="text"

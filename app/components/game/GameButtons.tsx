@@ -15,17 +15,17 @@ export default function GameButtons({ openModal }: GameButtonsProps) {
     };
 
     return (
-        <div className="grid grid-cols-2 gap-4">
-            <button className="btn-orange p-2 rounded-lg shadow" onClick={handleHelp}>
-                <FontAwesomeIcon icon={faQuestion} className="icon-margin" />
-                Help
-                <FontAwesomeIcon icon={faQuestion} className="icon-margin" />
+        <div className="flex flex-col sm:flex-row gap-4">
+            <button className="btn-orange p-1 rounded-lg shadow w-full sm:flex-1 flex items-center justify-between" onClick={handleHelp}>
+                <FontAwesomeIcon icon={faQuestion} className="icon-margin-small" />
+                <span className="mx-2 text-center">Help</span>
+                <FontAwesomeIcon icon={faQuestion} className="icon-margin-small" />
             </button>
-            <button className="btn-red p-2 rounded-lg shadow" onClick={handleGiveUp} >
-                <FontAwesomeIcon icon={faHand} className="icon-margin mirror-icon" />
-                Give up
-                <FontAwesomeIcon icon={faHand} className="icon-margin" />
+            <button className="btn-red p-1 rounded-lg shadow w-full sm:flex-1 flex items-center justify-between" onClick={handleGiveUp}>
+                <FontAwesomeIcon icon={faHand} className="icon-margin-small mirror-icon" />
+                <span className="mx-2 text-center">Give up</span>
+                <FontAwesomeIcon icon={faHand} className="icon-margin-small" />
             </button>
         </div>
-    )
+    );
 }
