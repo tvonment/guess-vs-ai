@@ -76,6 +76,10 @@ main {
   }
 }
 
+.mirror-icon {
+  transform: scaleX(-1);
+}
+
 .btn:hover {
   opacity: 0.8;
 }
@@ -94,6 +98,11 @@ main {
 
 .bg-light-red {
   background-color: #e69c99;
+}
+
+.footer-link {
+  color: #f7fefd;
+  text-decoration: none;
 }
 
 .btn-orange {

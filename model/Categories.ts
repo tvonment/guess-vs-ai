@@ -1,5 +1,5 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faShield, faJedi, faWandMagicSparkles, faPaw, faBasketball, faMusic } from "@fortawesome/free-solid-svg-icons";
+import { faShield, faJedi, faWandSparkles, faPaw, faBasketball, faMusic } from "@fortawesome/free-solid-svg-icons";
 
 export enum CategoryType {
     Advanced = "Advanced",
@@ -23,7 +23,7 @@ export const Categories: Category[] = [
         name: "Harry Potter",
         description: "Pick a character from the Harry Potter universe, encompassing books and films.",
         type: CategoryType.Theme,
-        icon: faWandMagicSparkles as IconProp
+        icon: faWandSparkles as IconProp
     },
     {
         name: "Disney Animal",

@@ -1,7 +1,13 @@
-export default function Header() {
+import Image from 'next/image';
+
+interface HeaderProps {
+    onClick: () => void;
+}
+
+export default function Header({ onClick }: HeaderProps) {
     return (
         <header className="header">
-            <h1>Guess vs AI</h1>
+            <Image src="/images/Guess vs AI logo Text.png" width={200} height={50} alt="Logo" className="w-100 h-100" onClick={onClick} />
         </header>
     );
 }
