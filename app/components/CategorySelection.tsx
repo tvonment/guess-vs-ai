@@ -22,7 +22,7 @@ export default function CategorySelection({ onNavigateBack, onSetCategory }: Cat
                 </button>
             </div>
             <div className="flex justify-center">
-                <Image src="/images/Pick your Poison.png" width={600} height={200} alt="Logo" className="w-100 h-100 mb-4" />
+                <Image src="/images/Pick your Poison.png" width={400} height={200} alt="Logo" className="w-100 h-100 mb-4" />
             </div>
             <div className="w-2/3">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
