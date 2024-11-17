@@ -11,6 +11,7 @@ import GameNotes from "./GameNotes";
 import GameButtons from "./GameButtons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faClose } from "@fortawesome/free-solid-svg-icons";
+import Image from 'next/image';
 
 type GameProps = {
     category: Category;
@@ -140,6 +141,7 @@ export default function Game({ category, userId, userWord, onSetWinner, openModa
                     <GameButtons openModal={openModal} />
                 </div>
             </div>
+            <Image src={category.image} alt={category.name} width={300} height={300} className="bg-image visible" />
         </main>
     );
 }

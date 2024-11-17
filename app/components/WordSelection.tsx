@@ -1,10 +1,11 @@
 "use client";
 
 import { Category } from "@/model/Categories";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faX } from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft, faGamepad, faX } from "@fortawesome/free-solid-svg-icons";
 import { v4 as uuidv4 } from 'uuid'; // Import UUID library
+import Image from 'next/image';
 
 interface WordSelectionProps {
     onNavigateBack: () => void;
@@ -57,6 +58,16 @@ export default function WordSelection({ onNavigateBack, category, onStartGame }:
         }
     };
 
+    useEffect(() => {
+        const bgImage = document.querySelector('.bg-image');
+        if (bgImage) {
+            setTimeout(() => {
+                bgImage.classList.add('visible');
+            }, 100); // Add a slight delay to ensure the transition is noticeable
+        }
+    }, []);
+
+
     return (
         <main className="w-full flex flex-col items-center">
             <div className="w-full flex mb-4">
@@ -72,24 +83,31 @@ export default function WordSelection({ onNavigateBack, category, onStartGame }:
                         <FontAwesomeIcon icon={category.icon} className="icon-margin" />
                     </h1>
                 </div>
-                <div className="box-gray mb-4">
-                    <div className="w-full box-blue mb-4">
-                        <p className="text-center">{category.description}</p>
-                    </div>
-                    <div className="w-full flex justify-center mb-4">
-                        <input
-                            type="text"
-                            value={userWord}
-                            onChange={(e) => setUserWord(e.target.value)} // Update character input value
-                            onKeyDown={handleWordKeyDown} // Add keydown event listener
-                            placeholder={`Enter a word from the ${category.name} category`} // Dynamic placeholder
-                            className="w-full p-2 border border-gray-300 rounded-lg"
-                            color="black"
-                        />
+                <div className="w-full box-blue mb-4">
+                    <p className="text-center">{category.description}</p>
+                </div>
+                <div className="w-full flex justify-center mb-4">
+                    <input
+                        type="text"
+                        value={userWord}
+                        onChange={(e) => setUserWord(e.target.value)} // Update character input value
+                        onKeyDown={handleWordKeyDown} // Add keydown event listener
+                        placeholder={`Enter a word from the ${category.name} category`} // Dynamic placeholder
+                        className="w-full p-2 border border-gray-300 rounded-lg"
+                        color="black"
+                    />
+                </div>
+                <div className="flex items-center justify-center mb-4 w-full">
+                    <div className="w-1/2 flex justify-center">
+                        <button className="w-full btn-orange p-1 rounded-lg shadow sm:flex-1 flex items-center justify-between" onClick={handleWordLock}>
+                            <FontAwesomeIcon icon={faGamepad} className="icon-margin-small" />
+                            <span className="mx-2 text-center">Start</span>
+                            <FontAwesomeIcon icon={faGamepad} className="icon-margin-small" />
+                        </button>
                     </div>
                 </div>
                 {errorMessage && (
-                    <div className="box-red mb-4">
+                    <div className="box-red">
                         <p className="text-center">
                             <FontAwesomeIcon icon={faX} className="icon-margin" />
                             {errorMessage}
@@ -97,12 +115,8 @@ export default function WordSelection({ onNavigateBack, category, onStartGame }:
                         </p>
                     </div>
                 )}
-                <div className="flex items-center justify-center">
-                    <button onClick={handleWordLock} className="btn-orange">
-                        Start
-                    </button>
-                </div>
             </div>
+            <Image src={category.image} alt={category.name} width={300} height={300} className="bg-image" />
         </main>
     );
 }
