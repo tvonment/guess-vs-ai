@@ -15,6 +15,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Confirm from './components/modal/Confirm';
 import Help from './components/modal/Help';
+import VersionFlag from './components/VersionFlag';
 
 export default function MainPage() {
     const [currentPage, setCurrentPage] = useState<'home' | 'categoryselection' | 'wordselection' | 'game' | 'gameover'>('home');
@@ -100,6 +101,7 @@ export default function MainPage() {
             {currentPage === 'game' && category && userId && <Game category={category} userId={userId} userWord={userWord} onSetWinner={handleGameOver} openModal={openModal} />}
             {currentPage === 'gameover' && <GameOver winner={winner} aiWord={aiWord} onNavigate={() => setCurrentPage('categoryselection')} />}
             <Footer openModal={openModal} />
+            <VersionFlag />
             <Modal content={modalContent} onClose={closeModal} renderContent={renderModalContent} />
         </>
     );

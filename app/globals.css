@@ -61,6 +61,11 @@ main {
   opacity: 0.8;
 }
 
+.bg-version {
+  background-color: #cb635f;
+  opacity: 0.8;
+}
+
 .bg-green {
   background-color: #48a05c;
 }
