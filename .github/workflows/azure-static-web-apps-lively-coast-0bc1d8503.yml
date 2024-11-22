@@ -24,7 +24,7 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         env:
-          APP_VERSION_TEXT: ${{ vars.APP_VERSION_TEXT }}
+          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_GPT4O_API_URL: ${{ vars.OPENAI_GPT4O_API_URL }}
           OPENAI_GPT4OMINI_API_URL: ${{ vars.OPENAI_GPT4OMINI_API_URL }}
