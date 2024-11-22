@@ -21,6 +21,10 @@ export default function WordSelection({ onNavigateBack, category, onStartGame }:
         // Initialize user after character is locked
         const generatedUserId = uuidv4();
 
+        console.log("Starting game with user ID:", generatedUserId);
+        console.log("User word:", userWord);
+        console.log("Category:", category.name);
+
         // Call the /api/start endpoint to retrieve chat history
         try {
             const response = await fetch('/api/start', {
