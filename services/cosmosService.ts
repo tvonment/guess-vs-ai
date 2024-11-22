@@ -5,10 +5,12 @@ import { Category } from "@/model/Categories";
 import { GameStatus } from "@/model/GameStatus";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
+const COSMOS_DB_DATABASE_NAME = process.env.COSMOS_DB_DATABASE_NAME || "";
+const COSMOS_DB_CONTAINER_NAME = process.env.COSMOS_DB_CONTAINER_NAME || "";
 
 const client = new CosmosClient(COSMOS_DB_CONNECTION_STRING);
-const database = client.database("gvaDB");
-const container = database.container("chatContainer");
+const database = client.database(COSMOS_DB_DATABASE_NAME);
+const container = database.container(COSMOS_DB_CONTAINER_NAME);
 
 async function getChatHistory(userId: string): Promise<Message[]> {
     // Retrieve chat history from Cosmos DB
