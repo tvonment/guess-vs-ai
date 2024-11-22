@@ -26,7 +26,7 @@ export const Categories: Category[] = [
         description: "Pick a character from the Harry Potter universe, encompassing books and films.",
         type: CategoryType.Theme,
         icon: faWandSparkles as IconProp,
-        image: "/images/harrypotter.png"
+        image: "/images/harrypotter.PNG"
     },
     {
         name: "Disney Animal",
@@ -40,14 +40,14 @@ export const Categories: Category[] = [
         description: "An NBA player.",
         type: CategoryType.Theme,
         icon: faBasketball as IconProp,
-        image: "/images/LeBron.png"
+        image: "/images/LeBron.PNG"
     },
     {
         name: "Music Artist",
         description: "A famous music artist or band.",
         type: CategoryType.Theme,
         icon: faMusic as IconProp,
-        image: "/images/queen.png"
+        image: "/images/queen.PNG"
     }
 ];
 

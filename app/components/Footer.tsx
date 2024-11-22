@@ -19,7 +19,7 @@ function FooterButtons({ openModal }: FooterProps) {
 function FooterText() {
     const year = new Date().getFullYear();
     return (
-        <p className='m-2'>© {year}. Created by <span style={{ color: "#7a95d2" }}>Pjotr Tinke</span> & <span style={{ color: "#ffa74f" }}>Thomas von Mentlen</span></p>
+        <p className='m-2'>© {year} <span style={{ color: "#ffa74f" }}>BeatAI</span>. Created by <span style={{ color: "#7a95d2" }}>Pjotr Tinke</span> & <span style={{ color: "#ffa74f" }}>Thomas von Mentlen</span></p>
     );
 }
 
