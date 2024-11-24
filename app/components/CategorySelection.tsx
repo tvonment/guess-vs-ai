@@ -1,9 +1,9 @@
 "use client";
 
 import { Category, Categories } from "@/model/Categories";
-import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons/faChevronLeft";
+import { faGamepad } from "@fortawesome/free-solid-svg-icons";
 
 interface CategorySelectionProps {
     onNavigateBack: () => void;
@@ -21,11 +21,15 @@ export default function CategorySelection({ onNavigateBack, onSetCategory }: Cat
                     <FontAwesomeIcon icon={faChevronLeft} className="icon-margin text-white" />
                 </button>
             </div>
-            <div className="flex justify-center">
-                <Image src="/images/Pick your Poison.png" width={400} height={200} alt="Logo" className="w-100 h-100 mb-4" />
-            </div>
             <div className="w-2/3">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="w-full flex justify-center box-blue text-white mb-4">
+                    <h1 className="text-center text-4xl font-extrabold items-center justify-between py-6">
+                        <FontAwesomeIcon icon={faGamepad} className="icon-margin" />
+                        <span className="mx-2 text-center">Pick your category</span>
+                        <FontAwesomeIcon icon={faGamepad} className="icon-margin" />
+                    </h1>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xl">
                     {categories.map((category) => (
                         <button
                             className="btn-orange category-button font-bold flex items-center justify-between p-4"

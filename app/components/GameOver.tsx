@@ -1,5 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 
 type GameOverProps = {
     onNavigate: () => void;
@@ -61,7 +63,13 @@ export default function GameOver({ winner, aiWord, onNavigate }: GameOverProps) 
         <main className="shadow-lg w-full">
             {renderContent()}
             <div className="flex justify-center">
-                <button onClick={onNavigate} className="btn-orange font-bold py-5 px-8">Again</button>
+                <div className="flex max-w-1/3">
+                    <button className="btn-orange py-4 px-8 rounded-lg shadow sm:flex-1 flex items-center justify-between text-2xl font-extrabold" onClick={onNavigate}>
+                        <FontAwesomeIcon icon={faRotateLeft} className="icon-margin" />
+                        <span className="mx-2 text-center">Again</span>
+                        <FontAwesomeIcon icon={faRotateLeft} className="icon-margin" />
+                    </button>
+                </div>
             </div>
         </main>
     );
