@@ -16,14 +16,12 @@ interface WordSelectionProps {
 export default function WordSelection({ onNavigateBack, category, onStartGame }: WordSelectionProps) {
     const [userWord, setUserWord] = useState(""); // State for character input
     const [errorMessage, setErrorMessage] = useState(""); // State for error message
+    const [loading, setLoading] = useState(false); // State for loading state
 
     const handleWordLock = async () => {
+        setLoading(true); // Set loading state to true
         // Initialize user after character is locked
         const generatedUserId = uuidv4();
-
-        console.log("Starting game with user ID:", generatedUserId);
-        console.log("User word:", userWord);
-        console.log("Category:", category.name);
 
         // Call the /api/start endpoint to retrieve chat history
         try {
@@ -54,6 +52,7 @@ export default function WordSelection({ onNavigateBack, category, onStartGame }:
                 setErrorMessage(error.message);
             }
         }
+        setLoading(false); // Set loading state to false
     };
 
     const handleWordKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -81,14 +80,16 @@ export default function WordSelection({ onNavigateBack, category, onStartGame }:
             </div>
             <div className="w-2/3">
                 <div className="box-orange flex justify-center mb-4">
-                    <h1 className="text-center">
+                    <h1 className="text-center text-4xl font-extrabold py-6">
                         <FontAwesomeIcon icon={category.icon} className="icon-margin" />
                         {category.name}
                         <FontAwesomeIcon icon={category.icon} className="icon-margin" />
                     </h1>
                 </div>
                 <div className="w-full box-blue mb-4">
-                    <p className="text-center">{category.description}</p>
+                    <h2 className="text-center text-2xl font-bold py-4 text-white">
+                        {category.description}
+                    </h2>
                 </div>
                 <div className="w-full flex justify-center mb-4">
                     <input
@@ -97,26 +98,30 @@ export default function WordSelection({ onNavigateBack, category, onStartGame }:
                         onChange={(e) => setUserWord(e.target.value)} // Update character input value
                         onKeyDown={handleWordKeyDown} // Add keydown event listener
                         placeholder={`Enter a word from the ${category.name} category`} // Dynamic placeholder
-                        className="w-full p-2 border border-gray-300 rounded-lg"
+                        className="w-full p-4 border border-gray-300 rounded-lg text-lg"
                         color="black"
                     />
                 </div>
                 <div className="flex items-center justify-center mb-4 w-full">
                     <div className="w-1/2 flex justify-center">
-                        <button className="w-full btn-orange p-1 rounded-lg shadow sm:flex-1 flex items-center justify-between" onClick={handleWordLock}>
-                            <FontAwesomeIcon icon={faGamepad} className="icon-margin-small" />
-                            <span className="mx-2 text-center">Start</span>
-                            <FontAwesomeIcon icon={faGamepad} className="icon-margin-small" />
-                        </button>
+                        {!loading ? (
+                            <button className="w-full btn-orange py-4 px-8 rounded-lg shadow sm:flex-1 flex items-center justify-between text-2xl font-extrabold" onClick={handleWordLock}>
+                                <FontAwesomeIcon icon={faGamepad} className="icon-margin-small" />
+                                <span className="mx-2 text-center">Start</span>
+                                <FontAwesomeIcon icon={faGamepad} className="icon-margin-small" />
+                            </button>
+                        ) : (
+                            <p className="center-spinner">
+                                <span className="loading-spinner"></span>
+                            </p>
+                        )}
                     </div>
                 </div>
                 {errorMessage && (
-                    <div className="box-red">
-                        <p className="text-center">
-                            <FontAwesomeIcon icon={faX} className="icon-margin" />
-                            {errorMessage}
-                            <FontAwesomeIcon icon={faX} className="icon-margin" />
-                        </p>
+                    <div className="flex box-red items-center justify-center w-full py-4 px-8">
+                        <FontAwesomeIcon icon={faX} className="icon-margin" />
+                        <span className="mx-2 text-center">{errorMessage}</span>
+                        <FontAwesomeIcon icon={faX} className="icon-margin" />
                     </div>
                 )}
             </div>

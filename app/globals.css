@@ -1,6 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 :root {
   --background: #141414;
@@ -29,6 +31,13 @@ main {
   /* Expands to fill available space, pushing footer to the bottom */
   overflow: auto;
   /* Ensures main content is scrollable if necessary */
+}
+
+h1,
+h2,
+h3,
+button {
+  font-family: 'VT323', serif;
 }
 
 .bg-image {
@@ -124,6 +133,10 @@ main {
 
 .btn-blue:hover {
   background-color: #a7bff6;
+}
+
+.bg-blue {
+  background-color: #4863A0;
 }
 
 .box-blue {
@@ -276,4 +289,66 @@ main {
   position: sticky;
   bottom: 0;
   width: 100%;
+}
+
+.transition-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.page-enter,
+.page-enter-active,
+.page-exit,
+.page-exit-active {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.page-enter-left {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.page-enter-left-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 600ms ease-in-out, transform 600ms ease-in-out;
+}
+
+/* Exit starts with full visibility */
+.page-exit-left {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Transition to invisible state */
+.page-exit-left-active {
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 600ms ease-in-out, transform 600ms ease-in-out;
+}
+
+.page-enter-right {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+.page-enter-right-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 600ms ease-in-out, transform 600ms ease-in-out;
+}
+
+.page-exit-right {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.page-exit-right-active {
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 600ms ease-in-out, transform 600ms ease-in-out;
 }

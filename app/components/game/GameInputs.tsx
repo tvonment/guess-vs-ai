@@ -18,12 +18,14 @@ export default function GameInputs({ onHandleAnswerClick, onHandleHumanGuess, tu
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter' && input) {
             onHandleHumanGuess(input);
+            setInput("");
         }
     };
 
     const handleHumanGuess = () => {
         if (input) {
             onHandleHumanGuess(input);
+            setInput("");
         }
     }
 
@@ -49,7 +51,7 @@ export default function GameInputs({ onHandleAnswerClick, onHandleHumanGuess, tu
                     />
                     <button onClick={handleHumanGuess}
                         disabled={!input} // Disable button if character is not locked or input is empty
-                        className={`flex items-center justify-center rounded-r-lg px-4 ${!input ? 'bg-gray-300 text-gray-700 cursor-not-allowed' : 'bg-blue-800 text-white hover:bg-blue-600'}`}>
+                        className={`flex items-center justify-center rounded-r-lg px-4 ${!input ? 'bg-gray-300 text-gray-700 cursor-not-allowed' : 'bg-blue text-white'}`}>
                         <FontAwesomeIcon icon={faPaperPlane} />
                     </button>
                 </div>
