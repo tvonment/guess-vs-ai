@@ -16,4 +16,4 @@ export default function Home({ onNavigate }: HomeScreenProps) {
             </div>
         </main>
     );
-};
+}

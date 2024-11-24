@@ -59,6 +59,7 @@ export async function selectWord(category: Category) {
         } as Message;
     try {
         const gptResponse = await gptCall([systemMessageText, ...fewShotMessages, userMessage], 0.7);
+        console.log("GPT Response:", gptResponse);
         const word = gptResponse.content;
         console.log("AI chose the word: " + word)
         return word;
