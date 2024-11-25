@@ -25,19 +25,6 @@ export default function MainPage() {
     const [winner, setWinner] = useState<string>("");
     const [aiWord, setAiWord] = useState<string>("");
     const [modalContent, setModalContent] = useState<string | null>(null);
-    const [transitionDirection, setTransitionDirection] = useState('left');
-    // Create a map to store refs for each page
-    const nodeRefs = useRef<{
-        home: React.RefObject<HTMLDivElement>,
-        categoryselection: React.RefObject<HTMLDivElement>,
-        wordselection: React.RefObject<HTMLDivElement>,
-        gameover: React.RefObject<HTMLDivElement>,
-    }>({
-        home: React.createRef<HTMLDivElement>(),
-        categoryselection: React.createRef<HTMLDivElement>(),
-        wordselection: React.createRef<HTMLDivElement>(),
-        gameover: React.createRef<HTMLDivElement>(),
-    });
 
     const openModal = (content: string) => {
         setModalContent(content);
@@ -70,32 +57,27 @@ export default function MainPage() {
                 openModal('giveup');
                 break;
             default:
-                setTransitionDirection('right');
                 setCurrentPage('home');
                 break;
         }
     }
 
     const handleStart = () => {
-        setTransitionDirection('left');
         setCurrentPage('categoryselection');
     };
 
     const handleSetCategory = (selectedCategory: Category) => {
-        setTransitionDirection('left');
         setCategory(selectedCategory);
         setCurrentPage('wordselection');
     };
 
     const handleOnStartGame = (userId: string, userWord: string) => {
-        setTransitionDirection('left');
         setUserId(userId);
         setUserWord(userWord);
         setCurrentPage('game');
     }
 
     const handleGameOver = (winner: string, aiWord: string) => {
-        setTransitionDirection('left');
         setWinner(winner);
         setAiWord(aiWord);
         setCurrentPage('gameover');
@@ -104,7 +86,6 @@ export default function MainPage() {
     const handleGivenUp = (aiWord: string) => {
         // Handle confirm action with the AI word
         console.log("Confirmed with AI word:", aiWord);
-        setTransitionDirection('right');
         setAiWord(aiWord);
         setWinner('givenup');
         setCurrentPage('gameover');
@@ -112,7 +93,6 @@ export default function MainPage() {
     };
 
     const handleNavigateBack = (targetPage: "home" | "categoryselection" | "wordselection" | "game" | "gameover") => {
-        setTransitionDirection('right');
         setCurrentPage(targetPage);
     };
 
