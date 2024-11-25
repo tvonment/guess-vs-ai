@@ -1,19 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import FooterButtons from './FooterButtons';
 
 interface FooterProps {
     openModal: (content: string) => void;
-}
-
-function FooterButtons({ openModal }: FooterProps) {
-    return (
-        <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
-            <button onClick={() => openModal('FAQ')} className="footer-link m-1">FAQ</button>
-            <button onClick={() => openModal('Terms of Use')} className="footer-link m-1">Terms of Use</button>
-            <button onClick={() => openModal('Contact')} className="footer-link m-1">Contact</button>
-        </div>
-    );
 }
 
 function FooterText() {
@@ -41,10 +32,9 @@ export default function Footer({ openModal }: FooterProps) {
     }, []);
 
     return (
-        <footer className="footer flex flex-col md:flex-row justify-between items-center p-4">
+        <footer className="footer text-white flex flex-col md:flex-row justify-between items-center p-4">
             {isSmallScreen ? (
                 <>
-                    <FooterButtons openModal={openModal} />
                     <FooterText />
                 </>
             ) : (
