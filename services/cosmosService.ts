@@ -2,7 +2,7 @@ import { CosmosClient } from "@azure/cosmos";
 import { Message } from "@/model/Message";
 import { Answer } from "@/model/Answer";
 import { Category } from "@/model/Categories";
-import { GameStatus } from "@/model/GameStatus";
+import { Game } from "@/model/Game";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
 const COSMOS_DB_DATABASE_NAME = process.env.COSMOS_DB_DATABASE_NAME || "";
@@ -24,21 +24,21 @@ async function getChatHistory(userId: string): Promise<Message[]> {
     return dbitem.messages as Message[]
 }
 
-async function getGameStatus(userId: string): Promise<GameStatus> {
+async function getGameStatus(userId: string): Promise<Game> {
     try {
         const statusQuery = `SELECT * FROM c WHERE c.id = @userId`;
         const db = await container.items.query({
             query: statusQuery,
             parameters: [{ name: "@userId", value: userId }]
         }).fetchNext();
-        return db.resources[0] as GameStatus;
+        return db.resources[0] as Game;
     } catch (error: unknown) {
         console.error("Error:", error);
         throw error;
     }
 }
 
-export async function startGame(gameStatus: GameStatus) {
+export async function startGame(gameStatus: Game) {
     await container.items.create(gameStatus);
 }
 
@@ -88,18 +88,18 @@ export async function getCategory(userId: string): Promise<Category> {
     return dbitem.category;
 }
 
-export async function updateGameStatus(gameStatus: GameStatus) {
-    await container.items.upsert(gameStatus);
+export async function updateGame(game: Game) {
+    await container.items.upsert(game);
 }
 
 export async function addToHistory(userId: string, message: Message, winner?: string): Promise<Message> {
-    const gameStatus = await getGameStatus(userId);
-    gameStatus.messages.push(message);
+    const game = await getGameStatus(userId);
+    game.messages.push(message);
     if (winner) {
-        gameStatus.winner = winner;
+        game.winner = winner;
     }
     try {
-        await updateGameStatus(gameStatus);
+        await updateGame(game);
         return message;
     } catch (error: unknown) {
         console.error("Error:", error);
@@ -137,7 +137,7 @@ export async function finishGame(userId: string): Promise<string> {
     gameStatus.winner = "given up";
 
     try {
-        await updateGameStatus(gameStatus);
+        await updateGame(gameStatus);
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {
@@ -150,6 +150,25 @@ export async function finishGame(userId: string): Promise<string> {
     try {
         const aiWord = await getAiWord(userId);
         return aiWord;
+    } catch (error: unknown) {
+        console.error("Error:", error);
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error("An error occurred");
+        }
+        return "An error occurred";
+    }
+}
+
+export async function reportIssue(userId: string, gameStatus: string, message: string): Promise<string> {
+    try {
+        const game = await getGameStatus(userId);
+        if (!message) { message = "No message provided"; }
+        if (!game.issues) { game.issues = []; }
+        game.issues.push({ gameStatus: gameStatus, message: message });
+        await updateGame(game);
+        return "Issue reported";
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {

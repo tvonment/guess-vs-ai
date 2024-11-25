@@ -1,15 +1,17 @@
 import React from 'react';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faBug, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 
 type GameOverProps = {
-    onNavigate: () => void;
     winner: string;
     aiWord: string;
+    onNavigate: () => void;
+    onReportIssue: (message: string) => void;
 };
 
-export default function GameOver({ winner, aiWord, onNavigate }: GameOverProps) {
+
+export default function GameOver({ winner, aiWord, onNavigate, onReportIssue }: GameOverProps) {
     const renderContent = () => {
         switch (winner) {
             case 'assistant':
@@ -68,6 +70,18 @@ export default function GameOver({ winner, aiWord, onNavigate }: GameOverProps) 
                         <FontAwesomeIcon icon={faRotateLeft} className="icon-margin" />
                         <span className="mx-2 text-center">Again</span>
                         <FontAwesomeIcon icon={faRotateLeft} className="icon-margin" />
+                    </button>
+                </div>
+            </div>
+            <div className="flex justify-center">
+                <p className='mt-10 m-4 text-white'>There was something odd in this round? Let a developer have a closer look at this!</p>
+            </div>
+            <div className="flex justify-center">
+                <div className="flex max-w-1/3">
+                    <button className="btn-red py-4 px-8 rounded-lg shadow sm:flex-1 flex items-center justify-between text-2xl font-extrabold" onClick={() => onReportIssue('report-gameover')}>
+                        <FontAwesomeIcon icon={faBug} className="icon-margin" />
+                        <span className="mx-2 text-center">Report Issue</span>
+                        <FontAwesomeIcon icon={faBug} className="icon-margin" />
                     </button>
                 </div>
             </div>

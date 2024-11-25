@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 interface ModalProps {
     content: string | null;
     onClose: () => void;
-    renderContent: (onConfirm?: () => void, onCancel?: () => void) => JSX.Element | null;
+    renderContent: (onConfirm?: () => void, onCancel?: () => void, userId?: string, gameStatus?: string) => JSX.Element | null;
     onConfirm?: () => void;
     onCancel?: () => void;
 }
