@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Home from './components/Home';
 import CategorySelection from './components/CategorySelection';
@@ -16,6 +16,7 @@ import Footer from './components/Footer';
 import Confirm from './components/modal/Confirm';
 import Help from './components/modal/Help';
 import VersionFlag from './components/VersionFlag';
+import Menu from './components/Menu';
 
 export default function MainPage() {
     const [currentPage, setCurrentPage] = useState<'home' | 'categoryselection' | 'wordselection' | 'game' | 'gameover'>('home');
@@ -25,6 +26,25 @@ export default function MainPage() {
     const [winner, setWinner] = useState<string>("");
     const [aiWord, setAiWord] = useState<string>("");
     const [modalContent, setModalContent] = useState<string | null>(null);
+    const [showMenu, setShowMenu] = useState<boolean>(false);
+    const [counter, setCounter] = useState<number>(1);
+
+    const handleCounterIncrease = () => {
+        setCounter(counter + 1);
+    }
+
+    const toggleMenu = () => {
+        setShowMenu(!showMenu);
+    };
+
+    const closeMenu = () => {
+        setShowMenu(false);
+    };
+
+    const handleMenuOpenModal = (content: string) => {
+        closeMenu();
+        openModal(content);
+    };
 
     const openModal = (content: string) => {
         setModalContent(content);
@@ -96,15 +116,31 @@ export default function MainPage() {
         setCurrentPage(targetPage);
     };
 
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 768) {
+                closeMenu();
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
     return (
         <>
-            <Header onClick={handleLogo} />
+            <Header onClick={handleLogo} onToggleMenu={toggleMenu} />
             {currentPage === 'home' && <Home onNavigate={handleStart} />}
             {currentPage === 'categoryselection' && <CategorySelection onNavigateBack={() => { handleNavigateBack('home') }} onSetCategory={handleSetCategory} />}
             {currentPage === 'wordselection' && category && <WordSelection onNavigateBack={() => handleNavigateBack('categoryselection')} onStartGame={handleOnStartGame} category={category} />}
-            {currentPage === 'game' && category && userId && <Game category={category} userId={userId} userWord={userWord} onSetWinner={handleGameOver} openModal={openModal} />}
+            {currentPage === 'game' && category && userId && <Game category={category} userId={userId} userWord={userWord} onSetWinner={handleGameOver} openModal={openModal} counter={counter} onCounterIncrease={handleCounterIncrease} />}
             {currentPage === 'gameover' && <GameOver winner={winner} aiWord={aiWord} onNavigate={() => handleNavigateBack('categoryselection')} />}
             <Footer openModal={openModal} />
+            {showMenu && (
+                <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} counter={counter} isGameScreen={currentPage === 'game'} />
+            )}
             <VersionFlag />
             <Modal content={modalContent} onClose={closeModal} renderContent={renderModalContent} />
         </>
