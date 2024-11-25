@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useRef } from 'react';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import Home from './components/Home';
 import CategorySelection from './components/CategorySelection';
@@ -120,31 +119,11 @@ export default function MainPage() {
     return (
         <>
             <Header onClick={handleLogo} />
-            {currentPage !== 'game' &&
-                <div className="transition-container">
-                    <TransitionGroup component={null}>
-                        <CSSTransition
-                            key={currentPage}
-                            nodeRef={nodeRefs.current[currentPage]} // Use a unique ref for each page
-                            classNames={{
-                                enter: `page-enter-${transitionDirection}`,
-                                enterActive: `page-enter-${transitionDirection}-active`,
-                                exit: `page-exit-${transitionDirection}`,
-                                exitActive: `page-exit-${transitionDirection}-active`,
-                            }}
-                            timeout={600}
-                        >
-                            <div ref={nodeRefs.current[currentPage]} className="w-full h-full">
-                                {currentPage === 'home' && <Home onNavigate={handleStart} />}
-                                {currentPage === 'categoryselection' && <CategorySelection onNavigateBack={() => { handleNavigateBack('home') }} onSetCategory={handleSetCategory} />}
-                                {currentPage === 'wordselection' && category && <WordSelection onNavigateBack={() => handleNavigateBack('categoryselection')} onStartGame={handleOnStartGame} category={category} />}
-                                {currentPage === 'gameover' && <GameOver winner={winner} aiWord={aiWord} onNavigate={() => handleNavigateBack('categoryselection')} />}
-                            </div>
-                        </CSSTransition>
-                    </TransitionGroup>
-                </div>
-            }
+            {currentPage === 'home' && <Home onNavigate={handleStart} />}
+            {currentPage === 'categoryselection' && <CategorySelection onNavigateBack={() => { handleNavigateBack('home') }} onSetCategory={handleSetCategory} />}
+            {currentPage === 'wordselection' && category && <WordSelection onNavigateBack={() => handleNavigateBack('categoryselection')} onStartGame={handleOnStartGame} category={category} />}
             {currentPage === 'game' && category && userId && <Game category={category} userId={userId} userWord={userWord} onSetWinner={handleGameOver} openModal={openModal} />}
+            {currentPage === 'gameover' && <GameOver winner={winner} aiWord={aiWord} onNavigate={() => handleNavigateBack('categoryselection')} />}
             <Footer openModal={openModal} />
             <VersionFlag />
             <Modal content={modalContent} onClose={closeModal} renderContent={renderModalContent} />
