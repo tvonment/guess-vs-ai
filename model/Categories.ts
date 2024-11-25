@@ -1,5 +1,5 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faShield, faJedi, faWandSparkles, faPaw, faBasketball, faMusic } from "@fortawesome/free-solid-svg-icons";
+import { faShield, faJedi, faWandSparkles, faPaw, faBasketball, faBook } from "@fortawesome/free-solid-svg-icons";
 
 export enum CategoryType {
     Advanced = "Advanced",
@@ -43,11 +43,11 @@ export const Categories: Category[] = [
         image: "/images/LeBron.PNG"
     },
     {
-        name: "Music Artist",
-        description: "A famous music artist or band.",
+        name: "Historical Figures",
+        description: "Pick a famous historical figure from any era, such as Cleopatra, Einstein, or Mandela.",
         type: CategoryType.Theme,
-        icon: faMusic as IconProp,
-        image: "/images/queen.PNG"
+        icon: faBook as IconProp,
+        image: "/images/sokrates.PNG"
     }
 ];
 
