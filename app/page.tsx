@@ -112,7 +112,7 @@ export default function MainPage() {
         closeModal();
     };
 
-    const handleNavigateBack = (targetPage: any) => {
+    const handleNavigateBack = (targetPage: "home" | "categoryselection" | "wordselection" | "game" | "gameover") => {
         setTransitionDirection('right');
         setCurrentPage(targetPage);
     };
