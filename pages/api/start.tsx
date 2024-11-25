@@ -2,7 +2,7 @@ import { selectWord } from "@/services/aiWordSelectionService"; // Import the se
 import { NextApiRequest, NextApiResponse } from "next";
 import { Message } from "@/model/Message";
 import { startGame } from "@/services/cosmosService";
-import { GameStatus } from "@/model/GameStatus";
+import { Game } from "@/model/Game";
 import { Category, Categories } from "@/model/Categories";
 import { characterCheck } from "@/services/characterCheckService";
 
@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
         const startMessage: Message = { role: "assistant", content: `Alright, I've locked in my word from the '${category.name}' category. Your move—ask away, and let's see what you've got!` };
-        const game = new GameStatus(userId, [], userWord, aiWord, category);
+        const game = new Game(userId, [], userWord, aiWord, category);
         await startGame(game);
         res.status(200).json({ result: [startMessage] });
     } catch (error: unknown) {
