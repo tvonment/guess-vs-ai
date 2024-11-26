@@ -1,38 +1,45 @@
-import { ReportedIssue } from "@/model/Game";
-import { faPaperPlane, faRotateLeft, faSkullCrossbones, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import { Feedback } from "@/model/Feedback";
+import { faHeart, faHeartBroken, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 
 interface ReportIssueProps {
     onClose: () => void;
     userId: string;
-    gameStatus: string;
 }
 
-export default function ReportIssue({ onClose, userId, gameStatus }: ReportIssueProps) {
+export default function ReportIssue({ onClose, userId }: ReportIssueProps) {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [systemMessage, setSystemMessage] = useState('');
+    const [warning, setWarning] = useState('');
 
     const handleSend = async () => {
+        if (!message) {
+            setWarning('Please write a message!');
+            return;
+        }
+        const feedbackId = uuidv4();
+
         setLoading(true);
         try {
-            const response = await fetch('/api/report', {
+            const response = await fetch('/api/feedback', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ userId: userId, reportedIssue: { message: message, gameStatus: gameStatus } as ReportedIssue }),
+                body: JSON.stringify({ feedback: { id: feedbackId, userId: userId, message: message } as Feedback }),
             });
             const data = await response.json();
             const result = data.result;
             if (result) {
                 setSystemMessage(result);
             } else {
-                setSystemMessage('Error sending issue!');
+                setSystemMessage('Error sending feedback!');
             }
         } catch (error) {
-            console.error('Error sending the Issue', error);
+            console.error('Error sending the feedback', error);
         } finally {
             setLoading(false);
         }
@@ -40,27 +47,28 @@ export default function ReportIssue({ onClose, userId, gameStatus }: ReportIssue
 
     return (
         <div className="p-4">
-            <h2 className="text-xl font-bold mb-4">Report Issue</h2>
+            <h2 className="text-xl font-bold mb-4">Feedback</h2>
             {(!loading && !systemMessage) ? (
                 <>
-                    <h3 className="mb-4">Message: </h3>
                     <textarea
                         className="w-full p-2 mb-4"
                         rows={4}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        placeholder="(optional) Please describe the issue here..."
+                        placeholder="Send us your thoughts..."
+                        required
                     ></textarea>
+                    <p className="text-orange-500 mb-4">{warning}</p>
                     <div className="flex justify-center space-x-4">
-                        <button className="btn btn-blue" onClick={onClose} disabled={loading}>
-                            <FontAwesomeIcon icon={faRotateLeft} className="icon-margin" />
+                        <button className="btn btn-red" onClick={onClose} disabled={loading}>
+                            <FontAwesomeIcon icon={faHeartBroken} className="icon-margin" />
                             <span className="text-center">Back</span>
-                            <FontAwesomeIcon icon={faRotateLeft} className="icon-margin" />
+                            <FontAwesomeIcon icon={faHeartBroken} className="icon-margin" />
                         </button>
                         <button className="btn btn-orange" onClick={handleSend} disabled={loading}>
-                            <FontAwesomeIcon icon={faPaperPlane} className="icon-margin" />
+                            <FontAwesomeIcon icon={faHeart} className="icon-margin" />
                             <span className="text-center">Send</span>
-                            <FontAwesomeIcon icon={faPaperPlane} className="icon-margin" />
+                            <FontAwesomeIcon icon={faHeart} className="icon-margin" />
                         </button>
                     </div>
                 </>

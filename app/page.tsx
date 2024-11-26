@@ -18,6 +18,7 @@ import Help from './components/modal/Help';
 import VersionFlag from './components/VersionFlag';
 import Menu from './components/Menu';
 import ReportIssue from './components/modal/ReportIssue';
+import Feedback from './components/modal/Feedback';
 
 export default function MainPage() {
     const [currentPage, setCurrentPage] = useState<'home' | 'categoryselection' | 'wordselection' | 'game' | 'gameover'>('home');
@@ -71,6 +72,8 @@ export default function MainPage() {
                 return <ReportIssue onClose={closeModal} gameStatus='ingame' userId={userId} />;
             case 'report-gameover':
                 return <ReportIssue onClose={closeModal} gameStatus='gameover' userId={userId} />;
+            case 'feedback':
+                return <Feedback onClose={closeModal} userId={userId} />;
             default:
                 return null;
         }
@@ -90,6 +93,10 @@ export default function MainPage() {
     const handleStart = () => {
         setCurrentPage('categoryselection');
     };
+
+    const handleFeedback = () => {
+        openModal('feedback');
+    }
 
     const handleSetCategory = (selectedCategory: Category) => {
         setCategory(selectedCategory);
@@ -141,7 +148,7 @@ export default function MainPage() {
             {currentPage === 'categoryselection' && <CategorySelection onNavigateBack={() => { handleNavigateBack('home') }} onSetCategory={handleSetCategory} />}
             {currentPage === 'wordselection' && category && <WordSelection onNavigateBack={() => handleNavigateBack('categoryselection')} onStartGame={handleOnStartGame} category={category} />}
             {currentPage === 'game' && category && userId && <Game category={category} userId={userId} userWord={userWord} onSetWinner={handleGameOver} openModal={openModal} counter={counter} onCounterIncrease={handleCounterIncrease} />}
-            {currentPage === 'gameover' && <GameOver winner={winner} aiWord={aiWord} onNavigate={() => handleNavigateBack('categoryselection')} onReportIssue={openModal} />}
+            {currentPage === 'gameover' && <GameOver winner={winner} aiWord={aiWord} onNavigate={() => handleNavigateBack('categoryselection')} onReportIssue={openModal} onFeedback={handleFeedback} />}
             <Footer openModal={openModal} />
             {showMenu && (
                 <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} counter={counter} isGameScreen={currentPage === 'game'} />

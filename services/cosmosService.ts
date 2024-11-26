@@ -2,7 +2,9 @@ import { CosmosClient } from "@azure/cosmos";
 import { Message } from "@/model/Message";
 import { Answer } from "@/model/Answer";
 import { Category } from "@/model/Categories";
-import { Game } from "@/model/Game";
+import { Game, ReportedIssue } from "@/model/Game";
+import { Feedback } from "@/model/Feedback";
+import { randomUUID } from "crypto";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
 const COSMOS_DB_DATABASE_NAME = process.env.COSMOS_DB_DATABASE_NAME || "";
@@ -11,6 +13,7 @@ const COSMOS_DB_CONTAINER_NAME = process.env.COSMOS_DB_CONTAINER_NAME || "";
 const client = new CosmosClient(COSMOS_DB_CONNECTION_STRING);
 const database = client.database(COSMOS_DB_DATABASE_NAME);
 const container = database.container(COSMOS_DB_CONTAINER_NAME);
+const feedbackContainer = database.container("feedback");
 
 async function getChatHistory(userId: string): Promise<Message[]> {
     // Retrieve chat history from Cosmos DB
@@ -161,14 +164,34 @@ export async function finishGame(userId: string): Promise<string> {
     }
 }
 
-export async function reportIssue(userId: string, gameStatus: string, message: string): Promise<string> {
+export async function reportIssue(userId: string, reportedIssue: ReportedIssue): Promise<string> {
+    console.log("Report Issue Request received");
     try {
         const game = await getGameStatus(userId);
-        if (!message) { message = "No message provided"; }
+
+        if (!reportedIssue.message) { reportedIssue.message = "No message provided"; }
         if (!game.issues) { game.issues = []; }
-        game.issues.push({ gameStatus: gameStatus, message: message });
+
+        game.issues.push(reportedIssue);
         await updateGame(game);
-        return "Issue reported";
+        return "Issue successfully reported!";
+    } catch (error: unknown) {
+        console.error("Error:", error);
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error("An error occurred");
+        }
+        return "An error occurred";
+    }
+}
+
+export async function writeFeedback(feedback: Feedback): Promise<string> {
+    console.log("Feedback Request received");
+
+    try {
+        await feedbackContainer.items.create(feedback);
+        return "Feedback successfully submitted";
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {
