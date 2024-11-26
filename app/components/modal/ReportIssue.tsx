@@ -1,5 +1,5 @@
 import { ReportedIssue } from "@/model/Game";
-import { faPaperPlane, faRotateLeft, faSkullCrossbones, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import { faPaperPlane, faRotateLeft, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from 'react';
 
