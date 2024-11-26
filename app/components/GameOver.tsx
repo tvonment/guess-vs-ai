@@ -1,17 +1,18 @@
 import React from 'react';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBug, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faBug, faHeart, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 
 type GameOverProps = {
     winner: string;
     aiWord: string;
     onNavigate: () => void;
     onReportIssue: (message: string) => void;
+    onFeedback: () => void;
 };
 
 
-export default function GameOver({ winner, aiWord, onNavigate, onReportIssue }: GameOverProps) {
+export default function GameOver({ winner, aiWord, onNavigate, onReportIssue, onFeedback }: GameOverProps) {
     const renderContent = () => {
         switch (winner) {
             case 'assistant':
@@ -70,6 +71,18 @@ export default function GameOver({ winner, aiWord, onNavigate, onReportIssue }: 
                         <FontAwesomeIcon icon={faRotateLeft} className="icon-margin" />
                         <span className="mx-2 text-center">Again</span>
                         <FontAwesomeIcon icon={faRotateLeft} className="icon-margin" />
+                    </button>
+                </div>
+            </div>
+            <div className="flex justify-center">
+                <p className='mt-10 m-4 text-white'>Had fun? Leave us a Feedback!</p>
+            </div>
+            <div className="flex justify-center">
+                <div className="flex max-w-1/3">
+                    <button className="btn-blue py-4 px-8 rounded-lg shadow sm:flex-1 flex items-center justify-between text-2xl font-extrabold" onClick={onFeedback}>
+                        <FontAwesomeIcon icon={faHeart} className="icon-margin" />
+                        <span className="mx-2 text-center">Feedback</span>
+                        <FontAwesomeIcon icon={faHeart} className="icon-margin" />
                     </button>
                 </div>
             </div>

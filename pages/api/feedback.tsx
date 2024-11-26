@@ -1,16 +1,14 @@
-import { ReportedIssue } from '@/model/Game';
-import { reportIssue } from '@/services/cosmosService';
+import { writeFeedback } from '@/services/cosmosService';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { report } from 'process';
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    console.log("Report Request received");
+    console.log("Feedback Request received");
 
-    const { userId, reportedIssue } = req.body;
+    const { feedback } = req.body;
 
     try {
-        const response = await reportIssue(userId, reportedIssue);
+        const response = await writeFeedback(feedback);
         res.status(200).json({ result: response });
     } catch (error: unknown) {
         console.error("Error:", error);
