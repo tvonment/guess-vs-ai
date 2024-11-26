@@ -1,7 +1,5 @@
-import { ReportedIssue } from '@/model/Game';
 import { reportIssue } from '@/services/cosmosService';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { report } from 'process';
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
