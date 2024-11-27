@@ -5,7 +5,7 @@ export default function TermsOfUse() {
             <ol className="list-decimal pl-6">
                 <li>
                     <h3 className="text-md font-semibold">Acceptance of Terms</h3>
-                    <p>By accessing or using GuessvsAI by BeatAI, you agree to comply with and be bound by these Terms of Use. If you do not agree to these terms, please do not use GuessvsAI. We reserve the right to update or modify these terms at any time, and such changes will take effect immediately upon posting.</p>
+                    <p>By accessing or using GuessvsAI by Cheesy AI, you agree to comply with and be bound by these Terms of Use. If you do not agree to these terms, please do not use GuessvsAI. We reserve the right to update or modify these terms at any time, and such changes will take effect immediately upon posting.</p>
                 </li>
                 <li>
                     <h3 className="text-md font-semibold">License Grant</h3>
@@ -38,7 +38,7 @@ export default function TermsOfUse() {
                 <li>
                     <h3 className="text-md font-semibold">Content Creation and Sharing</h3>
                     <p>We encourage content creators to share videos, screenshots, and other content related to their gameplay experience of the Game on social media, streaming platforms, and other channels. By doing so, you grant us a non-exclusive, royalty-free license to use, display, and share these videos or content across our marketing channels, website, and social media platforms.</p>
-                    <p>Content creators may monetize their gameplay videos (e.g., via platforms like YouTube, Twitch, etc.), but all rights to the game&apos;s intellectual property, including but not limited to the game itself, artwork, and trademarks, remain with BeatAI.</p>
+                    <p>Content creators may monetize their gameplay videos (e.g., via platforms like YouTube, Twitch, etc.), but all rights to the game&apos;s intellectual property, including but not limited to the game itself, artwork, and trademarks, remain with Cheesy AI.</p>
                     <p>Content creators agree to:</p>
                     <ul className="list-disc pl-6">
                         <li>Not infringe upon any intellectual property rights or violate these Terms of Use when sharing or monetizing gameplay content.</li>
@@ -52,7 +52,7 @@ export default function TermsOfUse() {
                 </li>
                 <li>
                     <h3 className="text-md font-semibold">Intellectual Property</h3>
-                    <p>All content, trademarks, logos, and other intellectual property associated with the Game are owned by BeatAI or its licensors. You acknowledge that no ownership rights are transferred to you under these Terms of Use.</p>
+                    <p>All content, trademarks, logos, and other intellectual property associated with the Game are owned by Cheesy AI or its licensors. You acknowledge that no ownership rights are transferred to you under these Terms of Use.</p>
                 </li>
                 <li>
                     <h3 className="text-md font-semibold">Disclaimers</h3>
@@ -61,7 +61,7 @@ export default function TermsOfUse() {
                 </li>
                 <li>
                     <h3 className="text-md font-semibold">Limitation of Liability</h3>
-                    <p>To the fullest extent permitted by law, BeatAI shall not be liable for any damages arising from the use of or inability to use the Game, including but not limited to lost profits, data loss, or personal injury. You agree to use the Game at your own risk.</p>
+                    <p>To the fullest extent permitted by law, Cheesy AI shall not be liable for any damages arising from the use of or inability to use the Game, including but not limited to lost profits, data loss, or personal injury. You agree to use the Game at your own risk.</p>
                 </li>
                 <li>
                     <h3 className="text-md font-semibold">Termination</h3>
@@ -73,7 +73,7 @@ export default function TermsOfUse() {
                 </li>
                 <li>
                     <h3 className="text-md font-semibold">Contact Us</h3>
-                    <p>If you have any questions or concerns about these Terms of Use, please contact us at: <a href="mailto:info@beatai.dev" className="text-blue-500">info@beatai.dev</a></p>
+                    <p>If you have any questions or concerns about these Terms of Use, please contact us at: <a href="mailto:info@cheesy-ai.com" className="text-blue-500">info@cheesy-ai.com</a></p>
                 </li>
             </ol>
         </div>
