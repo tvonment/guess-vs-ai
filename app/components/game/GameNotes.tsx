@@ -3,7 +3,7 @@ export default function GameNotes() {
         <textarea
             className="w-full p-2 border border-gray-300 rounded-lg mb-4"
             placeholder="Enter your notes here"
-            rows={4}
+            rows={8}
         ></textarea>
     )
 }

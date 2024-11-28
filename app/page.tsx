@@ -18,7 +18,7 @@ import Help from './components/modal/Help';
 import VersionFlag from './components/VersionFlag';
 import Menu from './components/Menu';
 import ReportIssue from './components/modal/ReportIssue';
-import Feedback from './components/modal/Feedback';
+import FeedbackForm from './components/modal/FeedbackForm';
 
 export default function MainPage() {
     const [currentPage, setCurrentPage] = useState<'home' | 'categoryselection' | 'wordselection' | 'game' | 'gameover'>('home');
@@ -29,7 +29,7 @@ export default function MainPage() {
     const [aiWord, setAiWord] = useState<string>("");
     const [modalContent, setModalContent] = useState<string | null>(null);
     const [showMenu, setShowMenu] = useState<boolean>(false);
-    const [counter, setCounter] = useState<number>(1);
+    const [counter, setCounter] = useState<number>(0);
 
     const handleCounterIncrease = () => {
         setCounter(counter + 1);
@@ -73,7 +73,7 @@ export default function MainPage() {
             case 'report-gameover':
                 return <ReportIssue onClose={closeModal} gameStatus='gameover' userId={userId} />;
             case 'feedback':
-                return <Feedback onClose={closeModal} userId={userId} />;
+                return <FeedbackForm onClose={closeModal} userId={userId} />;
             default:
                 return null;
         }
