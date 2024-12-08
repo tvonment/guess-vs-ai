@@ -33,11 +33,11 @@ export default function GameInputs({ onHandleAnswerClick, onHandleHumanGuess, tu
         <div className="w-full flex justify-center mb-4">
             {turn == TurnState.AI ? (
                 <>
-                    <button onClick={() => onHandleAnswerClick(Answer.YES)} className="btn m-1 p-2 bg-green rounded flex-1">{Answer.YES}</button>
-                    <button onClick={() => onHandleAnswerClick(Answer.PROBABLY_YES)} className="btn m-1 p-2 bg-light-green rounded flex-1">{Answer.PROBABLY_YES}</button>
-                    <button onClick={() => onHandleAnswerClick(Answer.PROBABLY_NO)} className="btn m-1 p-2 bg-light-red rounded flex-1">{Answer.PROBABLY_NO}</button>
-                    <button onClick={() => onHandleAnswerClick(Answer.NO)} className="btn m-1 p-2 bg-red rounded flex-1">{Answer.NO}</button>
-                    <button onClick={() => onHandleAnswerClick(Answer.I_DONT_KNOW)} className="btn m-1 p-2 bg-gray-300 rounded flex-1">{Answer.I_DONT_KNOW}</button>
+                    <button onClick={() => onHandleAnswerClick(Answer.YES)} className="m-1 p-2 bg-green rounded flex-1">{Answer.YES}</button>
+                    <button onClick={() => onHandleAnswerClick(Answer.PROBABLY_YES)} className="m-1 p-2 bg-light-green rounded flex-1">{Answer.PROBABLY_YES}</button>
+                    <button onClick={() => onHandleAnswerClick(Answer.PROBABLY_NO)} className="m-1 p-2 bg-light-red rounded flex-1">{Answer.PROBABLY_NO}</button>
+                    <button onClick={() => onHandleAnswerClick(Answer.NO)} className="m-1 p-2 bg-red rounded flex-1">{Answer.NO}</button>
+                    <button onClick={() => onHandleAnswerClick(Answer.I_DONT_KNOW)} className="m-1 p-2 bg-gray-300 rounded flex-1">{Answer.I_DONT_KNOW}</button>
                 </>
             ) : turn == TurnState.HUMAN ? (
                 <div className="w-full flex">

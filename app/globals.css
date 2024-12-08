@@ -98,40 +98,38 @@ button {
 .btn-orange {
   background-color: #fe9b39;
   color: #141414;
+  font-size: 1.2rem;
+  font-weight: bold;
   padding: 0.5rem 1rem;
   border-radius: 0.7rem;
   cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.btn-orange:hover {
-  background-color: #ffa74f;
+  transition: transform 0.3s;
 }
 
 .btn-red {
   background-color: #cb635f;
+  font-size: 1.4rem;
+  font-weight: bold;
   color: #141414;
   padding: 0.5rem 1rem;
   border-radius: 0.7rem;
   cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.btn-red:hover {
-  background-color: #e69c99;
+  transition: transform 0.3s;
 }
 
 .btn-blue {
   background-color: #4863A0;
+  font-size: 1.2rem;
+  font-weight: bold;
   color: #f7fefd;
   padding: 0.5rem 1rem;
   border-radius: 0.7rem;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: transform 0.3s;
 }
 
-.btn-blue:hover {
-  background-color: #a7bff6;
+button:hover {
+  transform: scale(1.05);
 }
 
 .bg-blue {
@@ -230,7 +228,7 @@ button {
 }
 
 .message.assistant .message-content {
-  background-color: rgba(255, 200, 100, 0.8);
+  background-color: rgba(255, 200, 100, 1);
   text-align: left;
 }
 

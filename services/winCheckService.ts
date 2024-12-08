@@ -4,7 +4,6 @@ import { gptMiniCall } from "./oaiService";
 const winCheckSystemMessage = "You are to verify if the guess is a complete winning guess. Only answer with 'win' or 'no'. A correct question is not yet a win, even if it is close! The user has to guess the word correctly to win the game. Spelling issues are ok!";
 
 export async function winCheck(guess: string, word: string): Promise<boolean> {
-    console.log("Win Check Request received", "Guess:", guess, "Word:", word);
     const systemMessage: Message = {
         role: "system",
         content: winCheckSystemMessage,
@@ -115,6 +114,7 @@ export async function winCheck(guess: string, word: string): Promise<boolean> {
 
     try {
         const gptResponse = await gptMiniCall([systemMessage, ...fewShotMessages, userMessage]);
+        console.log("Win Check:", guess, word, gptResponse.content);
         if (gptResponse.content === "win") {
             return true;
         } else {

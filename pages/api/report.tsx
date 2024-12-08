@@ -3,8 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    console.log("Report Request received");
-
     const { userId, reportedIssue } = req.body;
 
     try {

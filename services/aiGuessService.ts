@@ -4,8 +4,6 @@ import { Category } from "@/model/Categories";
 import { gptCall } from "./oaiService";
 
 export async function makeGuess(userId: string): Promise<Message> {
-    console.log("Make Guess Request received");
-
     const category = await getCategory(userId) as Category;
 
     const instructionSystemMessage = `You are playing a game of guess what. You play against a human and you are eager to win. Ask a question to narrow down the searched word from the category '${category.name}' or make a good guess!`;

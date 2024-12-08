@@ -111,8 +111,6 @@ export async function addToHistory(userId: string, message: Message, winner?: st
 }
 
 export async function getUsedCharacters(category: Category): Promise<string[]> {
-    console.log("Get Used Characters Request received");
-
     try {
         // Retrieve chat history from Cosmos DB
         const query = `SELECT c.aiWord FROM c WHERE c.category.name = @categoryName`;
@@ -135,7 +133,6 @@ export async function getUsedCharacters(category: Category): Promise<string[]> {
 }
 
 export async function finishGame(userId: string): Promise<string> {
-    console.log("Finish Request received");
     const gameStatus = await getGameStatus(userId);
     gameStatus.winner = "given up";
 
@@ -165,7 +162,6 @@ export async function finishGame(userId: string): Promise<string> {
 }
 
 export async function reportIssue(userId: string, reportedIssue: ReportedIssue): Promise<string> {
-    console.log("Report Issue Request received");
     try {
         const game = await getGameStatus(userId);
 
@@ -187,8 +183,6 @@ export async function reportIssue(userId: string, reportedIssue: ReportedIssue):
 }
 
 export async function writeFeedback(feedback: Feedback): Promise<string> {
-    console.log("Feedback Request received");
-
     try {
         await feedbackContainer.items.create(feedback);
         return "Feedback successfully submitted";

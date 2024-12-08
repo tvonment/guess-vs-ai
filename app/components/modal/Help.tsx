@@ -11,10 +11,10 @@ export default function Help({ onClose }: HelpProps) {
             <h2 className="text-xl font-bold mb-4">Help</h2>
             <p className="mb-4">Coming soon!</p>
             <div className="flex justify-end space-x-4">
-                <button className="btn btn-orange" onClick={onClose}>
+                <button className="btn-orange" onClick={onClose}>
                     <FontAwesomeIcon icon={faThumbsUp} className="icon-margin" />
                     <span className="text-center">OK</span>
-                    <FontAwesomeIcon icon={faThumbsUp} className="icon-margin" />
+                    <FontAwesomeIcon icon={faThumbsUp} className="icon-margin hidden sm:inline" />
                 </button>
             </div>
         </div>

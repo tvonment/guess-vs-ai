@@ -38,18 +38,20 @@ export default function GameOverModal({ winner, aiWord, openModal, onRestart }: 
     };
 
     return (
-        <main className="w-full">
+        <main className="w-full overflow-hidden">
             {renderContent()}
-            <button className="btn-blue p-3 mt-3 rounded-lg shadow w-full flex flex items-center justify-between" onClick={handleFeedback}>
-                <FontAwesomeIcon icon={faHeart} className="icon-margin-small" />
-                <span className="mx-2 text-center">Feedback</span>
-                <FontAwesomeIcon icon={faHeart} className="icon-margin-small" />
-            </button>
-            <button className="btn-orange p-3 mt-3 rounded-lg shadow w-full flex flex items-center justify-between" onClick={handleRestart}>
-                <FontAwesomeIcon icon={faRotateLeft} className="icon-margin-small" />
-                <span className="mx-2 text-center">Again</span>
-                <FontAwesomeIcon icon={faRotateLeft} className="icon-margin-small" />
-            </button>
+            <div className="flex justify-center space-x-4 mt-3">
+                <button className="btn-blue p-3 rounded-lg shadow flex items-center justify-between w-48 transform transition-transform duration-300 hover:scale-105" onClick={handleFeedback}>
+                    <FontAwesomeIcon icon={faHeart} className="icon-margin-small" />
+                    <span className="mx-2 text-center">Feedback</span>
+                    <FontAwesomeIcon icon={faHeart} className="icon-margin-small hidden sm:inline" />
+                </button>
+                <button className="btn-orange p-3 rounded-lg shadow flex items-center justify-between w-48 transform transition-transform duration-300 hover:scale-105" onClick={handleRestart}>
+                    <FontAwesomeIcon icon={faRotateLeft} className="icon-margin-small" />
+                    <span className="mx-2 text-center">Again</span>
+                    <FontAwesomeIcon icon={faRotateLeft} className="icon-margin-small hidden sm:inline" />
+                </button>
+            </div>
         </main>
     );
 }

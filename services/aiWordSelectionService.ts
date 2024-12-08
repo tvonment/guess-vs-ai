@@ -4,8 +4,6 @@ import { gptCall } from "./oaiService";
 import { Message } from "@/model/Message";
 
 export async function selectWord(category: Category) {
-    console.log("Select Word Request received");
-
     const usedCharacters: string[] = await getUsedCharacters(category);
     console.log("Used Characters:", usedCharacters);
 
@@ -59,9 +57,7 @@ export async function selectWord(category: Category) {
         } as Message;
     try {
         const gptResponse = await gptCall([systemMessageText, ...fewShotMessages, userMessage], 0.7);
-        console.log("GPT Response:", gptResponse);
         const word = gptResponse.content;
-        console.log("AI chose the word: " + word)
         return word;
     } catch (error) {
         console.error("Error selecting word:", error);

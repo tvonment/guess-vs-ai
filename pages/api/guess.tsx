@@ -6,7 +6,6 @@ import { addToHistory, getWinningWords } from "@/services/cosmosService";
 import { Message } from "@/model/Message";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    console.log("Guess Request received");
     const { text, userId } = req.body;
 
     try {

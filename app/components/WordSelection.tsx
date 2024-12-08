@@ -36,8 +36,6 @@ export default function WordSelection({ onNavigateBack, category, onStartGame }:
             // Set the retrieved chat history
             if (data.result) {
                 setErrorMessage("");
-                console.log("Game started", data);
-                console.log("User ID:", generatedUserId);
                 console.log("User word:", userWord);
                 onStartGame(generatedUserId, userWord);
             }
@@ -103,9 +101,9 @@ export default function WordSelection({ onNavigateBack, category, onStartGame }:
                     />
                 </div>
                 <div className="flex items-center justify-center mb-4 w-full">
-                    <div className="w-1/2 flex justify-center">
+                    <div className="w-full sm:w-1/2 flex justify-center">
                         {!loading ? (
-                            <button className="w-full btn-orange py-4 px-8 rounded-lg shadow sm:flex-1 flex items-center justify-between text-2xl font-extrabold" onClick={handleWordLock}>
+                            <button className="w-full btn-orange py-4 px-8 rounded-lg shadow sm:flex-1 flex items-center justify-between text-3xl font-extrabold" onClick={handleWordLock}>
                                 <FontAwesomeIcon icon={faGamepad} className="icon-margin-small" />
                                 <span className="mx-2 text-center">Start</span>
                                 <FontAwesomeIcon icon={faGamepad} className="icon-margin-small" />

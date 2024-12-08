@@ -49,7 +49,6 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
     }, []);
 
     const handleWinner = (winner: string, aiWord: string) => {
-        console.log("handle Game over!");
         onSetTurn(TurnState.FINISHED);
         onSetWinner(winner, aiWord);
         openModal("gameover");

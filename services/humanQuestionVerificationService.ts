@@ -9,8 +9,6 @@ export async function verifyHumanQuestion(userId: string, userQuestion: string) 
     const aiWord = await getAiWord(userId);
     const verifySystemMessage = `Verify if the question is correct. The Word in question is ${aiWord}. Only answer with ${possibleAnswersString}.`
 
-    console.log(possibleAnswersString);
-
     const systemMessage = {
         role: "system",
         content: verifySystemMessage

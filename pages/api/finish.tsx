@@ -2,8 +2,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { finishGame } from "@/services/cosmosService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    console.log("Finish Request received");
-
     const { userId } = req.body;
 
     try {
