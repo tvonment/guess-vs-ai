@@ -63,7 +63,6 @@ export default function MainPage() {
     }
 
     const renderModalContent = () => {
-        console.log("Modal content:", modalContent);
         switch (modalContent) {
             case 'FAQ':
                 return <Faq />;

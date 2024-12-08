@@ -37,15 +37,15 @@ export default function Confirm({ onConfirm, onClose, userId }: ConfirmProps) {
                 <h2 className="text-xl font-bold mb-4">Give up</h2>
                 <p className="mb-4">Are you sure?</p>
                 <div className="flex justify-center space-x-4">
-                    <button className="btn btn-blue" onClick={onClose} disabled={loading}>
+                    <button className="btn-blue" onClick={onClose} disabled={loading}>
                         <FontAwesomeIcon icon={faRotateLeft} className="icon-margin" />
                         <span className="text-center">Continue</span>
-                        <FontAwesomeIcon icon={faRotateLeft} className="icon-margin" />
+                        <FontAwesomeIcon icon={faRotateLeft} className="icon-margin hidden sm:inline" />
                     </button>
-                    <button className="btn btn-red" onClick={handleConfirm} disabled={loading}>
+                    <button className="btn-red" onClick={handleConfirm} disabled={loading}>
                         <FontAwesomeIcon icon={faSkullCrossbones} className="icon-margin" />
                         <span className="text-center">Finish</span>
-                        <FontAwesomeIcon icon={faSkullCrossbones} className="icon-margin" />
+                        <FontAwesomeIcon icon={faSkullCrossbones} className="icon-margin hidden sm:inline" />
                     </button>
                 </div>
             </div>

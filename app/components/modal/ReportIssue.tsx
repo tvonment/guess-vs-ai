@@ -52,15 +52,15 @@ export default function ReportIssue({ onClose, userId, gameStatus }: ReportIssue
                         placeholder="(optional) Please describe the issue here..."
                     ></textarea>
                     <div className="flex justify-center space-x-4">
-                        <button className="btn btn-blue" onClick={onClose} disabled={loading}>
+                        <button className="btn-blue" onClick={onClose} disabled={loading}>
                             <FontAwesomeIcon icon={faRotateLeft} className="icon-margin" />
                             <span className="text-center">Back</span>
-                            <FontAwesomeIcon icon={faRotateLeft} className="icon-margin" />
+                            <FontAwesomeIcon icon={faRotateLeft} className="icon-margin hidden sm:inline" />
                         </button>
-                        <button className="btn btn-orange" onClick={handleSend} disabled={loading}>
+                        <button className="btn-orange" onClick={handleSend} disabled={loading}>
                             <FontAwesomeIcon icon={faPaperPlane} className="icon-margin" />
                             <span className="text-center">Send</span>
-                            <FontAwesomeIcon icon={faPaperPlane} className="icon-margin" />
+                            <FontAwesomeIcon icon={faPaperPlane} className="icon-margin hidden sm:inline" />
                         </button>
                     </div>
                 </>
@@ -68,10 +68,10 @@ export default function ReportIssue({ onClose, userId, gameStatus }: ReportIssue
                 <>
                     <p className="mb-4">{systemMessage}</p>
                     <div className="flex justify-end space-x-4">
-                        <button className="btn btn-orange" onClick={onClose} disabled={loading}>
+                        <button className="btn-orange" onClick={onClose} disabled={loading}>
                             <FontAwesomeIcon icon={faThumbsUp} className="icon-margin" />
                             <span className="text-center">Ok</span>
-                            <FontAwesomeIcon icon={faThumbsUp} className="icon-margin" />
+                            <FontAwesomeIcon icon={faThumbsUp} className="icon-margin hidden sm:inline" />
                         </button>
                     </div>
                 </>

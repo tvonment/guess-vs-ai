@@ -5,11 +5,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    console.log("Message Request received");
     const { categoryName } = req.body;
     const { messageRequestType } = req.body;
     const category = Categories.find((c) => c.name === categoryName) as Category;
-    console.log(`Category: ${category.name}`);
 
     switch (messageRequestType) {
         case MessageRequestType.START:

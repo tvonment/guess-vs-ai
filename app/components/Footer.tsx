@@ -10,7 +10,7 @@ interface FooterProps {
 function FooterText() {
     const year = new Date().getFullYear();
     return (
-        <p className='m-1 lg:m-2'>© {year} <a href='https://www.cheesy-ai.com/' target='_blank'><span style={{ color: "#ffa74f" }}>Cheesy AI</span></a>. Created by <span style={{ color: "#7a95d2" }}>Pjotr Tinke</span> & <span style={{ color: "#ffa74f" }}>Thomas von Mentlen</span></p>
+        <p className='m-1 lg:m-2'>© {year} <a href='https://www.cheesy-ai.com/' target='_blank'><span style={{ color: "#ffa74f" }}>Cheesy AI</span></a>.</p>
     );
 }
 

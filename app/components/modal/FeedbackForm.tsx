@@ -233,15 +233,15 @@ export default function FeedbackForm({ onClose, userId }: FeedbackProps) {
                     </div>
                     <p className="text-orange-500 mb-4">{warning}</p>
                     <div className="flex justify-center space-x-4">
-                        <button className="btn btn-red" onClick={onClose} disabled={loading}>
+                        <button className="btn-red" onClick={onClose} disabled={loading}>
                             <FontAwesomeIcon icon={faHeartBroken} className="icon-margin" />
                             <span className="text-center">Back</span>
-                            <FontAwesomeIcon icon={faHeartBroken} className="icon-margin" />
+                            <FontAwesomeIcon icon={faHeartBroken} className="icon-margin hidden sm:inline" />
                         </button>
-                        <button className="btn btn-orange" onClick={handleSend} disabled={loading}>
+                        <button className="btn-orange" onClick={handleSend} disabled={loading}>
                             <FontAwesomeIcon icon={faHeart} className="icon-margin" />
                             <span className="text-center">Send</span>
-                            <FontAwesomeIcon icon={faHeart} className="icon-margin" />
+                            <FontAwesomeIcon icon={faHeart} className="icon-margin hidden sm:inline" />
                         </button>
                     </div>
                 </>
@@ -249,10 +249,10 @@ export default function FeedbackForm({ onClose, userId }: FeedbackProps) {
                 <>
                     <p className="mb-4">{systemMessage}</p>
                     <div className="flex justify-end space-x-4">
-                        <button className="btn btn-orange" onClick={onClose} disabled={loading}>
+                        <button className="btn-orange" onClick={onClose} disabled={loading}>
                             <FontAwesomeIcon icon={faThumbsUp} className="icon-margin" />
                             <span className="text-center">Ok</span>
-                            <FontAwesomeIcon icon={faThumbsUp} className="icon-margin" />
+                            <FontAwesomeIcon icon={faThumbsUp} className="icon-margin hidden sm:inline" />
                         </button>
                     </div>
                 </>

@@ -3,8 +3,6 @@ import { gptCall, gptMiniCall } from "./oaiService";
 import { Message } from "@/model/Message";
 
 export async function characterCheck(word: string, category: Category): Promise<boolean> {
-    console.log("Character Request received");
-    console.log("Used word:", word);
     const systemMessageText = { role: "system", content: `You need to check if the selected word fits in the Category of "${category.name}" with the following description: ${category.description}. Only answer with 'yes' or 'no'` } as Message;
     const fewShotMessages: Message[] = [
         {
