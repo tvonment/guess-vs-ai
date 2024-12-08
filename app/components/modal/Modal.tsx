@@ -4,12 +4,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 interface ModalProps {
     content: string | null;
     onClose: () => void;
-    renderContent: (onConfirm?: () => void, onCancel?: () => void, userId?: string, gameStatus?: string) => JSX.Element | null;
-    onConfirm?: () => void;
+    renderContent: (onRestart?: () => void, onCancel?: () => void, openModal?: (content: string) => void, userId?: string, gameStatus?: string, winner?: string, aiWord?: string) => JSX.Element | null;
+    onRestart?: () => void;
     onCancel?: () => void;
+    openModal?: (content: string) => void;
 }
 
-export default function Modal({ content, onClose, renderContent, onConfirm, onCancel }: ModalProps) {
+export default function Modal({ content, onClose, renderContent, onRestart, onCancel, openModal }: ModalProps) {
     if (!content) return null;
 
     return (
@@ -18,7 +19,7 @@ export default function Modal({ content, onClose, renderContent, onConfirm, onCa
                 <button onClick={onClose} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 w-8 h-8 flex items-center justify-center">
                     <FontAwesomeIcon icon={faClose} />
                 </button>
-                {renderContent(onConfirm, onCancel)}
+                {renderContent(onRestart, onCancel, openModal)}
             </div>
         </div>
     );

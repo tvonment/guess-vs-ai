@@ -6,7 +6,6 @@ import CategorySelection from './components/CategorySelection';
 import Game from './components/game/Game';
 import { Category } from '@/model/Categories';
 import WordSelection from './components/WordSelection';
-import GameOver from './components/GameOver';
 import Modal from './components/modal/Modal';
 import Faq from './components/modal/Faq';
 import TermsOfUse from './components/modal/TermsOfUse';
@@ -19,9 +18,11 @@ import VersionFlag from './components/VersionFlag';
 import Menu from './components/Menu';
 import ReportIssue from './components/modal/ReportIssue';
 import FeedbackForm from './components/modal/FeedbackForm';
+import GameOverModal from './components/modal/GameOver';
+import { TurnState } from '@/model/TurnState';
 
 export default function MainPage() {
-    const [currentPage, setCurrentPage] = useState<'home' | 'categoryselection' | 'wordselection' | 'game' | 'gameover'>('home');
+    const [currentPage, setCurrentPage] = useState<'home' | 'categoryselection' | 'wordselection' | 'game'>('home');
     const [category, setCategory] = useState<Category>();
     const [userWord, setUserWord] = useState<string>("");
     const [userId, setUserId] = useState<string>("");
@@ -30,6 +31,7 @@ export default function MainPage() {
     const [modalContent, setModalContent] = useState<string | null>(null);
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const [counter, setCounter] = useState<number>(0);
+    const [turn, setTurn] = useState<TurnState>(TurnState.LOADING);
 
     const handleCounterIncrease = () => {
         setCounter(counter + 1);
@@ -56,7 +58,12 @@ export default function MainPage() {
         setModalContent(null);
     };
 
+    const handleSetTurn = (turn: TurnState) => {
+        setTurn(turn);
+    }
+
     const renderModalContent = () => {
+        console.log("Modal content:", modalContent);
         switch (modalContent) {
             case 'FAQ':
                 return <Faq />;
@@ -65,13 +72,15 @@ export default function MainPage() {
             case 'Contact':
                 return <Contact />;
             case 'giveup':
-                return <Confirm onClose={closeModal} onConfirm={handleGivenUp} userId={userId} />;
+                return <Confirm onClose={closeModal} onConfirm={handleGameOver} userId={userId} />;
             case 'help':
                 return <Help onClose={closeModal} />;
             case 'report-ingame':
                 return <ReportIssue onClose={closeModal} gameStatus='ingame' userId={userId} />;
             case 'report-gameover':
                 return <ReportIssue onClose={closeModal} gameStatus='gameover' userId={userId} />;
+            case 'gameover':
+                return <GameOverModal onClose={closeModal} winner={winner} aiWord={aiWord} openModal={openModal} onRestart={handleStart} />;
             case 'feedback':
                 return <FeedbackForm onClose={closeModal} userId={userId} />;
             default:
@@ -91,12 +100,16 @@ export default function MainPage() {
     }
 
     const handleStart = () => {
+        setCategory(undefined);
+        setUserWord("");
+        setUserId("");
+        setWinner("");
+        setAiWord("");
+        setCounter(0);
+        setTurn(TurnState.LOADING);
         setCurrentPage('categoryselection');
+        closeModal();
     };
-
-    const handleFeedback = () => {
-        openModal('feedback');
-    }
 
     const handleSetCategory = (selectedCategory: Category) => {
         setCategory(selectedCategory);
@@ -112,19 +125,13 @@ export default function MainPage() {
     const handleGameOver = (winner: string, aiWord: string) => {
         setWinner(winner);
         setAiWord(aiWord);
-        setCurrentPage('gameover');
+        setTurn(TurnState.FINISHED);
+        console.log("Game over with winner:", winner);
+        //setCurrentPage('gameover');
+        openModal('gameover');
     }
 
-    const handleGivenUp = (aiWord: string) => {
-        // Handle confirm action with the AI word
-        console.log("Confirmed with AI word:", aiWord);
-        setAiWord(aiWord);
-        setWinner('givenup');
-        setCurrentPage('gameover');
-        closeModal();
-    };
-
-    const handleNavigateBack = (targetPage: "home" | "categoryselection" | "wordselection" | "game" | "gameover") => {
+    const handleNavigateBack = (targetPage: "home" | "categoryselection" | "wordselection" | "game") => {
         setCurrentPage(targetPage);
     };
 
@@ -147,8 +154,7 @@ export default function MainPage() {
             {currentPage === 'home' && <Home onNavigate={handleStart} />}
             {currentPage === 'categoryselection' && <CategorySelection onNavigateBack={() => { handleNavigateBack('home') }} onSetCategory={handleSetCategory} />}
             {currentPage === 'wordselection' && category && <WordSelection onNavigateBack={() => handleNavigateBack('categoryselection')} onStartGame={handleOnStartGame} category={category} />}
-            {currentPage === 'game' && category && userId && <Game category={category} userId={userId} userWord={userWord} onSetWinner={handleGameOver} openModal={openModal} counter={counter} onCounterIncrease={handleCounterIncrease} />}
-            {currentPage === 'gameover' && <GameOver winner={winner} aiWord={aiWord} onNavigate={() => handleNavigateBack('categoryselection')} onReportIssue={openModal} onFeedback={handleFeedback} />}
+            {currentPage === 'game' && category && userId && <Game category={category} userId={userId} userWord={userWord} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onCounterIncrease={handleCounterIncrease} turn={turn} onSetTurn={handleSetTurn} />}
             <Footer openModal={openModal} />
             {showMenu && (
                 <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} counter={counter} isGameScreen={currentPage === 'game'} />
