@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const startMessage: Message = { role: "assistant", content: `Alright, I've locked in my word from the '${category.name}' category. Your move—ask away, and let's see what you've got!` };
         const game = new Game(userId, [], userWord, aiWord, category);
         await startGame(game);
-        res.status(200).json({ result: [startMessage] });
+        res.status(200).json({ result: "success" });
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {

@@ -1,6 +1,6 @@
 import { Category } from "@/model/Categories";
 import { Answer } from "@/model/Answer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Message } from "@/model/Message";
 import { TurnState } from "@/model/TurnState";
 import GameHeader from "./GameHeader";
@@ -10,23 +10,53 @@ import GameInfo from "./GameInfo";
 import GameNotes from "./GameNotes";
 import GameButtons from "./GameButtons";
 import Image from 'next/image';
+import { MessageRequestType } from "@/model/MessageRequestType";
 
 type GameProps = {
     category: Category;
     userId: string;
     userWord: string;
     counter: number;
+    turn: TurnState;
+    aiWord: string;
+    onSetTurn: (turn: TurnState) => void;
     onSetWinner: (winner: string, aiWord: string) => void;
     onCounterIncrease: () => void;
     openModal: (content: string) => void;
 };
 
-export default function Game({ category, userId, userWord, counter, onSetWinner, openModal, onCounterIncrease }: GameProps) {
+export default function Game({ category, userId, userWord, counter, turn, aiWord, onSetWinner, openModal, onCounterIncrease, onSetTurn }: GameProps) {
     const [messages, setMessages] = useState<Message[]>([]);
-    const [turn, setTurn] = useState(TurnState.HUMAN);
+
+    const onInit = async () => {
+        onSetTurn(TurnState.LOADING); // Show loading spinner
+        const response = await fetch('/api/messagerequest', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ categoryName: category.name, messageRequestType: MessageRequestType.START }),
+        });
+        const data = await response.json();
+        if (data.messages) {
+            setMessages([...messages, ...data.messages]); // Add user message to messages
+        }
+        onSetTurn(TurnState.HUMAN); // Set turn back to human after initialization
+    };
+
+    useEffect(() => {
+        onInit();
+    }, []);
+
+    const handleWinner = (winner: string, aiWord: string) => {
+        console.log("handle Game over!");
+        onSetTurn(TurnState.FINISHED);
+        onSetWinner(winner, aiWord);
+        openModal("gameover");
+    };
 
     const handleAnswerClick = async (answer: Answer) => {
-        setTurn(TurnState.LOADING); // Show loading spinner
+        onSetTurn(TurnState.LOADING); // Show loading spinner
         const response = await fetch('/api/save', {
             method: 'POST',
             headers: {
@@ -38,13 +68,13 @@ export default function Game({ category, userId, userWord, counter, onSetWinner,
         const responseMessage = data.result;
         if (responseMessage) {
             setMessages([...messages, responseMessage]); // Add user message to messages
-            setTurn(TurnState.HUMAN); // Show input field after selection
+            onSetTurn(TurnState.HUMAN); // Show input field after selection
             onCounterIncrease(); // Increase counter
         }
     };
 
     const handleHumanGuess = async (input: string) => {
-        setTurn(TurnState.LOADING); // Show loading spinner
+        onSetTurn(TurnState.LOADING); // Show loading spinner
         const newMessage = { role: "user", content: input };
         setMessages([...messages, newMessage]); // Add user message to messages
         const response = await fetch('/api/guess', {
@@ -60,11 +90,11 @@ export default function Game({ category, userId, userWord, counter, onSetWinner,
         const aiWin = data.aiWin;
         if (userWin) {
             console.log("You won!");
-            onSetWinner("user", data.aiWord);
+            handleWinner("user", data.aiWord);
         } else if (aiWin) {
             console.log("AI won!");
             setMessages([...messages, newMessage, ...aiMessages]); // Add AI response to messages
-            onSetWinner("assistant", data.aiWord);
+            handleWinner("assistant", data.aiWord);
         } else {
             let updatedMessages = [...messages, newMessage];
             for (let i = 0; i < aiMessages.length; i++) {
@@ -72,7 +102,7 @@ export default function Game({ category, userId, userWord, counter, onSetWinner,
                 setMessages([...updatedMessages]); // Update state with accumulated messages
                 await new Promise(r => setTimeout(r, 500));
             }
-            setTurn(TurnState.AI); // Show buttons after sending the question
+            onSetTurn(TurnState.AI); // Show buttons after sending the question
         }
     };
 
@@ -81,13 +111,17 @@ export default function Game({ category, userId, userWord, counter, onSetWinner,
             <div className="col-span-1 md:col-span-3 rounded-lg">
                 <GameHeader category={category} />
                 <GameWindow messages={messages} />
-                <GameInputs onHandleAnswerClick={handleAnswerClick} onHandleHumanGuess={handleHumanGuess} turn={turn} />
+                {turn !== TurnState.FINISHED ? (
+                    <GameInputs onHandleAnswerClick={handleAnswerClick} onHandleHumanGuess={handleHumanGuess} turn={turn} />
+                ) : (
+                    <h2 className="text-lg font-semibold text-white">AI&apos;s word was: {aiWord}</h2>
+                )}
             </div>
             <div className="col-span-1 md:col-span-2">
                 <div className="hidden md:block">
                     <GameInfo userWord={userWord} counter={counter} />
                     <GameNotes />
-                    <GameButtons openModal={openModal} />
+                    <GameButtons openModal={openModal} turn={turn} />
                 </div>
             </div>
             <Image src={category.image} alt={category.name} width={300} height={300} className="bg-image visible" />
