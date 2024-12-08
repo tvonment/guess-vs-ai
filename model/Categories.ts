@@ -36,13 +36,6 @@ export const Categories: Category[] = [
         image: "/images/Guess vs AI logo.png"
     },
     {
-        name: "NBA Player",
-        description: "An NBA player.",
-        type: CategoryType.Theme,
-        icon: faBasketball as IconProp,
-        image: "/images/LeBron.PNG"
-    },
-    {
         name: "Historical Figures",
         description: "Pick a famous historical figure from any era, such as Cleopatra, Einstein, or Mandela.",
         type: CategoryType.Theme,
