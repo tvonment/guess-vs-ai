@@ -40,6 +40,11 @@ export default function CategorySelection({ onNavigateBack, onSetCategory }: Cat
                             <FontAwesomeIcon icon={category.icon} className="icon-margin" />
                         </button>
                     ))}
+                    <button
+                        className="btn-orange opacity-50 category-button font-bold flex items-center justify-between p-4"
+                        disabled>
+                        <span className="mx-2 text-center">more coming soon...</span>
+                    </button>
                 </div>
             </div>
         </main>
