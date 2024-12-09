@@ -219,7 +219,7 @@ button:hover {
 
 .message.user .message-content {
   background-color: lightblue;
-  text-align: right;
+  text-align: left;
 }
 
 /* Assistant message alignment */
