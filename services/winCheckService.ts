@@ -263,7 +263,15 @@ export async function winCheck(guess: string, word: string): Promise<boolean> {
         // Harry Potter additional example
         {
             role: "user",
-            content: "Is your character Hermoine Granger? Correct Word: Hermione Granger",
+            content: "Is your character Hermoine? Correct Word: Hermione Granger",
+        },
+        {
+            role: "assistant",
+            content: "win"
+        },
+        {
+            role: "user",
+            content: "is it olivander? Correct Word: Garrick Ollivander",
         },
         {
             role: "assistant",
