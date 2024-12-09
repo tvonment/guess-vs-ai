@@ -4,7 +4,6 @@ import { Answer } from "@/model/Answer";
 import { Category } from "@/model/Categories";
 import { Game, ReportedIssue } from "@/model/Game";
 import { Feedback } from "@/model/Feedback";
-import { randomUUID } from "crypto";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
 const COSMOS_DB_DATABASE_NAME = process.env.COSMOS_DB_DATABASE_NAME || "";
@@ -27,7 +26,7 @@ async function getChatHistory(userId: string): Promise<Message[]> {
     return dbitem.messages as Message[]
 }
 
-async function getGameStatus(userId: string): Promise<Game> {
+export async function getGameStatus(userId: string): Promise<Game> {
     try {
         const statusQuery = `SELECT * FROM c WHERE c.id = @userId`;
         const db = await container.items.query({

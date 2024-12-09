@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import GameInfo from './game/GameInfo';
 import GameButtons from './game/GameButtons';
 import FooterButtons from './FooterButtons';
+import { TurnState } from "@/model/TurnState";
 
 interface MenuProps {
     onCloseMenu: () => void;
@@ -10,9 +11,10 @@ interface MenuProps {
     isGameScreen: boolean;
     userWord: string;
     counter: number;
+    turn: TurnState;
 }
 
-export default function Menu({ onCloseMenu, onMenuOpenModal, userWord, counter, isGameScreen }: MenuProps) {
+export default function Menu({ onCloseMenu, onMenuOpenModal, userWord, counter, isGameScreen, turn }: MenuProps) {
 
     return (
         <>
@@ -26,7 +28,7 @@ export default function Menu({ onCloseMenu, onMenuOpenModal, userWord, counter, 
                 {isGameScreen && (
                     <div className="flex-1 overflow-y-auto">
                         <GameInfo userWord={userWord} counter={counter} />
-                        <GameButtons openModal={onMenuOpenModal} />
+                        <GameButtons openModal={onMenuOpenModal} turn={turn} />
                     </div>
                 )}
                 <div className="text-gray-700 hover:text-gray-900">

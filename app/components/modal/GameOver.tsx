@@ -1,21 +1,20 @@
 import React from 'react';
-import Image from 'next/image';
 import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import GameOverWinner from './GameOverWinner';
-import Game from '../game/Game';
-import { faArrowCircleLeft, faCircleArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 
 type GameOverProps = {
     winner: string;
     aiWord: string;
+    summary: string;
     onClose: () => void;
     onRestart: () => void;
     openModal: (content: string) => void;
 };
 
 
-export default function GameOverModal({ winner, aiWord, openModal, onRestart }: GameOverProps) {
+export default function GameOverModal({ winner, aiWord, summary, openModal, onRestart }: GameOverProps) {
     const handleFeedback = () => {
         openModal('feedback');
     };
@@ -40,6 +39,7 @@ export default function GameOverModal({ winner, aiWord, openModal, onRestart }: 
     return (
         <main className="w-full overflow-hidden">
             {renderContent()}
+            <p className="summary text-center mt-4">{summary}</p>
             <div className="flex justify-center space-x-4 mt-3">
                 <button className="btn-blue p-3 rounded-lg shadow flex items-center justify-between w-48 transform transition-transform duration-300 hover:scale-105" onClick={handleFeedback}>
                     <FontAwesomeIcon icon={faHeart} className="icon-margin-small" />

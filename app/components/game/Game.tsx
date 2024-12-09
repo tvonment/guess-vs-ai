@@ -19,13 +19,15 @@ type GameProps = {
     counter: number;
     turn: TurnState;
     aiWord: string;
+    summary: string;
+    onSetSummary: (summary: string) => void;
     onSetTurn: (turn: TurnState) => void;
-    onSetWinner: (winner: string, aiWord: string) => void;
+    onSetWinner: (winner: string, aiWord: string, summary: string) => void;
     onCounterIncrease: () => void;
     openModal: (content: string) => void;
 };
 
-export default function Game({ category, userId, userWord, counter, turn, aiWord, onSetWinner, openModal, onCounterIncrease, onSetTurn }: GameProps) {
+export default function Game({ category, userId, userWord, counter, turn, aiWord, summary, onSetSummary, onSetWinner, openModal, onCounterIncrease, onSetTurn }: GameProps) {
     const [messages, setMessages] = useState<Message[]>([]);
 
     const onInit = async () => {
@@ -35,7 +37,7 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ categoryName: category.name, messageRequestType: MessageRequestType.START }),
+            body: JSON.stringify({ userId: userId, category: category, messageRequestType: MessageRequestType.START }),
         });
         const data = await response.json();
         if (data.messages) {
@@ -48,10 +50,60 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
         onInit();
     }, []);
 
-    const handleWinner = (winner: string, aiWord: string) => {
+    useEffect(() => {
+        const fetchMessages = async () => {
+            if (counter % 3 === 0 && counter !== 0) {
+                onSetTurn(TurnState.LOADING); // Show loading spinner
+                const response = await fetch('/api/messagerequest', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId: userId, category: category, messages: messages, messageRequestType: MessageRequestType.HUMILIATE }),
+                });
+                const data = await response.json();
+                if (data.messages) {
+                    setMessages([...messages, ...data.messages]); // Add user message to messages
+                }
+                onSetTurn(TurnState.HUMAN); // Set turn back to human after initialization
+            }
+        };
+
+        fetchMessages();
+    }, [counter]);
+
+    useEffect(() => {
+        const fetchSummary = async () => {
+            if (summary) {
+                setMessages([...messages, { role: "assistant", content: summary }]);
+            }
+        };
+
+        fetchSummary();
+    }, [summary]);
+
+
+    const handleWinner = async (winner: string, aiWord: string) => {
         onSetTurn(TurnState.FINISHED);
-        onSetWinner(winner, aiWord);
-        openModal("gameover");
+        try {
+            const response = await fetch('/api/messagerequest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId: userId, category: category, messageRequestType: MessageRequestType.SUMMARY }),
+            });
+            const data = await response.json();
+            console.log("Summary data:", data);
+            const message = data.message as Message;
+            if (data.message) {
+                onSetSummary(message.content);
+                onSetWinner(winner, aiWord, message.content);
+                openModal("gameover");
+            }
+        } catch (error) {
+            console.error("Error fetching summary:", error);
+        }
     };
 
     const handleAnswerClick = async (answer: Answer) => {
@@ -113,7 +165,9 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
                 {turn !== TurnState.FINISHED ? (
                     <GameInputs onHandleAnswerClick={handleAnswerClick} onHandleHumanGuess={handleHumanGuess} turn={turn} />
                 ) : (
-                    <h2 className="text-lg font-semibold text-white">AI&apos;s word was: {aiWord}</h2>
+                    <>
+                        <h2 className="text-lg font-semibold text-white">AI&apos;s word was: {aiWord}</h2>
+                    </>
                 )}
             </div>
             <div className="col-span-1 md:col-span-2">

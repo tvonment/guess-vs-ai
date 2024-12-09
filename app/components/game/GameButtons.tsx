@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowCircleLeft, faBug, faHand, faHeart, faQuestion, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faBug, faHand, faHeart, faQuestion, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { TurnState } from '@/model/TurnState';
 
 interface GameButtonsProps {

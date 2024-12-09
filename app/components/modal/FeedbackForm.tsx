@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSmile, faMeh, faFrown, faSadTear, faHeart, faHeartBroken, faThumbsUp, faStar, faFaceTired, faFaceGrimace, faFaceSmileWink, faFaceLaughSquint, faFaceGrinStars, faFaceDizzy } from '@fortawesome/free-solid-svg-icons';
 import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 import { Feedback } from "@/model/Feedback";
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 type FeedbackProps = {
     onClose: () => void;
@@ -101,7 +102,7 @@ export default function FeedbackForm({ onClose, userId }: FeedbackProps) {
         return 'text-gray-500';
     };
 
-    const renderIconButton = (name: string, value: string, icon: any, selectedValue: string, setSelectedValue: (value: string) => void, description: string) => (
+    const renderIconButton = (name: string, value: string, icon: IconProp, selectedValue: string, setSelectedValue: (value: string) => void, description: string) => (
         <label className={`cursor-pointer flex flex-col items-center ${getColorClass(value, selectedValue)}`}>
             <input
                 type="radio"
@@ -110,6 +111,7 @@ export default function FeedbackForm({ onClose, userId }: FeedbackProps) {
                 className="hidden"
                 onChange={(e) => setSelectedValue(e.target.value)}
             />
+            <p className='hidden'>{description}</p>
             <FontAwesomeIcon icon={icon} size="2x" />
         </label>
     );

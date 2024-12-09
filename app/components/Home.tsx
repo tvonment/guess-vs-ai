@@ -16,10 +16,10 @@ export default function Home({ onNavigate }: HomeScreenProps) {
                 </div>
             </div>
             <div className="flex justify-center">
-                <div className="flex max-w-1/3">
-                    <button className="btn-orange py-4 px-8 rounded-lg shadow sm:flex-1 flex items-center justify-between text-2xl font-extrabold" onClick={onNavigate}>
+                <div className="flex">
+                    <button className="btn-orange py-4 rounded-lg shadow flex-1 flex items-center justify-between text-2xl font-extrabold" onClick={onNavigate}>
                         <FontAwesomeIcon icon={faGamepad} className="icon-margin" />
-                        <span className="mx-2 text-center">Start Game</span>
+                        <span className="mx-2 text-center">Start</span>
                         <FontAwesomeIcon icon={faGamepad} className="icon-margin" />
                     </button>
                 </div>

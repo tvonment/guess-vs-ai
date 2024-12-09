@@ -1,4 +1,5 @@
 export enum MessageRequestType {
     START = "startmessage",
-    HUMILIATION = "humiliation",
+    HUMILIATE = "humiliation",
+    SUMMARY = "summary"
 }
