@@ -3,7 +3,7 @@
 import { Category } from "@/model/Categories";
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faGamepad, faX } from "@fortawesome/free-solid-svg-icons";
+import { faGamepad, faX } from "@fortawesome/free-solid-svg-icons";
 import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 import Image from 'next/image';
 
