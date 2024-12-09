@@ -232,6 +232,16 @@ button:hover {
   text-align: left;
 }
 
+.message.system {
+  justify-content: center;
+}
+
+.message.system .message-content {
+  background-color: rgba(255, 255, 255, 0.8);
+  max-width: 100%;
+  text-align: left;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
