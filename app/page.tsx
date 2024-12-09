@@ -78,7 +78,7 @@ export default function MainPage() {
             case 'giveup':
                 return <Confirm onClose={closeModal} onConfirm={handleGameOver} userId={userId} />;
             case 'help':
-                return <Help onClose={closeModal} />;
+                return <Help onClose={closeModal} category={category} />;
             case 'report-ingame':
                 return <ReportIssue onClose={closeModal} gameStatus='ingame' userId={userId} />;
             case 'report-gameover':
