@@ -136,8 +136,18 @@ export default function MainPage() {
         openModal('gameover');
     }
 
-    const handleNavigateBack = (targetPage: "home" | "categoryselection" | "wordselection" | "game") => {
-        setCurrentPage(targetPage);
+    const handleNavigateBack = () => {
+        switch (currentPage) {
+            case 'categoryselection':
+                setCurrentPage('home');
+                break;
+            case 'wordselection':
+                setCurrentPage('categoryselection');
+                break;
+            default:
+                setCurrentPage('home');
+                break;
+        }
     };
 
     useEffect(() => {
@@ -155,10 +165,10 @@ export default function MainPage() {
 
     return (
         <>
-            <Header onClick={handleLogo} onToggleMenu={toggleMenu} />
+            <Header currentPage={currentPage} onClick={handleLogo} onToggleMenu={toggleMenu} onNavigateBack={() => handleNavigateBack()} />
             {currentPage === 'home' && <Home onNavigate={handleStart} />}
-            {currentPage === 'categoryselection' && <CategorySelection onNavigateBack={() => { handleNavigateBack('home') }} onSetCategory={handleSetCategory} />}
-            {currentPage === 'wordselection' && category && <WordSelection onNavigateBack={() => handleNavigateBack('categoryselection')} onStartGame={handleOnStartGame} category={category} />}
+            {currentPage === 'categoryselection' && <CategorySelection onSetCategory={handleSetCategory} />}
+            {currentPage === 'wordselection' && category && <WordSelection onStartGame={handleOnStartGame} category={category} />}
             {currentPage === 'game' && category && userId && <Game category={category} userId={userId} userWord={userWord} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onCounterIncrease={handleCounterIncrease} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} />}
             <Footer openModal={openModal} />
             {showMenu && (

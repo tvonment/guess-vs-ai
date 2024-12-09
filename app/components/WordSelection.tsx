@@ -8,12 +8,11 @@ import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 import Image from 'next/image';
 
 interface WordSelectionProps {
-    onNavigateBack: () => void;
     onStartGame: (userId: string, userWord: string) => void;
     category: Category;
 }
 
-export default function WordSelection({ onNavigateBack, category, onStartGame }: WordSelectionProps) {
+export default function WordSelection({ category, onStartGame }: WordSelectionProps) {
     const [userWord, setUserWord] = useState(""); // State for character input
     const [errorMessage, setErrorMessage] = useState(""); // State for error message
     const [loading, setLoading] = useState(false); // State for loading state
@@ -70,22 +69,17 @@ export default function WordSelection({ onNavigateBack, category, onStartGame }:
 
 
     return (
-        <main className="w-full flex flex-col items-center">
-            <div className="w-full flex mb-4">
-                <button onClick={onNavigateBack} className="btn font-bold py-5 px-8">
-                    <FontAwesomeIcon icon={faChevronLeft} className="icon-margin text-white" />
-                </button>
-            </div>
-            <div className="w-2/3">
+        <main className="w-full flex flex-col items-center md:mt-12 lg:mt-20 xl:mt-24">
+            <div className="w-3/4 md:w-2/3">
                 <div className="box-orange flex justify-center mb-4">
-                    <h1 className="text-center text-4xl font-extrabold py-6">
-                        <FontAwesomeIcon icon={category.icon} className="icon-margin" />
+                    <h1 className="text-center text-4xl flex items-center justify-between font-extrabold py-6">
+                        <FontAwesomeIcon icon={category.icon} className="icon-margin hidden sm:inline" />
                         {category.name}
-                        <FontAwesomeIcon icon={category.icon} className="icon-margin" />
+                        <FontAwesomeIcon icon={category.icon} className="icon-margin hidden sm:inline" />
                     </h1>
                 </div>
                 <div className="w-full box-blue mb-4">
-                    <h2 className="text-center text-2xl font-bold py-4 text-white">
+                    <h2 className="text-center text-3xl font-bold py-4 text-white">
                         {category.description}
                     </h2>
                 </div>
@@ -95,17 +89,17 @@ export default function WordSelection({ onNavigateBack, category, onStartGame }:
                         value={userWord}
                         onChange={(e) => setUserWord(e.target.value)} // Update character input value
                         onKeyDown={handleWordKeyDown} // Add keydown event listener
-                        placeholder={`Enter a word from the ${category.name} category`} // Dynamic placeholder
+                        placeholder={`Enter your character`} // Dynamic placeholder
                         className="w-full p-4 border border-gray-300 rounded-lg text-lg"
                         color="black"
                     />
                 </div>
-                <div className="flex items-center justify-center mb-4 w-full">
-                    <div className="w-full sm:w-1/2 flex justify-center">
+                <div className="flex items-center justify-center mb-4 mt-8 md:mt-32 w-full">
+                    <div className="w-full sm:w-1/3 flex justify-center">
                         {!loading ? (
                             <button className="w-full btn-orange py-4 px-8 rounded-lg shadow sm:flex-1 flex items-center justify-between text-3xl font-extrabold" onClick={handleWordLock}>
                                 <FontAwesomeIcon icon={faGamepad} className="icon-margin-small" />
-                                <span className="mx-2 text-center">Start</span>
+                                <span className="mx-2 text-center text-3xl">Start</span>
                                 <FontAwesomeIcon icon={faGamepad} className="icon-margin-small" />
                             </button>
                         ) : (
