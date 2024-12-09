@@ -1,5 +1,5 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faShield, faJedi, faWandSparkles, faPaw, faBasketball, faBook } from "@fortawesome/free-solid-svg-icons";
+import { faShield, faJedi, faWandSparkles, faPaw, faBook } from "@fortawesome/free-solid-svg-icons";
 
 export enum CategoryType {
     Advanced = "Advanced",
