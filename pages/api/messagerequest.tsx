@@ -26,6 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         case MessageRequestType.SUMMARY:
             console.log("Summary", userId);
             const responseSummary = await makeSummary(userId);
+            responseSummary.role = "system";
             await addToHistory(userId, responseSummary);
             res.status(200).json({ message: responseSummary as Message });
             return;

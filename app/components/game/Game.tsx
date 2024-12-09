@@ -75,7 +75,7 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
     useEffect(() => {
         const fetchSummary = async () => {
             if (summary) {
-                setMessages([...messages, { role: "assistant", content: summary }]);
+                setMessages([...messages, { role: "system", content: summary }]);
             }
         };
 
@@ -158,7 +158,7 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
     };
 
     return (
-        <main className="w-full grid grid-cols-1 md:grid-cols-5 gap-4 p-4">
+        <main className="w-full grid grid-cols-1 md:grid-cols-5 gap-4 p-4 overflow-hidden">
             <div className="col-span-1 md:col-span-3 rounded-lg">
                 <GameHeader category={category} />
                 <GameWindow messages={messages} />
