@@ -146,7 +146,6 @@ button:hover {
 .box-orange {
   background-color: #fe9b39;
   color: #141414;
-  padding: 1rem;
   border-radius: 0.5rem;
 }
 
@@ -272,7 +271,6 @@ button:hover {
 
 .header {
   padding: 1rem;
-  margin-bottom: 1rem;
   background-color: rgba(255, 255, 255, 0.05);
   /* Transparent background */
   position: sticky;
@@ -289,4 +287,8 @@ button:hover {
 
 .text-white {
   color: #f7fefd;
+}
+
+.text-orange {
+  color: #fe9b39;
 }

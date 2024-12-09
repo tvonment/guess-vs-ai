@@ -1,7 +1,7 @@
 export enum Answer {
     YES = "Yes",
-    PROBABLY_YES = "Probably yes",
-    PROBABLY_NO = "Probably no",
+    PROBABLY_YES = "Probably Yes",
+    PROBABLY_NO = "Probably No",
     NO = "No",
-    I_DONT_KNOW = "I do not know",
+    I_DONT_KNOW = "I Don't Know",
 }

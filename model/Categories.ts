@@ -8,7 +8,7 @@ export enum CategoryType {
 
 export const Categories: Category[] = [
     {
-        name: "Marvel",
+        name: "Marvel Universe",
         description: "Select a character from any movie or series within the Marvel Universe.",
         type: CategoryType.Theme,
         icon: faShield as IconProp,

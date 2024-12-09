@@ -63,7 +63,7 @@ export async function makeSummary(userId: string): Promise<Message> {
 
     let instructionSystemMessage = `
     You were playing a game of 'Guess vs AI' a social deduction word guessing game. You played against a human and you were eager to win. The game is over now!
-    The game was played in the category: '${game.category.name}'! The game so went like this:
+    The game was played in the category: '${game.category.name}'! The game went like this:
     `;
 
     for (const message of game.messages) {
