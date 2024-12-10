@@ -1,5 +1,6 @@
 import { Category } from "@/model/Categories"
 import { Message } from "./Message"
+import { Counter } from "./Counter";
 
 export class Game {
     id: string;
@@ -7,15 +8,18 @@ export class Game {
     userWord: string;
     aiWord: string;
     category: Category;
+    counter: Counter;
+    summary?: Message;
     winner?: string;
     issues?: ReportedIssue[];
 
-    constructor(id: string, messages: Message[], userWord: string, aiWord: string, category: Category, winner?: string, issues?: ReportedIssue[]) {
+    constructor(id: string, messages: Message[], userWord: string, aiWord: string, category: Category, counter: Counter, winner?: string, issues?: ReportedIssue[]) {
         this.id = id;
         this.messages = messages;
         this.userWord = userWord;
         this.aiWord = aiWord;
         this.category = category;
+        this.counter = counter;
         this.winner = winner;
         this.issues = issues;
     }

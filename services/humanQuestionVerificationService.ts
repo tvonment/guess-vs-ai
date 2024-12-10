@@ -24,6 +24,6 @@ export async function verifyHumanQuestion(userId: string, userQuestion: string) 
     }
     catch (error: unknown) {
         console.error("Error:", error);
-        return "An error occurred";
+        throw "An error occurred";
     }
 }

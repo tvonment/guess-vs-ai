@@ -20,23 +20,23 @@ import ReportIssue from './components/modal/ReportIssue';
 import FeedbackForm from './components/modal/FeedbackForm';
 import GameOverModal from './components/modal/GameOver';
 import { TurnState } from '@/model/TurnState';
+import { Message } from '@/model/Message';
+import { Counter } from '@/model/Counter';
+import { PageState } from '@/model/PageState';
+import { ModalState } from '@/model/ModalState';
 
 export default function MainPage() {
-    const [currentPage, setCurrentPage] = useState<'home' | 'categoryselection' | 'wordselection' | 'game'>('home');
+    const [currentPage, setCurrentPage] = useState<PageState>(PageState.HOME);
     const [category, setCategory] = useState<Category>();
     const [userWord, setUserWord] = useState<string>("");
     const [userId, setUserId] = useState<string>("");
     const [winner, setWinner] = useState<string>("");
     const [aiWord, setAiWord] = useState<string>("");
-    const [modalContent, setModalContent] = useState<string | null>(null);
+    const [modalContent, setModalContent] = useState<ModalState | null>(null);
     const [showMenu, setShowMenu] = useState<boolean>(false);
-    const [counter, setCounter] = useState<number>(0);
+    const [counter, setCounter] = useState<Counter>(new Counter(0, 0));
     const [turn, setTurn] = useState<TurnState>(TurnState.LOADING);
-    const [summary, setSummary] = useState<string>("");
-
-    const handleCounterIncrease = () => {
-        setCounter(counter + 1);
-    }
+    const [summary, setSummary] = useState<Message>({ role: 'system', content: '' });
 
     const toggleMenu = () => {
         setShowMenu(!showMenu);
@@ -46,12 +46,12 @@ export default function MainPage() {
         setShowMenu(false);
     };
 
-    const handleMenuOpenModal = (content: string) => {
+    const handleMenuOpenModal = (content: ModalState) => {
         closeMenu();
         openModal(content);
     };
 
-    const openModal = (content: string) => {
+    const openModal = (content: ModalState) => {
         setModalContent(content);
     };
 
@@ -63,29 +63,29 @@ export default function MainPage() {
         setTurn(turn);
     }
 
-    const handleSetSummary = (summary: string) => {
+    const handleSetSummary = (summary: Message) => {
         setSummary(summary);
     }
 
     const renderModalContent = () => {
         switch (modalContent) {
-            case 'FAQ':
+            case ModalState.FAQ:
                 return <Faq />;
-            case 'Terms of Use':
+            case ModalState.TOU:
                 return <TermsOfUse />;
-            case 'Contact':
+            case ModalState.CONTACT:
                 return <Contact />;
-            case 'giveup':
+            case ModalState.GIVEUP:
                 return <Confirm onClose={closeModal} onConfirm={handleGameOver} userId={userId} />;
-            case 'help':
+            case ModalState.HELP:
                 return <Help onClose={closeModal} category={category} />;
-            case 'report-ingame':
+            case ModalState.REPORT_INGAME:
                 return <ReportIssue onClose={closeModal} gameStatus='ingame' userId={userId} />;
-            case 'report-gameover':
+            case ModalState.REPORT_GAMEOVER:
                 return <ReportIssue onClose={closeModal} gameStatus='gameover' userId={userId} />;
-            case 'gameover':
+            case ModalState.GAME_OVER:
                 return <GameOverModal onClose={closeModal} winner={winner} aiWord={aiWord} summary={summary} openModal={openModal} onRestart={handleStart} />;
-            case 'feedback':
+            case ModalState.FEEDBACK:
                 return <FeedbackForm onClose={closeModal} userId={userId} />;
             default:
                 return null;
@@ -95,10 +95,10 @@ export default function MainPage() {
     const handleLogo = () => {
         switch (currentPage) {
             case 'game':
-                openModal('giveup');
+                openModal(ModalState.GIVEUP);
                 break;
             default:
-                setCurrentPage('home');
+                setCurrentPage(PageState.HOME);
                 break;
         }
     }
@@ -109,43 +109,43 @@ export default function MainPage() {
         setUserId("");
         setWinner("");
         setAiWord("");
-        setCounter(0);
-        setSummary("");
+        setCounter(new Counter(0, 0));
+        setSummary({ role: 'system', content: '' });
         setTurn(TurnState.LOADING);
-        setCurrentPage('categoryselection');
+        setCurrentPage(PageState.CATEGORY_SELECTION);
         closeModal();
     };
 
     const handleSetCategory = (selectedCategory: Category) => {
         setCategory(selectedCategory);
-        setCurrentPage('wordselection');
+        setCurrentPage(PageState.WORD_SELECTION);
     };
 
     const handleOnStartGame = (userId: string, userWord: string) => {
         setUserId(userId);
         setUserWord(userWord);
-        setCurrentPage('game');
+        setCurrentPage(PageState.GAME);
     }
 
-    const handleGameOver = async (winner: string, aiWord: string, summary: string) => {
+    const handleGameOver = async (winner: string, aiWord: string, summary: Message) => {
         setWinner(winner);
         setAiWord(aiWord);
         setTurn(TurnState.FINISHED);
         setSummary(summary);
         console.log("Game over with winner:", winner);
-        openModal('gameover');
+        openModal(ModalState.GAME_OVER);
     }
 
     const handleNavigateBack = () => {
         switch (currentPage) {
-            case 'categoryselection':
-                setCurrentPage('home');
+            case PageState.CATEGORY_SELECTION:
+                setCurrentPage(PageState.HOME);
                 break;
-            case 'wordselection':
-                setCurrentPage('categoryselection');
+            case PageState.WORD_SELECTION:
+                setCurrentPage(PageState.CATEGORY_SELECTION);
                 break;
             default:
-                setCurrentPage('home');
+                setCurrentPage(PageState.HOME);
                 break;
         }
     };
@@ -166,10 +166,10 @@ export default function MainPage() {
     return (
         <>
             <Header currentPage={currentPage} onClick={handleLogo} onToggleMenu={toggleMenu} onNavigateBack={() => handleNavigateBack()} />
-            {currentPage === 'home' && <Home onNavigate={handleStart} />}
-            {currentPage === 'categoryselection' && <CategorySelection onSetCategory={handleSetCategory} />}
-            {currentPage === 'wordselection' && category && <WordSelection onStartGame={handleOnStartGame} category={category} />}
-            {currentPage === 'game' && category && userId && <Game category={category} userId={userId} userWord={userWord} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onCounterIncrease={handleCounterIncrease} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} />}
+            {currentPage === PageState.HOME && <Home onNavigate={handleStart} />}
+            {currentPage === PageState.CATEGORY_SELECTION && <CategorySelection onSetCategory={handleSetCategory} />}
+            {currentPage === PageState.WORD_SELECTION && category && <WordSelection onStartGame={handleOnStartGame} category={category} />}
+            {currentPage === PageState.GAME && category && userId && <Game category={category} userId={userId} userWord={userWord} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onSetCounter={setCounter} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} />}
             <Footer openModal={openModal} />
             {showMenu && (
                 <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} counter={counter} isGameScreen={currentPage === 'game'} turn={turn} />
