@@ -8,4 +8,5 @@ export enum ModalState {
     REPORT_GAMEOVER = 'Report Issue Game Over',
     GAME_OVER = 'Game Over',
     FEEDBACK = 'Feedback',
+    STATISTICS = 'Statistics'
 }
