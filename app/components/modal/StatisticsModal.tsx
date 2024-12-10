@@ -48,10 +48,22 @@ export default function StatisticsModal() {
                         <p>{statistics?.totalAIWins || "no value"}</p>
                         <p className="col-span-2">Total Human Wins:</p>
                         <p>{statistics?.totalHumanWins || "no value"}</p>
+                        <p className="col-span-2">Min. Questions Human:</p>
+                        <p>{statistics?.minQuestionCountHuman || "no value"}</p>
+                        <p className="col-span-2">Min. Questions AI:</p>
+                        <p>{statistics?.minQuestionCountAI || "no value"}</p>
+                        <p className="col-span-2">Max. Questions Human:</p>
+                        <p>{statistics?.maxQuestionCountHuman || "no value"}</p>
+                        <p className="col-span-2">Max. Questions AI:</p>
+                        <p>{statistics?.maxQuestionCountAI || "no value"}</p>
                         <p className="col-span-2">Avg. Questions Human:</p>
                         <p>{statistics?.avgQuestionCountHuman || "no value"}</p>
                         <p className="col-span-2">Avg. Questions AI:</p>
                         <p>{statistics?.avgQuestionCountAI || "no value"}</p>
+                        <p className="col-span-2">Median Questions Human:</p>
+                        <p>{statistics?.medQuestionCountHuman || "no value"}</p>
+                        <p className="col-span-2">Median Questions AI:</p>
+                        <p>{statistics?.medQuestionCountAI || "no value"}</p>
                         <p className="col-span-2">Total Given-Up games:</p>
                         <p>{statistics?.totalGivenUp || "no value"}</p>
                     </div>

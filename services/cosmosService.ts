@@ -228,7 +228,15 @@ export async function getStatistics(): Promise<Statistics> {
 
         const totalAIWins = aiWins.length;
         const totalHumanWins = humanWins.length;
+
+        const minQuestionCountAI = aiWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.ai), Number.MAX_VALUE);
+        const maxQuestionCountAI = aiWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.ai), 0);
+        const medQuestionCountAI = aiWins[Math.floor(aiWins.length / 2)].counter.ai;
         const avgQuestionCountAI = aiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / aiWins.length;
+
+        const minQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.human), Number.MAX_VALUE);
+        const maxQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.human), 0);
+        const medQuestionCountHuman = humanWins[Math.floor(humanWins.length / 2)].counter.human;
         const avgQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / humanWins.length;
 
         const winsByCategory: CategoryWins[] = [];
@@ -237,10 +245,6 @@ export async function getStatistics(): Promise<Statistics> {
         categories.forEach((category: Category) => {
             const categoryAiWins = aiWins.filter((game: Game) => game.category.name === category.name);
             const categoryHumanWins = humanWins.filter((game: Game) => game.category.name === category.name);
-
-            console.log("Category:", category.name, "AI Wins:", categoryAiWins.length, "Human Wins:", categoryHumanWins.length);
-
-
             const categoryWins: CategoryWins = {
                 category: category,
                 aiWins: categoryAiWins.length,
@@ -256,7 +260,13 @@ export async function getStatistics(): Promise<Statistics> {
             totalAIWins: totalAIWins,
             totalHumanWins: totalHumanWins,
             totalGivenUp: givenUpCount,
+            minQuestionCountHuman: minQuestionCountHuman,
+            maxQuestionCountHuman: maxQuestionCountHuman,
+            medQuestionCountHuman: medQuestionCountHuman,
             avgQuestionCountHuman: avgQuestionCountHuman,
+            minQuestionCountAI: minQuestionCountAI,
+            maxQuestionCountAI: maxQuestionCountAI,
+            medQuestionCountAI: medQuestionCountAI,
             avgQuestionCountAI: avgQuestionCountAI,
             winsByCategory: winsByCategory
         } as Statistics;
