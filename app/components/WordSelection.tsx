@@ -6,9 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGamepad, faX } from "@fortawesome/free-solid-svg-icons";
 import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 import Image from 'next/image';
+import { Message } from "@/model/Message";
 
 interface WordSelectionProps {
-    onStartGame: (userId: string, userWord: string) => void;
+    onStartGame: (userId: string, userWord: string, startMessage: Message) => void;
     category: Category;
 }
 
@@ -33,10 +34,10 @@ export default function WordSelection({ category, onStartGame }: WordSelectionPr
             });
             const data = await response.json();
             // Set the retrieved chat history
-            if (data.result) {
+            if (data.message) {
                 setErrorMessage("");
                 console.log("User word:", userWord);
-                onStartGame(generatedUserId, userWord);
+                onStartGame(generatedUserId, userWord, data.message as Message);
             }
 
             if (data.invalid) {
