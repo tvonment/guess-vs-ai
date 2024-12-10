@@ -1,5 +1,5 @@
 import { Category } from "@/model/Categories";
-import { gptCall, gptMiniCall } from "./oaiService";
+import { gptMiniCall } from "./oaiService";
 import { Message } from "@/model/Message";
 
 export async function characterCheck(word: string, category: Category): Promise<boolean> {
