@@ -60,9 +60,9 @@ export default function StatisticsModal() {
                         <p>{statistics?.avgQuestionCountHuman || "no value"}</p>
                         <p className="col-span-2">Avg. Questions AI:</p>
                         <p>{statistics?.avgQuestionCountAI || "no value"}</p>
-                        <p className="col-span-2">Median Questions Human:</p>
+                        <p className="col-span-2">Med. Questions Human:</p>
                         <p>{statistics?.medQuestionCountHuman || "no value"}</p>
-                        <p className="col-span-2">Median Questions AI:</p>
+                        <p className="col-span-2">Med. Questions AI:</p>
                         <p>{statistics?.medQuestionCountAI || "no value"}</p>
                         <p className="col-span-2">Total Given-Up games:</p>
                         <p>{statistics?.totalGivenUp || "no value"}</p>
