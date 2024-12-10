@@ -5,6 +5,8 @@ import { Game } from "@/model/Game";
 import { Category, Categories } from "@/model/Categories";
 import { characterCheck } from "@/services/characterCheckService";
 import { Counter } from "@/model/Counter";
+import { Message } from "@/model/Message";
+import { startMessage } from "@/services/aiMessagesServcie";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { userId } = req.body;
@@ -30,9 +32,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-        const game = new Game(userId, [], userWord, aiWord, category, new Counter(0, 0));
+        const message: Message = await startMessage(category);
+        const game = new Game(userId, [message], userWord, aiWord, category, new Counter(0, 0));
         await startGame(game);
-        res.status(200).json({ result: "success" });
+        res.status(200).json({ message: message });
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {

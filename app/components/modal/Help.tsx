@@ -1,3 +1,4 @@
+import { Answer } from "@/model/Answer";
 import { Category } from "@/model/Categories";
 import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,6 +15,7 @@ export default function Help({ onClose, category }: HelpProps) {
         <div className="p-4">
             <h2 className="text-xl font-bold mb-4">Help</h2>
             <p className="mb-4">{helpText}</p>
+            <p className="mb-4">Ask your Questions carefully, if the answer is a <strong>{Answer.YES}</strong> or <strong>{Answer.PROBABLY_YES}</strong> you get another turn.</p>
             <div className="flex justify-end space-x-4">
                 <button className="btn-orange" onClick={onClose}>
                     <FontAwesomeIcon icon={faThumbsUp} className="icon-margin" />

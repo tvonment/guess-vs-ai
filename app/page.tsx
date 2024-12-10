@@ -37,6 +37,7 @@ export default function MainPage() {
     const [counter, setCounter] = useState<Counter>(new Counter(0, 0));
     const [turn, setTurn] = useState<TurnState>(TurnState.LOADING);
     const [summary, setSummary] = useState<Message>({ role: 'system', content: '' });
+    const [startMessage, setStartMessage] = useState<Message>({ role: 'assistant', content: '' });
 
     const toggleMenu = () => {
         setShowMenu(!showMenu);
@@ -121,10 +122,12 @@ export default function MainPage() {
         setCurrentPage(PageState.WORD_SELECTION);
     };
 
-    const handleOnStartGame = (userId: string, userWord: string) => {
+    const handleOnStartGame = (userId: string, userWord: string, startMessage: Message) => {
         setUserId(userId);
         setUserWord(userWord);
+        setStartMessage(startMessage);
         setCurrentPage(PageState.GAME);
+        setTurn(TurnState.HUMAN);
     }
 
     const handleGameOver = async (winner: string, aiWord: string, summary: Message) => {
@@ -169,7 +172,7 @@ export default function MainPage() {
             {currentPage === PageState.HOME && <Home onNavigate={handleStart} />}
             {currentPage === PageState.CATEGORY_SELECTION && <CategorySelection onSetCategory={handleSetCategory} />}
             {currentPage === PageState.WORD_SELECTION && category && <WordSelection onStartGame={handleOnStartGame} category={category} />}
-            {currentPage === PageState.GAME && category && userId && <Game category={category} userId={userId} userWord={userWord} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onSetCounter={setCounter} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} />}
+            {currentPage === PageState.GAME && category && userId && <Game category={category} userId={userId} userWord={userWord} startMessage={startMessage} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onSetCounter={setCounter} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} />}
             <Footer openModal={openModal} />
             {showMenu && (
                 <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} counter={counter} isGameScreen={currentPage === 'game'} turn={turn} />

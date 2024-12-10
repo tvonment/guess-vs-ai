@@ -10,7 +10,6 @@ import GameInfo from "./GameInfo";
 import GameNotes from "./GameNotes";
 import GameButtons from "./GameButtons";
 import Image from 'next/image';
-import { MessageRequestType } from "@/model/MessageRequestType";
 import { TurnResponse } from "@/model/TurnResponse";
 import { WinnerState } from "@/model/WinnerState";
 import { Counter } from "@/model/Counter";
@@ -24,6 +23,7 @@ type GameProps = {
     turn: TurnState;
     aiWord: string;
     summary: Message;
+    startMessage: Message;
     onSetSummary: (summary: Message) => void;
     onSetTurn: (turn: TurnState) => void;
     onSetWinner: (winner: string, aiWord: string, summary: Message) => void;
@@ -31,33 +31,13 @@ type GameProps = {
     openModal: (content: ModalState) => void;
 };
 
-export default function Game({ category, userId, userWord, counter, turn, aiWord, summary, onSetWinner, openModal, onSetTurn, onSetCounter }: GameProps) {
-    const [messages, setMessages] = useState<Message[]>([]);
-
-    const onInit = async () => {
-        onSetTurn(TurnState.LOADING); // Show loading spinner
-        const response = await fetch('/api/messagerequest', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId: userId, category: category, messageRequestType: MessageRequestType.START }),
-        });
-        const data = await response.json();
-        if (data.messages) {
-            setMessages([...messages, ...data.messages]); // Add user message to messages
-        }
-        onSetTurn(TurnState.HUMAN); // Set turn back to human after initialization
-    };
-
-    useEffect(() => {
-        onInit();
-    }, []);
+export default function Game({ category, userId, userWord, counter, turn, aiWord, summary, startMessage, onSetWinner, openModal, onSetTurn, onSetCounter }: GameProps) {
+    const [messages, setMessages] = useState<Message[]>([startMessage]);
 
     useEffect(() => {
         const fetchSummary = async () => {
-            if (summary) {
-                setMessages([...messages, summary]);
+            if (summary && summary.content) {
+                floatMessages([summary]);
             }
         };
 
