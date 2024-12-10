@@ -14,6 +14,7 @@ export default function Help({ onClose, category }: HelpProps) {
     return (
         <div className="p-4">
             <h2 className="text-xl font-bold mb-4">Help</h2>
+            <p className="mb-4">Ask <strong>Yes/No Questions</strong> to get to the AIs character.</p>
             <p className="mb-4">{helpText}</p>
             <p className="mb-4">Ask your Questions carefully, if the answer is a <strong>{Answer.YES}</strong> or <strong>{Answer.PROBABLY_YES}</strong> you get another turn.</p>
             <div className="flex justify-end space-x-4">
