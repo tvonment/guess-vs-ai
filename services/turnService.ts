@@ -8,6 +8,7 @@ import { TurnResponse } from "@/model/TurnResponse";
 import { WinnerState } from "@/model/WinnerState";
 
 export async function humanGuessTurn(userId: string, text: string): Promise<TurnResponse> {
+    await addToHistory(userId, new Message("user", text));
     const winningWords = await getWinningWords(userId);
     const userwin = await winCheck(text, winningWords.aiWord);
     const counter = await increaseCounter(userId, "human");
@@ -43,6 +44,7 @@ export async function aiGuessTurn(userId: string): Promise<TurnResponse> {
     } else {
         if (counter.ai % 5 === 0) {
             const humiliation = await makeHumiliation(userId);
+            await addToHistory(userId, humiliation);
             return new TurnResponse([humiliation, guessResponse], TurnState.AI, WinnerState.PLAYING, counter);
         }
         return new TurnResponse([guessResponse], TurnState.AI, WinnerState.PLAYING, counter);
