@@ -1,12 +1,13 @@
 import { CosmosClient } from "@azure/cosmos";
 import { Message } from "@/model/Message";
 import { Answer } from "@/model/Answer";
-import { Category } from "@/model/Categories";
+import { Categories, Category } from "@/model/Categories";
 import { Game, ReportedIssue } from "@/model/Game";
 import { Feedback } from "@/model/Feedback";
 import { Counter } from "@/model/Counter";
 import { WinnerState } from "@/model/WinnerState";
 import { makeSummary } from "./aiMessagesServcie";
+import { CategoryWins, Statistics } from "@/model/Statistics";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
 const COSMOS_DB_DATABASE_NAME = process.env.COSMOS_DB_DATABASE_NAME || "";
@@ -205,5 +206,65 @@ export async function writeFeedback(feedback: Feedback): Promise<string> {
             console.error("An error occurred");
         }
         return "An error occurred";
+    }
+}
+
+export async function getStatistics(): Promise<Statistics> {
+    try {
+        const givenUpQuery = `SELECT VALUE COUNT(1) FROM c WHERE c.winner = '${WinnerState.GIVENUP}'`;
+        const givenUpResult = await container.items.query({
+            query: givenUpQuery
+        }).fetchAll();
+        const givenUpCount = givenUpResult.resources[0];
+
+        const statisticsQuery = `SELECT * FROM c WHERE c.winner IN ('${WinnerState.AI}', '${WinnerState.HUMAN}')`;
+        const db = await container.items.query({
+            query: statisticsQuery
+        }).fetchAll();
+        const totalGames = db.resources.length;
+
+        const aiWins = db.resources.filter((game: Game) => game.winner === WinnerState.AI);
+        const humanWins = db.resources.filter((game: Game) => game.winner === WinnerState.HUMAN);
+
+        const totalAIWins = aiWins.length;
+        const totalHumanWins = humanWins.length;
+        const avgQuestionCountAI = aiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / aiWins.length;
+        const avgQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / humanWins.length;
+
+        const winsByCategory: CategoryWins[] = [];
+        const categories: Category[] = db.resources.map((game: Game) => game.category);
+        const uniqueCategories = Array.from(new Set(categories.map((category: Category) => category)));
+
+        uniqueCategories.forEach((category: Category) => {
+            const categoryAiWins = aiWins.filter((game: Game) => game.category === category);
+            const categoryHumanWins = humanWins.filter((game: Game) => game.category === category);
+
+            const categoryWins: CategoryWins = {
+                category: category,
+                aiWins: categoryAiWins.length,
+                humanWins: categoryHumanWins.length,
+                avgQuestionCountAI: categoryAiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / categoryAiWins.length,
+                avgQuestionCountHuman: categoryHumanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / categoryHumanWins.length
+            };
+            winsByCategory.push(categoryWins);
+        });
+
+        return {
+            totalGames: totalGames,
+            totalAIWins: totalAIWins,
+            totalHumanWins: totalHumanWins,
+            totalGivenUp: givenUpCount,
+            avgQuestionCountHuman: avgQuestionCountHuman,
+            avgQuestionCountAI: avgQuestionCountAI,
+            winsByCategory: winsByCategory
+        } as Statistics;
+    } catch (error: unknown) {
+        console.error("Error:", error);
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error("An error occurred");
+        }
+        throw "An error occurred";
     }
 }

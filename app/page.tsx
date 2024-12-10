@@ -24,6 +24,7 @@ import { Message } from '@/model/Message';
 import { Counter } from '@/model/Counter';
 import { PageState } from '@/model/PageState';
 import { ModalState } from '@/model/ModalState';
+import StatisticsModal from './components/modal/StatisticsModal';
 
 export default function MainPage() {
     const [currentPage, setCurrentPage] = useState<PageState>(PageState.HOME);
@@ -70,6 +71,8 @@ export default function MainPage() {
 
     const renderModalContent = () => {
         switch (modalContent) {
+            case ModalState.STATISTICS:
+                return <StatisticsModal />;
             case ModalState.FAQ:
                 return <Faq />;
             case ModalState.TOU:
