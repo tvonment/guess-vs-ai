@@ -17,7 +17,7 @@ export default function GameWindow({ messages }: GameWindowProps) {
     }, [messages]); // Scroll to bottom when messages change
 
     return (
-        <div ref={chatWindowRef} className="chat-window p-4 flex-grow h-2/3 max-h-[55vh] md:max-h-[60vh] overflow-y-auto mb-4 border border-gray-100">
+        <div ref={chatWindowRef} className="chat-window p-4 flex-grow h-2/3 max-h-[55vh] md:max-h-[60vh] overflow-y-auto mb-4">
             {messages.map((message, index) => (
                 <div key={index} className={`message ${message.role}`}>
                     {message.role === "assistant" && (

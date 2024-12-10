@@ -4,13 +4,15 @@ import GameInfo from './game/GameInfo';
 import GameButtons from './game/GameButtons';
 import FooterButtons from './FooterButtons';
 import { TurnState } from "@/model/TurnState";
+import { Counter } from "@/model/Counter";
+import { ModalState } from "@/model/ModalState";
 
 interface MenuProps {
     onCloseMenu: () => void;
-    onMenuOpenModal: (content: string) => void;
+    onMenuOpenModal: (content: ModalState) => void;
     isGameScreen: boolean;
     userWord: string;
-    counter: number;
+    counter: Counter;
     turn: TurnState;
 }
 

@@ -1,19 +1,51 @@
 import { Message } from "@/model/Message";
 import { gptCall } from "./oaiService";
 import { Category } from "@/model/Categories";
-import { getGameStatus } from "./cosmosService";
+import { getCategory, getFilteredAiChatHistory, getGameStatus } from "./cosmosService";
+import { Answer } from "@/model/Answer";
 
-export async function makeHumiliation(messages: Message[], category: Category): Promise<Message> {
+export async function makeGuess(userId: string): Promise<Message> {
+    const category = await getCategory(userId) as Category;
+    const possibleAnswers = Object.values(Answer).join(", ");
+
+    const instructionSystemMessage = `
+    You are playing a game social deduction game in the category '${category.name}' where you need to narrow down the others character. 
+    You play against a human and you are eager to win. Ask a question to narrow down the searched word from the category '${category.name}' or make a good guess!
+    The Answers you get are either '${possibleAnswers}'. If you get a '${Answer.YES}' or '${Answer.PROBABLY_YES}' you can continue asking questions or make a guess. If you get a 'no' the human will get the turn, so be careful and try to get answers where you most likely get a '${Answer.YES}.'!`;
+    const guessSystemMessage = `
+    Create a good question to get to your word from the category '${category.name} - ${category.description}' or make a guess.`
+
+    const startSystemMessage = {
+        role: "system",
+        content: instructionSystemMessage
+    };
+
+    const endSystemMessage = {
+        role: "system",
+        content: guessSystemMessage
+    };
+
+    try {
+        const filteredChatHistory = await getFilteredAiChatHistory(userId);
+        return await gptCall([startSystemMessage, ...filteredChatHistory, endSystemMessage]);
+    } catch (error: unknown) {
+        console.error("Error:", error);
+        throw new Error("An error occurred");
+    }
+}
+
+export async function makeHumiliation(userId: string): Promise<Message> {
+    const game = await getGameStatus(userId);
 
     let instructionSystemMessage = `
-    You are playing a game of 'Guess vs AI' a word guessing game. You play against a human and you are eager to win.You play in the category: '${category.name}'!
+    You are playing a game of 'Guess vs AI' a word guessing game. You play against a human and you are eager to win. You play in the category: '${game.category.name}'!
     The game so far:`;
 
-    for (const message of messages) {
+    for (const message of game.messages) {
         instructionSystemMessage += `
         - ${message.role}: ${message.content}`;
     }
-    const instructionMessage = `Create a short comment to humiliate the human. You can be as creative as you want but a reference to the category '${category.name}' would be nice!`;
+    const instructionMessage = `Create a short comment to humiliate the human. You can be as creative as you want but a reference to the category '${game.category.name}' would be nice!`;
 
     const systemMessage = {
         role: "system",
@@ -99,7 +131,9 @@ export async function makeSummary(userId: string): Promise<Message> {
     };
 
     try {
-        return await gptCall([systemMessage, userMessage], 0.5, 1000, 1);
+        const response = await gptCall([systemMessage, userMessage], 0.5, 1000, 1);
+        response.role = "system";
+        return response;
     } catch (error: unknown) {
         console.error("Error:", error);
         throw new Error("An error occurred");

@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import FooterButtons from './FooterButtons';
+import { ModalState } from '@/model/ModalState';
 
 interface FooterProps {
-    openModal: (content: string) => void;
+    openModal: (content: ModalState) => void;
 }
 
 function FooterText() {

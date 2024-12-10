@@ -1,6 +1,8 @@
+import { Counter } from "@/model/Counter";
+
 interface GameInfoProps {
     userWord: string;
-    counter: number;
+    counter: Counter;
 }
 
 export default function GameInfo({ userWord, counter }: GameInfoProps) {
@@ -13,7 +15,10 @@ export default function GameInfo({ userWord, counter }: GameInfoProps) {
                 </h2>
             </div>
             <div className="box-blue p-2 rounded-lg shadow flex-1 flex items-center justify-center">
-                <h3 className="text-2xl font-semibold">Round: {counter}</h3>
+                <h3 className="text-center">
+                    <p className="text-xl font-extrabold">Questions</p>
+                    <p className="text-3xl font-extrabold"><span className="counter ai">{counter.ai}</span> / <span className="counter human">{counter.human}</span></p>
+                </h3>
             </div>
         </div>
     );

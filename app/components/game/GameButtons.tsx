@@ -1,31 +1,36 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBug, faHand, faHeart, faQuestion, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { TurnState } from '@/model/TurnState';
+import { ModalState } from '@/model/ModalState';
 
 interface GameButtonsProps {
     turn: TurnState;
-    openModal: (content: string) => void;
+    openModal: (content: ModalState) => void;
 }
 
 export default function GameButtons({ openModal, turn }: GameButtonsProps) {
     const handleGiveUp = () => {
-        openModal('giveup');
+        openModal(ModalState.GIVEUP);
     };
 
     const handleHelp = () => {
-        openModal('help');
+        openModal(ModalState.HELP);
     };
 
     const handleIssueReport = () => {
-        openModal('report-ingame');
+        if (turn === TurnState.FINISHED) {
+            openModal(ModalState.REPORT_GAMEOVER);
+        } else {
+            openModal(ModalState.REPORT_INGAME);
+        }
     }
 
     const handleFeedback = () => {
-        openModal('feedback');
+        openModal(ModalState.FEEDBACK);
     }
 
     const handleAgain = () => {
-        openModal('gameover');
+        openModal(ModalState.GAME_OVER);
     }
 
     return (

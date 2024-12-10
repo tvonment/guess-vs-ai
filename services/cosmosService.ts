@@ -4,6 +4,9 @@ import { Answer } from "@/model/Answer";
 import { Category } from "@/model/Categories";
 import { Game, ReportedIssue } from "@/model/Game";
 import { Feedback } from "@/model/Feedback";
+import { Counter } from "@/model/Counter";
+import { WinnerState } from "@/model/WinnerState";
+import { makeSummary } from "./aiMessagesServcie";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
 const COSMOS_DB_DATABASE_NAME = process.env.COSMOS_DB_DATABASE_NAME || "";
@@ -24,6 +27,21 @@ async function getChatHistory(userId: string): Promise<Message[]> {
     const dbitem: { id: string, messages: Message[], userWord: string, aiWord: string, category: string } = db.resources[0];
 
     return dbitem.messages as Message[]
+}
+
+async function updateGame(game: Game) {
+    await container.items.upsert(game);
+}
+
+export async function increaseCounter(userId: string, player: string): Promise<Counter> {
+    const game = await getGameStatus(userId);
+    if (player === 'human') {
+        game.counter.human++;
+    } else if (player === 'ai') {
+        game.counter.ai++;
+    }
+    await updateGame(game);
+    return game.counter;
 }
 
 export async function getGameStatus(userId: string): Promise<Game> {
@@ -90,16 +108,9 @@ export async function getCategory(userId: string): Promise<Category> {
     return dbitem.category;
 }
 
-export async function updateGame(game: Game) {
-    await container.items.upsert(game);
-}
-
-export async function addToHistory(userId: string, message: Message, winner?: string): Promise<Message> {
+export async function addToHistory(userId: string, message: Message): Promise<Message> {
     const game = await getGameStatus(userId);
     game.messages.push(message);
-    if (winner) {
-        game.winner = winner;
-    }
     try {
         await updateGame(game);
         return message;
@@ -131,9 +142,10 @@ export async function getUsedCharacters(category: Category): Promise<string[]> {
     }
 }
 
-export async function finishGame(userId: string): Promise<string> {
+export async function finishGame(userId: string, winner: WinnerState): Promise<{ aiWord: string, counter: Counter, summary: Message }> {
     const gameStatus = await getGameStatus(userId);
-    gameStatus.winner = "given up";
+    gameStatus.winner = winner;
+    gameStatus.summary = await makeSummary(userId);
 
     try {
         await updateGame(gameStatus);
@@ -148,7 +160,7 @@ export async function finishGame(userId: string): Promise<string> {
 
     try {
         const aiWord = await getAiWord(userId);
-        return aiWord;
+        return { aiWord: aiWord, counter: gameStatus.counter, summary: gameStatus.summary };
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {
@@ -156,7 +168,7 @@ export async function finishGame(userId: string): Promise<string> {
         } else {
             console.error("An error occurred");
         }
-        return "An error occurred";
+        throw "An error occurred";
     }
 }
 

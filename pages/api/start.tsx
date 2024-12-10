@@ -4,6 +4,7 @@ import { startGame } from "@/services/cosmosService";
 import { Game } from "@/model/Game";
 import { Category, Categories } from "@/model/Categories";
 import { characterCheck } from "@/services/characterCheckService";
+import { Counter } from "@/model/Counter";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { userId } = req.body;
@@ -29,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-        const game = new Game(userId, [], userWord, aiWord, category);
+        const game = new Game(userId, [], userWord, aiWord, category, new Counter(0, 0));
         await startGame(game);
         res.status(200).json({ result: "success" });
     } catch (error: unknown) {

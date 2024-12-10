@@ -1,9 +1,11 @@
+import { Message } from "@/model/Message";
+import { TurnResponse } from "@/model/TurnResponse";
 import { faRotateLeft, faSkullCrossbones } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from 'react';
 
 interface ConfirmProps {
-    onConfirm: (winner: string, aiWord: string, summary: string) => void;
+    onConfirm: (winner: string, aiWord: string, summary: Message) => void;
     onClose: () => void;
     userId: string;
 }
@@ -21,11 +23,13 @@ export default function Confirm({ onConfirm, onClose, userId }: ConfirmProps) {
                 },
                 body: JSON.stringify({ userId: userId }),
             });
-            const data = await response.json();
-            const aiWord = data.result;
+            const data = await response.json() as TurnResponse;
+            const aiWord = data.aiWord;
             const summary = data.summary;
-            console.log("SUMMARY", summary);
-            onConfirm("givenup", aiWord, summary);
+            const winnerState = data.winnerState;
+            if (aiWord && summary && winnerState) {
+                onConfirm(winnerState, aiWord, summary);
+            }
         } catch (error) {
             console.error('Error fetching AI word:', error);
         } finally {

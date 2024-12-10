@@ -1,15 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { addToHistory, finishGame } from "@/services/cosmosService";
-import { makeSummary } from '@/services/aiMessagesServcie';
+import { finishGame } from "@/services/cosmosService";
+import { TurnResponse } from '@/model/TurnResponse';
+import { TurnState } from '@/model/TurnState';
+import { WinnerState } from '@/model/WinnerState';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { userId } = req.body;
 
     try {
-        const aiWord = await finishGame(userId);
-        const responseSummary = await makeSummary(userId);
-        await addToHistory(userId, responseSummary);
-        res.status(200).json({ result: aiWord, summary: responseSummary.content });
+        const { aiWord, counter, summary } = await finishGame(userId, WinnerState.GIVENUP);
+        res.status(200).json(new TurnResponse([], TurnState.FINISHED, WinnerState.GIVENUP, counter, summary, aiWord));
         return;
     } catch (error: unknown) {
         console.error("Error:", error);

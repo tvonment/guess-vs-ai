@@ -11,23 +11,27 @@ import GameNotes from "./GameNotes";
 import GameButtons from "./GameButtons";
 import Image from 'next/image';
 import { MessageRequestType } from "@/model/MessageRequestType";
+import { TurnResponse } from "@/model/TurnResponse";
+import { WinnerState } from "@/model/WinnerState";
+import { Counter } from "@/model/Counter";
+import { ModalState } from "@/model/ModalState";
 
 type GameProps = {
     category: Category;
     userId: string;
     userWord: string;
-    counter: number;
+    counter: Counter;
     turn: TurnState;
     aiWord: string;
-    summary: string;
-    onSetSummary: (summary: string) => void;
+    summary: Message;
+    onSetSummary: (summary: Message) => void;
     onSetTurn: (turn: TurnState) => void;
-    onSetWinner: (winner: string, aiWord: string, summary: string) => void;
-    onCounterIncrease: () => void;
-    openModal: (content: string) => void;
+    onSetWinner: (winner: string, aiWord: string, summary: Message) => void;
+    onSetCounter: (counter: Counter) => void;
+    openModal: (content: ModalState) => void;
 };
 
-export default function Game({ category, userId, userWord, counter, turn, aiWord, summary, onSetSummary, onSetWinner, openModal, onCounterIncrease, onSetTurn }: GameProps) {
+export default function Game({ category, userId, userWord, counter, turn, aiWord, summary, onSetWinner, openModal, onSetTurn, onSetCounter }: GameProps) {
     const [messages, setMessages] = useState<Message[]>([]);
 
     const onInit = async () => {
@@ -51,58 +55,19 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
     }, []);
 
     useEffect(() => {
-        const fetchMessages = async () => {
-            if (counter % 3 === 0 && counter !== 0) {
-                onSetTurn(TurnState.LOADING); // Show loading spinner
-                const response = await fetch('/api/messagerequest', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId: userId, category: category, messages: messages, messageRequestType: MessageRequestType.HUMILIATE }),
-                });
-                const data = await response.json();
-                if (data.messages) {
-                    setMessages([...messages, ...data.messages]); // Add user message to messages
-                }
-                onSetTurn(TurnState.HUMAN); // Set turn back to human after initialization
-            }
-        };
-
-        fetchMessages();
-    }, [counter]);
-
-    useEffect(() => {
         const fetchSummary = async () => {
             if (summary) {
-                setMessages([...messages, { role: "system", content: summary }]);
+                setMessages([...messages, summary]);
             }
         };
 
         fetchSummary();
     }, [summary]);
 
-
-    const handleWinner = async (winner: string, aiWord: string) => {
-        onSetTurn(TurnState.FINISHED);
-        try {
-            const response = await fetch('/api/messagerequest', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId: userId, category: category, messageRequestType: MessageRequestType.SUMMARY }),
-            });
-            const data = await response.json();
-            console.log("Summary data:", data);
-            const message = data.message as Message;
-            if (data.message) {
-                onSetSummary(message.content);
-                onSetWinner(winner, aiWord, message.content);
-                openModal("gameover");
-            }
-        } catch (error) {
-            console.error("Error fetching summary:", error);
+    const floatMessages = async (newMessages: Message[]) => {
+        for (let i = 0; i < newMessages.length; i++) {
+            setMessages(prevMessages => [...prevMessages, newMessages[i]]); // Use functional update
+            await new Promise(r => setTimeout(r, 500));
         }
     };
 
@@ -115,47 +80,36 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
             },
             body: JSON.stringify({ userId: userId, answer: answer }),
         });
-        const data = await response.json();
-        const responseMessage = data.result;
-        if (responseMessage) {
-            setMessages([...messages, responseMessage]); // Add user message to messages
-            onSetTurn(TurnState.HUMAN); // Show input field after selection
-            onCounterIncrease(); // Increase counter
-        }
+        const data = await response.json() as TurnResponse;
+        await handleResponse(data);
     };
 
     const handleHumanGuess = async (input: string) => {
         onSetTurn(TurnState.LOADING); // Show loading spinner
-        const newMessage = { role: "user", content: input };
-        setMessages([...messages, newMessage]); // Add user message to messages
-        const response = await fetch('/api/guess', {
+        const newMessage = new Message("user", input);
+        setMessages(prevMessages => [...prevMessages, newMessage]); // Use functional update
+        const response = await fetch('/api/humanguess', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ userId: userId, text: input }), // Use input value
         });
-        const data = await response.json();
-        const aiMessages = data.result;
-        const userWin = data.userWin;
-        const aiWin = data.aiWin;
-        if (userWin) {
-            console.log("You won!");
-            handleWinner("user", data.aiWord);
-        } else if (aiWin) {
-            console.log("AI won!");
-            setMessages([...messages, newMessage, ...aiMessages]); // Add AI response to messages
-            handleWinner("assistant", data.aiWord);
-        } else {
-            let updatedMessages = [...messages, newMessage];
-            for (let i = 0; i < aiMessages.length; i++) {
-                updatedMessages = [...updatedMessages, aiMessages[i]];
-                setMessages([...updatedMessages]); // Update state with accumulated messages
-                await new Promise(r => setTimeout(r, 500));
-            }
-            onSetTurn(TurnState.AI); // Show buttons after sending the question
-        }
+        const data = await response.json() as TurnResponse;
+        await handleResponse(data);
     };
+
+    const handleResponse = async (data: TurnResponse) => {
+        const newMessages = data.messages as Message[];
+        const winner = data.winnerState as WinnerState;
+        const counter = data.counter as Counter;
+        const turn = data.turn as TurnState;
+        if (counter) { onSetCounter(counter) };
+        await floatMessages(newMessages);
+        onSetTurn(turn);
+        console.log("Winner:", winner);
+        if (winner && data.aiWord && data.summary) { onSetWinner(winner, data.aiWord, data.summary); }
+    }
 
     return (
         <main className="w-full grid grid-cols-1 md:grid-cols-5 gap-4 p-4 overflow-hidden">
