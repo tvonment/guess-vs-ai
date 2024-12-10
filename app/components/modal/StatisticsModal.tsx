@@ -52,7 +52,7 @@ export default function StatisticsModal() {
                         <p>{statistics?.avgQuestionCountHuman || "no value"}</p>
                         <p className="col-span-2">Avg. Questions AI:</p>
                         <p>{statistics?.avgQuestionCountAI || "no value"}</p>
-                        <p className="col-span-2">Total given up games:</p>
+                        <p className="col-span-2">Total Given-Up games:</p>
                         <p>{statistics?.totalGivenUp || "no value"}</p>
                     </div>
                     {statistics?.winsByCategory?.map((categoryWins) => (

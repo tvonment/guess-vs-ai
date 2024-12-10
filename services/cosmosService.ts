@@ -232,19 +232,21 @@ export async function getStatistics(): Promise<Statistics> {
         const avgQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / humanWins.length;
 
         const winsByCategory: CategoryWins[] = [];
-        const categories: Category[] = db.resources.map((game: Game) => game.category);
-        const uniqueCategories = Array.from(new Set(categories.map((category: Category) => category)));
+        const categories: Category[] = Categories;
 
-        uniqueCategories.forEach((category: Category) => {
-            const categoryAiWins = aiWins.filter((game: Game) => game.category === category);
-            const categoryHumanWins = humanWins.filter((game: Game) => game.category === category);
+        categories.forEach((category: Category) => {
+            const categoryAiWins = aiWins.filter((game: Game) => game.category.name === category.name);
+            const categoryHumanWins = humanWins.filter((game: Game) => game.category.name === category.name);
+
+            console.log("Category:", category.name, "AI Wins:", categoryAiWins.length, "Human Wins:", categoryHumanWins.length);
+
 
             const categoryWins: CategoryWins = {
                 category: category,
                 aiWins: categoryAiWins.length,
                 humanWins: categoryHumanWins.length,
-                avgQuestionCountAI: categoryAiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / categoryAiWins.length,
-                avgQuestionCountHuman: categoryHumanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / categoryHumanWins.length
+                avgQuestionCountAI: categoryAiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / categoryAiWins.length || 0,
+                avgQuestionCountHuman: categoryHumanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / categoryHumanWins.length || 0
             };
             winsByCategory.push(categoryWins);
         });
