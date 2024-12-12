@@ -35,13 +35,25 @@ export class CategoryWins {
     category: Category;
     humanWins: number;
     aiWins: number;
+    minQuestionCountHuman: number;
+    maxQuestionCountHuman: number;
+    medQuestionCountHuman: number;
     avgQuestionCountHuman: number;
+    minQuestionCountAI: number;
+    maxQuestionCountAI: number;
+    medQuestionCountAI: number;
     avgQuestionCountAI: number;
-    constructor(category: Category, humanWins: number, aiWins: number, avgQuestionCountHuman: number, avgQuestionCountAI: number) {
+    constructor(category: Category, humanWins: number, aiWins: number, avgQuestionCountHuman: number, avgQuestionCountAI: number, minQuestionCountHuman: number, maxQuestionCountHuman: number, medQuestionCountHuman: number, minQuestionCountAI: number, maxQuestionCountAI: number, medQuestionCountAI: number) {
         this.category = category;
         this.humanWins = humanWins;
         this.aiWins = aiWins;
-        this.avgQuestionCountHuman = avgQuestionCountHuman;
+        this.minQuestionCountAI = minQuestionCountAI;
+        this.maxQuestionCountAI = maxQuestionCountAI;
+        this.medQuestionCountAI = medQuestionCountAI;
         this.avgQuestionCountAI = avgQuestionCountAI;
+        this.minQuestionCountHuman = minQuestionCountHuman;
+        this.maxQuestionCountHuman = maxQuestionCountHuman;
+        this.medQuestionCountHuman = medQuestionCountHuman;
+        this.avgQuestionCountHuman = avgQuestionCountHuman;
     }
 }
