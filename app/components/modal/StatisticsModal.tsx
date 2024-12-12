@@ -134,7 +134,7 @@ export default function StatisticsModal() {
                                 <p className="text-xl font-bold">{categoryWins.humanWins ? categoryWins.humanWins + " Wins" : "no value"}</p>
                                 <p className="col-span-1 text-xl font-bold">AI Wins:</p>
                                 <p className="text-xl font-bold">{categoryWins.aiWins ? categoryWins.aiWins + " Wins" : "no value"}</p>
-                                <h3 className="col-span-2 text-xl font-bold">Questions used to win: (Human)</h3>
+                                <h3 className="col-span-2 text-xl font-bold">Questions used to win: (Player)</h3>
                                 <p className="col-span-1">Low:</p>
                                 <p>{categoryWins.minQuestionCountHuman && categoryWins.minQuestionCountHuman > 0 ? categoryWins.minQuestionCountHuman + " Questions" : "no value"}</p>
                                 <p className="col-span-1">Max:</p>
