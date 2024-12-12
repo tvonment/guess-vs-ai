@@ -37,7 +37,8 @@ h1,
 h2,
 h3,
 button,
-.summary {
+.summary,
+.statistics p {
   font-family: 'VT323', serif;
 }
 
@@ -245,11 +246,13 @@ button:hover {
 }
 
 .counter.human {
-  color: lightblue;
+  color: #ADD8E6;
+  /* lightblue */
 }
 
 .counter.ai {
-  color: rgba(255, 200, 100, 1);
+  color: #FFC864;
+  /* rgba(255, 200, 100, 1) */
 }
 
 @keyframes spin {

@@ -231,12 +231,12 @@ export async function getStatistics(): Promise<Statistics> {
 
         const minQuestionCountAI = aiWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.ai), Number.MAX_VALUE);
         const maxQuestionCountAI = aiWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.ai), 0);
-        const medQuestionCountAI = aiWins[Math.floor(aiWins.length / 2)].counter.ai;
+        const medQuestionCountAI = aiWins.length > 0 ? aiWins[Math.floor(aiWins.length / 2)].counter.ai : 0;
         const avgQuestionCountAI = aiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / aiWins.length;
 
         const minQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.human), Number.MAX_VALUE);
         const maxQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.human), 0);
-        const medQuestionCountHuman = humanWins[Math.floor(humanWins.length / 2)].counter.human;
+        const medQuestionCountHuman = humanWins.length > 0 ? humanWins[Math.floor(humanWins.length / 2)].counter.human : 0;
         const avgQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / humanWins.length;
 
         const winsByCategory: CategoryWins[] = [];
@@ -249,8 +249,14 @@ export async function getStatistics(): Promise<Statistics> {
                 category: category,
                 aiWins: categoryAiWins.length,
                 humanWins: categoryHumanWins.length,
-                avgQuestionCountAI: categoryAiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / categoryAiWins.length || 0,
-                avgQuestionCountHuman: categoryHumanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / categoryHumanWins.length || 0
+                minQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.ai), Number.MAX_VALUE) : 0,
+                maxQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.ai), 0) : 0,
+                medQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins[Math.floor(categoryAiWins.length / 2)].counter.ai : 0,
+                avgQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / categoryAiWins.length : 0,
+                minQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.human), Number.MAX_VALUE) : 0,
+                maxQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.human), 0) : 0,
+                medQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins[Math.floor(categoryHumanWins.length / 2)].counter.human : 0,
+                avgQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / categoryHumanWins.length : 0
             };
             winsByCategory.push(categoryWins);
         });
