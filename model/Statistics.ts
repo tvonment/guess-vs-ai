@@ -1,4 +1,6 @@
 import { Category } from "./Categories";
+import { Counter } from "./Counter";
+import { Message } from "./Message";
 
 export class Statistics {
     totalGames: number;
@@ -61,5 +63,33 @@ export class CategoryWins {
         this.maxQuestionCountHuman = maxQuestionCountHuman;
         this.medQuestionCountHuman = medQuestionCountHuman;
         this.avgQuestionCountHuman = avgQuestionCountHuman;
+    }
+}
+
+export class DetailedStatistics {
+    basic: Statistics;
+    games: GameStatistics[];
+    constructor(basic: Statistics, games: GameStatistics[]) {
+        this.basic = basic;
+        this.games = games;
+    }
+}
+
+export class GameStatistics {
+    id: string;
+    userWord: string;
+    aiWord: string;
+    categoryName: string;
+    counter: Counter;
+    winner: string;
+    messages: Message[];
+    constructor(id: string, userWord: string, aiWord: string, category: Category, counter: Counter, winner: string, messages: Message[]) {
+        this.id = id;
+        this.userWord = userWord;
+        this.aiWord = aiWord;
+        this.categoryName = category.name;
+        this.counter = counter;
+        this.winner = winner;
+        this.messages = messages;
     }
 }
