@@ -118,7 +118,7 @@ export default function StatisticsModal() {
                         <p className="col-span-1">Max:</p>
                         <p>{statistics?.maxQuestionCountAI ? statistics?.maxQuestionCountAI + " Questions" : "no value"}</p>
                         <p className="col-span-1">Average:</p>
-                        <p>{statistics?.avgQuestionCountAI ? statistics?.avgQuestionCountAI + " Questions" : "no value"}</p>
+                        <p>{statistics?.avgQuestionCountAI ? statistics?.avgQuestionCountAI.toFixed(1) + " Questions" : "no value"}</p>
                         <p className="col-span-1">Median:</p>
                         <p>{statistics?.medQuestionCountAI ? statistics?.medQuestionCountAI + " Questions" : "no value"}</p>
                     </div>
