@@ -209,6 +209,25 @@ export async function writeFeedback(feedback: Feedback): Promise<string> {
     }
 }
 
+export async function getFeedback(): Promise<Feedback[]> {
+    try {
+        const query = `SELECT * FROM c`;
+        const db = await feedbackContainer.items.query({
+            query: query
+        }).fetchAll();
+        return db.resources as Feedback[];
+    }
+    catch (error: unknown) {
+        console.error("Error:", error);
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error("An error occurred");
+        }
+        throw "An error occurred";
+    }
+}
+
 export async function getStatistics(): Promise<Statistics> {
     try {
         const givenUpQuery = `SELECT VALUE COUNT(1) FROM c WHERE c.winner = '${WinnerState.GIVENUP}'`;
