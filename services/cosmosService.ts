@@ -7,7 +7,7 @@ import { Feedback } from "@/model/Feedback";
 import { Counter } from "@/model/Counter";
 import { WinnerState } from "@/model/WinnerState";
 import { makeSummary } from "./aiMessagesServcie";
-import { CategoryWins, Statistics } from "@/model/Statistics";
+import { CategoryWins, Statistics, DetailedStatistics, GameStatistics } from "@/model/Statistics";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
 const COSMOS_DB_DATABASE_NAME = process.env.COSMOS_DB_DATABASE_NAME || "";
@@ -337,6 +337,56 @@ export async function getStatistics(): Promise<Statistics> {
             avgQuestionCountAI: avgQuestionCountAI,
             winsByCategory: winsByCategory
         } as Statistics;
+    } catch (error: unknown) {
+        console.error("Error:", error);
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error("An error occurred");
+        }
+        throw "An error occurred";
+    }
+}
+
+async function getGameStatistics(): Promise<GameStatistics[]> {
+    try {
+        const query = `SELECT * FROM c WHERE c.winner IN ('${WinnerState.AI}', '${WinnerState.HUMAN}')`;
+        const db = await container.items.query({
+            query: query
+        }).fetchAll();
+        const games: Game[] = db.resources;
+        const gameStatistics: GameStatistics[] = games.map((game: Game) => {
+            return {
+                id: game.id,
+                userWord: game.userWord,
+                aiWord: game.aiWord,
+                categoryName: game.category.name,
+                winner: game.winner,
+                counter: game.counter,
+                messages: game.messages,
+            } as GameStatistics;
+        });
+        return gameStatistics;
+    } catch (error: unknown) {
+        console.error("Error:", error);
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error("An error occurred");
+        }
+        throw "An error occurred";
+    }
+}
+
+export async function getDetailedStatistics(): Promise<DetailedStatistics> {
+    try {
+        const basicStatistics = await getStatistics();
+        const gamesStatistics = await getGameStatistics();
+        const detailedStatistics: DetailedStatistics = {
+            basic: basicStatistics,
+            games: gamesStatistics
+        };
+        return detailedStatistics;
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {
