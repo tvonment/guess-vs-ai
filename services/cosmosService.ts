@@ -228,8 +228,33 @@ export async function getFeedback(): Promise<Feedback[]> {
     }
 }
 
+export async function getIssues(): Promise<{ id: string, issues: ReportedIssue[] }[]> {
+    try {
+        const query = `SELECT c.id, c.issues FROM c WHERE c.issues != null`;
+        const db = await container.items.query({
+            query: query
+        }).fetchAll();
+        const games: { id: string, issues: ReportedIssue[] }[] = db.resources;
+        return games;
+    } catch (error: unknown) {
+        console.error("Error:", error);
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error("An error occurred");
+        }
+        throw "An error occurred";
+    }
+}
+
 export async function getStatistics(): Promise<Statistics> {
     try {
+        const startedQuery = `SELECT VALUE COUNT(1) FROM c`;
+        const startedResult = await container.items.query({
+            query: startedQuery
+        }).fetchAll();
+        const startedCount = startedResult.resources[0];
+
         const givenUpQuery = `SELECT VALUE COUNT(1) FROM c WHERE c.winner = '${WinnerState.GIVENUP}'`;
         const givenUpResult = await container.items.query({
             query: givenUpQuery
@@ -261,30 +286,47 @@ export async function getStatistics(): Promise<Statistics> {
         const winsByCategory: CategoryWins[] = [];
         const categories: Category[] = Categories;
 
-        categories.forEach((category: Category) => {
-            const categoryAiWins = aiWins.filter((game: Game) => game.category.name === category.name);
-            const categoryHumanWins = humanWins.filter((game: Game) => game.category.name === category.name);
-            const categoryWins: CategoryWins = {
-                category: category,
-                aiWins: categoryAiWins.length,
-                humanWins: categoryHumanWins.length,
-                minQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.ai), Number.MAX_VALUE) : 0,
-                maxQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.ai), 0) : 0,
-                medQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins[Math.floor(categoryAiWins.length / 2)].counter.ai : 0,
-                avgQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / categoryAiWins.length : 0,
-                minQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.human), Number.MAX_VALUE) : 0,
-                maxQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.human), 0) : 0,
-                medQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins[Math.floor(categoryHumanWins.length / 2)].counter.human : 0,
-                avgQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / categoryHumanWins.length : 0
-            };
-            winsByCategory.push(categoryWins);
-        });
+        await Promise.all(
+            categories.map(async (category: Category) => {
+                const startedQuery = `SELECT VALUE COUNT(1) FROM c WHERE c.category.name = '${category.name}'`;
+                const startedResult = await container.items.query({
+                    query: startedQuery
+                }).fetchAll();
+                const startedCount = startedResult.resources[0];
+
+                const givenUpQuery = `SELECT VALUE COUNT(1) FROM c WHERE c.category.name = '${category.name}' AND c.winner = '${WinnerState.GIVENUP}'`;
+                const givenUpResult = await container.items.query({
+                    query: givenUpQuery
+                }).fetchAll();
+                const givenUpCount = givenUpResult.resources[0];
+
+                const categoryAiWins = aiWins.filter((game: Game) => game.category.name === category.name);
+                const categoryHumanWins = humanWins.filter((game: Game) => game.category.name === category.name);
+                const categoryWins: CategoryWins = {
+                    category: category,
+                    aiWins: categoryAiWins.length,
+                    humanWins: categoryHumanWins.length,
+                    givenUp: givenUpCount,
+                    started: startedCount,
+                    minQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.ai), Number.MAX_VALUE) : 0,
+                    maxQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.ai), 0) : 0,
+                    medQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins[Math.floor(categoryAiWins.length / 2)].counter.ai : 0,
+                    avgQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / categoryAiWins.length : 0,
+                    minQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.human), Number.MAX_VALUE) : 0,
+                    maxQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.human), 0) : 0,
+                    medQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins[Math.floor(categoryHumanWins.length / 2)].counter.human : 0,
+                    avgQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / categoryHumanWins.length : 0
+                };
+                winsByCategory.push(categoryWins);
+            })
+        );
 
         return {
             totalGames: totalGames,
             totalAIWins: totalAIWins,
             totalHumanWins: totalHumanWins,
             totalGivenUp: givenUpCount,
+            totalStarted: startedCount,
             minQuestionCountHuman: minQuestionCountHuman,
             maxQuestionCountHuman: maxQuestionCountHuman,
             medQuestionCountHuman: medQuestionCountHuman,
