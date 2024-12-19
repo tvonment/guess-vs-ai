@@ -31,6 +31,26 @@
             "src": "/icons/apple-touch-icon.png",
             "sizes": "180x180",
             "type": "image/png"
+        },
+        {
+            "src": "/icons/128-mac.png",
+            "sizes": "128x128",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/256-mac.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/512-mac.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/1024-mac.png",
+            "sizes": "1024x1024",
+            "type": "image/png"
         }
     ]
 }
