@@ -22,6 +22,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" href="/images/favicon-16x16.png" sizes="16x16" />
+        <link rel="icon" href="/images/favicon-32x32.png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" sizes="180x180" />
+        <meta name="theme-color" content="#fe9b39" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col items-center justify-center min-h-screen`}>
         {children}
       </body>
