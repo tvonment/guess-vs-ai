@@ -5,10 +5,12 @@ import { ModalState } from '@/model/ModalState';
 
 interface GameButtonsProps {
     turn: TurnState;
+    feedbackSent: boolean;
     openModal: (content: ModalState) => void;
+    onRestart: () => void;
 }
 
-export default function GameButtons({ openModal, turn }: GameButtonsProps) {
+export default function GameButtons({ openModal, turn, feedbackSent, onRestart }: GameButtonsProps) {
     const handleGiveUp = () => {
         openModal(ModalState.GIVEUP);
     };
@@ -30,7 +32,11 @@ export default function GameButtons({ openModal, turn }: GameButtonsProps) {
     }
 
     const handleAgain = () => {
-        openModal(ModalState.GAME_OVER);
+        if (!feedbackSent) {
+            openModal(ModalState.FEEDBACK);
+        } else {
+            onRestart();
+        }
     }
 
     return (
@@ -57,11 +63,14 @@ export default function GameButtons({ openModal, turn }: GameButtonsProps) {
                 </>
             ) : (
                 <>
-                    <button className="btn-blue p-3 rounded-lg shadow w-full flex flex items-center justify-between" onClick={handleFeedback}>
-                        <FontAwesomeIcon icon={faHeart} className="icon-margin-small" />
-                        <span className="mx-2 text-center">Feedback</span>
-                        <FontAwesomeIcon icon={faHeart} className="icon-margin-small hidden sm:inline" />
-                    </button>
+
+                    {!feedbackSent && (
+                        <button className="btn-blue p-3 rounded-lg shadow w-full flex flex items-center justify-between" onClick={handleFeedback}>
+                            <FontAwesomeIcon icon={faHeart} className="icon-margin-small" />
+                            <span className="mx-2 text-center">Feedback</span>
+                            <FontAwesomeIcon icon={faHeart} className="icon-margin-small hidden sm:inline" />
+                        </button>
+                    )}
                     <div className="flex flex-row gap-4 w-full">
                         <button className="btn-red p-3 rounded-lg shadow flex-1 flex items-center justify-between" onClick={handleIssueReport}>
                             <FontAwesomeIcon icon={faBug} className="icon-margin-small" />

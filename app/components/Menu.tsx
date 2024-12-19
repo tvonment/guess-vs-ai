@@ -11,13 +11,15 @@ import { FooterText } from "./Footer";
 interface MenuProps {
     onCloseMenu: () => void;
     onMenuOpenModal: (content: ModalState) => void;
+    onRestart: () => void;
+    feedbackSent: boolean;
     isGameScreen: boolean;
     userWord: string;
     counter: Counter;
     turn: TurnState;
 }
 
-export default function Menu({ onCloseMenu, onMenuOpenModal, userWord, counter, isGameScreen, turn }: MenuProps) {
+export default function Menu({ onCloseMenu, onMenuOpenModal, onRestart, feedbackSent, userWord, counter, isGameScreen, turn }: MenuProps) {
 
     return (
         <>
@@ -31,7 +33,7 @@ export default function Menu({ onCloseMenu, onMenuOpenModal, userWord, counter, 
                 {isGameScreen && (
                     <div className="flex-1 overflow-y-auto">
                         <GameInfo userWord={userWord} counter={counter} />
-                        <GameButtons openModal={onMenuOpenModal} turn={turn} />
+                        <GameButtons openModal={onMenuOpenModal} turn={turn} onRestart={onRestart} feedbackSent={feedbackSent} />
                     </div>
                 )}
                 <div className="text-gray-700 hover:text-gray-900 overflow-y-auto mb-10">

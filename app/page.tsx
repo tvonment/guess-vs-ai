@@ -39,6 +39,7 @@ export default function MainPage() {
     const [turn, setTurn] = useState<TurnState>(TurnState.LOADING);
     const [summary, setSummary] = useState<Message>({ role: 'system', content: '' });
     const [startMessage, setStartMessage] = useState<Message>({ role: 'assistant', content: '' });
+    const [feedbackSent, setFeedbackSent] = useState<boolean>(false);
 
     const toggleMenu = () => {
         setShowMenu(!showMenu);
@@ -69,6 +70,10 @@ export default function MainPage() {
         setSummary(summary);
     }
 
+    const handleFeedbackSent = () => {
+        setFeedbackSent(true);
+    }
+
     const renderModalContent = () => {
         switch (modalContent) {
             case ModalState.STATISTICS:
@@ -90,7 +95,7 @@ export default function MainPage() {
             case ModalState.GAME_OVER:
                 return <GameOverModal onClose={closeModal} winner={winner} aiWord={aiWord} summary={summary} openModal={openModal} />;
             case ModalState.FEEDBACK:
-                return <FeedbackForm onClose={closeModal} userId={userId} />;
+                return <FeedbackForm onClose={closeModal} userId={userId} onFeedbackSent={handleFeedbackSent} />;
             default:
                 return null;
         }
@@ -175,10 +180,10 @@ export default function MainPage() {
             {currentPage === PageState.HOME && <Home onNavigate={handleStart} />}
             {currentPage === PageState.CATEGORY_SELECTION && <CategorySelection onSetCategory={handleSetCategory} />}
             {currentPage === PageState.WORD_SELECTION && category && <WordSelection onStartGame={handleOnStartGame} category={category} />}
-            {currentPage === PageState.GAME && category && userId && <Game category={category} userId={userId} userWord={userWord} startMessage={startMessage} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onSetCounter={setCounter} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} />}
+            {currentPage === PageState.GAME && category && userId && <Game category={category} userId={userId} userWord={userWord} startMessage={startMessage} feedbackSent={feedbackSent} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onSetCounter={setCounter} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} onRestart={handleStart} />}
             <Footer openModal={openModal} />
             {showMenu && (
-                <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} counter={counter} isGameScreen={currentPage === 'game'} turn={turn} />
+                <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} counter={counter} feedbackSent={feedbackSent} isGameScreen={currentPage === 'game'} turn={turn} onRestart={handleStart} />
             )}
             <VersionFlag />
             <Modal content={modalContent} onClose={closeModal} renderContent={renderModalContent} />
