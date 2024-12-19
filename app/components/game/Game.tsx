@@ -24,6 +24,8 @@ type GameProps = {
     aiWord: string;
     summary: Message;
     startMessage: Message;
+    feedbackSent: boolean;
+    onRestart: () => void;
     onSetSummary: (summary: Message) => void;
     onSetTurn: (turn: TurnState) => void;
     onSetWinner: (winner: string, aiWord: string, summary: Message) => void;
@@ -31,7 +33,7 @@ type GameProps = {
     openModal: (content: ModalState) => void;
 };
 
-export default function Game({ category, userId, userWord, counter, turn, aiWord, summary, startMessage, onSetWinner, openModal, onSetTurn, onSetCounter }: GameProps) {
+export default function Game({ category, userId, userWord, counter, turn, aiWord, summary, startMessage, feedbackSent, onRestart, onSetWinner, openModal, onSetTurn, onSetCounter }: GameProps) {
     const [messages, setMessages] = useState<Message[]>([startMessage]);
 
     useEffect(() => {
@@ -108,7 +110,7 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
                 <div className="hidden md:block">
                     <GameInfo userWord={userWord} counter={counter} />
                     <GameNotes />
-                    <GameButtons openModal={openModal} turn={turn} />
+                    <GameButtons openModal={openModal} turn={turn} feedbackSent={feedbackSent} onRestart={onRestart} />
                 </div>
             </div>
             <Image src={category.image} alt={category.name} width={300} height={300} className="bg-image visible" />

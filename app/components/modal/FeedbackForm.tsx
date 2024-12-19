@@ -7,10 +7,12 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 type FeedbackProps = {
     onClose: () => void;
+    onFeedbackSent: () => void;
     userId: string;
+
 };
 
-export default function FeedbackForm({ onClose, userId }: FeedbackProps) {
+export default function FeedbackForm({ onClose, userId, onFeedbackSent }: FeedbackProps) {
     const [overallRating, setOverallRating] = useState<number>(0);
     const [aiDifficulty, setAiDifficulty] = useState<string>('');
     const [aiFairness, setAiFairness] = useState<string>('');
@@ -55,6 +57,7 @@ export default function FeedbackForm({ onClose, userId }: FeedbackProps) {
             const result = data.result;
             if (result) {
                 setSystemMessage(result);
+                onFeedbackSent();
             } else {
                 setSystemMessage('Error sending feedback!');
             }
