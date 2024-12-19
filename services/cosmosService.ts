@@ -247,6 +247,17 @@ export async function getIssues(): Promise<{ id: string, issues: ReportedIssue[]
     }
 }
 
+function getMedian(arr: number[]): number {
+    const sortedArr = arr.slice().sort((a, b) => a - b);
+    const mid = Math.floor(sortedArr.length / 2);
+
+    if (sortedArr.length % 2 === 0) {
+        return (sortedArr[mid - 1] + sortedArr[mid]) / 2;
+    } else {
+        return sortedArr[mid];
+    }
+}
+
 export async function getStatistics(): Promise<Statistics> {
     try {
         const startedQuery = `SELECT VALUE COUNT(1) FROM c`;
@@ -275,12 +286,12 @@ export async function getStatistics(): Promise<Statistics> {
 
         const minQuestionCountAI = aiWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.ai), Number.MAX_VALUE);
         const maxQuestionCountAI = aiWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.ai), 0);
-        const medQuestionCountAI = aiWins.length > 0 ? aiWins[Math.floor(aiWins.length / 2)].counter.ai : 0;
+        const medQuestionCountAI = aiWins.length > 0 ? getMedian(aiWins.map(win => win.counter.ai)) : 0;
         const avgQuestionCountAI = aiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / aiWins.length;
 
         const minQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.human), Number.MAX_VALUE);
         const maxQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.human), 0);
-        const medQuestionCountHuman = humanWins.length > 0 ? humanWins[Math.floor(humanWins.length / 2)].counter.human : 0;
+        const medQuestionCountHuman = humanWins.length > 0 ? getMedian(humanWins.map(win => win.counter.human)) : 0;
         const avgQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / humanWins.length;
 
         const winsByCategory: CategoryWins[] = [];
