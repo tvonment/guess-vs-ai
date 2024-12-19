@@ -6,6 +6,7 @@ import FooterButtons from './FooterButtons';
 import { TurnState } from "@/model/TurnState";
 import { Counter } from "@/model/Counter";
 import { ModalState } from "@/model/ModalState";
+import { FooterText } from "./Footer";
 
 interface MenuProps {
     onCloseMenu: () => void;
@@ -33,10 +34,14 @@ export default function Menu({ onCloseMenu, onMenuOpenModal, userWord, counter, 
                         <GameButtons openModal={onMenuOpenModal} turn={turn} />
                     </div>
                 )}
-                <div className="text-gray-700 hover:text-gray-900">
+                <div className="text-gray-700 hover:text-gray-900 overflow-y-auto mb-10">
                     <FooterButtons openModal={onMenuOpenModal} />
                 </div>
+                <footer className="absolute bottom-0 w-full z-40 p-4">
+                    <FooterText />
+                </footer>
             </div>
+
         </>
     );
 }

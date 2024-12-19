@@ -49,11 +49,6 @@ export default function GameOverModal({ winner, aiWord, summary, openModal, onRe
                     <span className="mx-2 text-center">Feedback</span>
                     <FontAwesomeIcon icon={faHeart} className="icon-margin-small hidden sm:inline" />
                 </button>
-                <button className="btn-orange p-3 rounded-lg shadow flex items-center justify-between w-48 transform transition-transform duration-300 hover:scale-105" onClick={handleRestart}>
-                    <FontAwesomeIcon icon={faRotateLeft} className="icon-margin-small" />
-                    <span className="mx-2 text-center">Again</span>
-                    <FontAwesomeIcon icon={faRotateLeft} className="icon-margin-small hidden sm:inline" />
-                </button>
             </div>
         </main>
     );
