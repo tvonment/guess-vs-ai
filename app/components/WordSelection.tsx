@@ -33,10 +33,10 @@ export default function WordSelection({ category, onStartGame }: WordSelectionPr
                 body: JSON.stringify({ userId: generatedUserId, categoryName: category.name, userWord: userWord }),
             });
             const data = await response.json();
+
             // Set the retrieved chat history
-            if (data.message) {
+            if (data.message && !data.invalid) {
                 setErrorMessage("");
-                console.log("User word:", userWord);
                 onStartGame(generatedUserId, userWord, data.message as Message);
             }
 
