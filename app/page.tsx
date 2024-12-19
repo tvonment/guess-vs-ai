@@ -88,7 +88,7 @@ export default function MainPage() {
             case ModalState.REPORT_GAMEOVER:
                 return <ReportIssue onClose={closeModal} gameStatus='gameover' userId={userId} />;
             case ModalState.GAME_OVER:
-                return <GameOverModal onClose={closeModal} winner={winner} aiWord={aiWord} summary={summary} openModal={openModal} onRestart={handleStart} />;
+                return <GameOverModal onClose={closeModal} winner={winner} aiWord={aiWord} summary={summary} openModal={openModal} />;
             case ModalState.FEEDBACK:
                 return <FeedbackForm onClose={closeModal} userId={userId} />;
             default:
