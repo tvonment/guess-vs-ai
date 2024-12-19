@@ -2,7 +2,6 @@ import React from 'react';
 import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import GameOverWinner from './GameOverWinner';
-import { faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { Message } from '@/model/Message';
 import { WinnerState } from '@/model/WinnerState';
 import { ModalState } from '@/model/ModalState';
@@ -12,18 +11,13 @@ type GameOverProps = {
     aiWord: string;
     summary: Message;
     onClose: () => void;
-    onRestart: () => void;
     openModal: (content: ModalState) => void;
 };
 
 
-export default function GameOverModal({ winner, aiWord, summary, openModal, onRestart }: GameOverProps) {
+export default function GameOverModal({ winner, aiWord, summary, openModal }: GameOverProps) {
     const handleFeedback = () => {
         openModal(ModalState.FEEDBACK);
-    };
-
-    const handleRestart = () => {
-        onRestart();
     };
 
     const renderContent = () => {
