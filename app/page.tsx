@@ -25,6 +25,7 @@ import { Counter } from '@/model/Counter';
 import { PageState } from '@/model/PageState';
 import { ModalState } from '@/model/ModalState';
 import StatisticsModal from './components/modal/StatisticsModal';
+import Install from './components/modal/Install';
 
 export default function MainPage() {
     const [currentPage, setCurrentPage] = useState<PageState>(PageState.HOME);
@@ -96,6 +97,8 @@ export default function MainPage() {
                 return <GameOverModal onClose={closeModal} winner={winner} aiWord={aiWord} summary={summary} openModal={openModal} />;
             case ModalState.FEEDBACK:
                 return <FeedbackForm onClose={closeModal} userId={userId} onFeedbackSent={handleFeedbackSent} />;
+            case ModalState.INSTALL:
+                return <Install />;
             default:
                 return null;
         }
