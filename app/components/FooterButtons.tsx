@@ -47,6 +47,8 @@ export default function FooterButtons({ openModal }: FooterButtonsProps) {
                 console.log('User dismissed the install prompt');
             }
             setDeferredPrompt(null);
+        } else {
+            openModal(ModalState.INSTALL);
         }
     };
 
