@@ -1,26 +1,31 @@
 import { ModalState } from "@/model/ModalState";
 import React, { useState, useEffect } from 'react';
 
+interface BeforeInstallPromptEvent extends Event {
+    prompt: () => Promise<void>;
+    userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 interface FooterButtonsProps {
     openModal: (content: ModalState) => void;
 }
 
 export default function FooterButtons({ openModal }: FooterButtonsProps) {
-    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [isStandalone, setIsStandalone] = useState<boolean>(false);
 
     useEffect(() => {
         const handleBeforeInstallPrompt = (e: Event) => {
             e.preventDefault();
-            setDeferredPrompt(e as any);
+            setDeferredPrompt(e as BeforeInstallPromptEvent);
         };
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
         // Check if the app is running in standalone mode
         const checkStandaloneMode = () => {
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
-            setIsStandalone(isStandalone);
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as Navigator & { standalone?: boolean }).standalone;
+            setIsStandalone(isStandalone || false);
         };
 
         checkStandaloneMode();
