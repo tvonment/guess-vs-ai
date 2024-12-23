@@ -121,6 +121,7 @@ export default function MainPage() {
         setUserId("");
         setWinner("");
         setAiWord("");
+        setFeedbackSent(false);
         setCounter(new Counter(0, 0));
         setSummary({ role: 'system', content: '' });
         setTurn(TurnState.LOADING);

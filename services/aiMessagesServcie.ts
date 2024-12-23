@@ -3,6 +3,7 @@ import { gptCall } from "./oaiService";
 import { Category } from "@/model/Categories";
 import { getCategory, getFilteredAiChatHistory, getGameStatus } from "./cosmosService";
 import { Answer } from "@/model/Answer";
+import { WinnerState } from "@/model/WinnerState";
 
 export async function makeGuess(userId: string): Promise<Message> {
     const category = await getCategory(userId) as Category;
@@ -104,17 +105,21 @@ export async function makeSummary(userId: string): Promise<Message> {
     }
 
     switch (game.winner) {
-        case "assistant":
+        case WinnerState.AI:
             instructionSystemMessage += `
             The AI (YOU) won the game! Be a bit humiliating!`;
             break;
-        case "user":
+        case WinnerState.HUMAN:
             instructionSystemMessage += `
             The human won the game! Be humble!`;
             break;
-        default:
+        case WinnerState.GIVENUP:
             instructionSystemMessage += `
             The human gave up! Be a bit humiliating!`;
+            break;
+        default:
+            instructionSystemMessage += `
+            The winner is uncertain...`;
             break;
     }
 
