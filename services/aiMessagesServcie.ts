@@ -91,12 +91,16 @@ export async function startMessage(category: Category): Promise<Message> {
     }
 }
 
-export async function makeSummary(userId: string): Promise<Message> {
+export async function makeSummary(userId: string, winner: WinnerState): Promise<Message> {
     const game = await getGameStatus(userId);
 
     let instructionSystemMessage = `
     You were playing a game of 'Guess vs AI' a social deduction word guessing game. You played against a human and you were eager to win. The game is over now!
-    The game was played in the category: '${game.category.name}'! The game went like this:
+    The game was played in the category: '${game.category.name}'! 
+    
+    The human aked ${game.counter.human} questions and the AI asked ${game.counter.ai} questions.
+    
+    The game went like this:
     `;
 
     for (const message of game.messages) {
@@ -104,18 +108,21 @@ export async function makeSummary(userId: string): Promise<Message> {
         - ${message.role}: ${message.content}`;
     }
 
-    switch (game.winner) {
+    switch (winner) {
         case WinnerState.AI:
             instructionSystemMessage += `
             The AI (YOU) won the game! Be a bit humiliating!`;
+            console.log("AI won");
             break;
         case WinnerState.HUMAN:
             instructionSystemMessage += `
             The human won the game! Be humble!`;
+            console.log("Human won");
             break;
         case WinnerState.GIVENUP:
             instructionSystemMessage += `
-            The human gave up! Be a bit humiliating!`;
+            It was probably a hard game for both of you. No one won!`;
+            console.log("No one won");
             break;
         default:
             instructionSystemMessage += `

@@ -145,8 +145,9 @@ export async function getUsedCharacters(category: Category): Promise<string[]> {
 
 export async function finishGame(userId: string, winner: WinnerState): Promise<{ aiWord: string, counter: Counter, summary: Message }> {
     const gameStatus = await getGameStatus(userId);
+
     gameStatus.winner = winner;
-    gameStatus.summary = await makeSummary(userId);
+    gameStatus.summary = await makeSummary(userId, winner);
 
     try {
         await updateGame(gameStatus);
