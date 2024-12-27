@@ -1,7 +1,8 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faShield, faJedi, faWandSparkles, faPaw, faBook } from "@fortawesome/free-solid-svg-icons";
+import { faShield, faJedi, faWandSparkles, faPaw, faBook, faFlag, faCloudBolt, faBasketball, faCalendar } from "@fortawesome/free-solid-svg-icons";
 
 export enum CategoryType {
+    Featured = "Featured",
     Advanced = "Advanced",
     Theme = "Theme"
 }
@@ -41,6 +42,34 @@ export const Categories: Category[] = [
         type: CategoryType.Theme,
         icon: faBook as IconProp,
         image: "/images/sokrates.PNG"
+    },
+    {
+        name: "Historical Events",
+        description: "Select a significant historical event, such as the moon landing, the fall of the Berlin Wall, or the French Revolution.",
+        type: CategoryType.Featured,
+        icon: faCalendar as IconProp,
+        image: "/images/timeline.png"
+    },
+    {
+        name: "Iconic Sports Athletes",
+        description: "Choose an iconic sports athlete from any sport, such as Michael Jordan, Serena Williams, or Usain Bolt.",
+        type: CategoryType.Featured,
+        icon: faBasketball as IconProp,
+        image: "/images/Guess vs AI logo.png"
+    },
+    {
+        name: "Countries",
+        description: "Select a country from around the world.",
+        type: CategoryType.Featured,
+        icon: faFlag as IconProp,
+        image: "/images/earth.png"
+    },
+    {
+        name: "Ancient Gods",
+        description: "Choose a god or goddess from an ancient mythology, such as Greek, Roman, or Norse.",
+        type: CategoryType.Featured,
+        icon: faCloudBolt as IconProp,
+        image: "/images/gods.png",
     }
 ];
 

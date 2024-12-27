@@ -50,7 +50,7 @@ export default function CategorySelection({ onSetCategory }: CategorySelectionPr
                 <div className="grid grid-cols-1 mb-4 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xl">
                     {categories.map((category) => (
                         <button
-                            className="btn-orange category-button font-bold flex items-center justify-between p-4 h-24"
+                            className={`btn-orange category-button font-bold flex items-center justify-between p-4 h-24 ${category.type}`}
                             onClick={() => onSetCategory(category)}
                             key={category.name}>
                             <FontAwesomeIcon icon={category.icon} className="icon-margin-small" />

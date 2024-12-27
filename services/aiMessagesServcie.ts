@@ -112,17 +112,14 @@ export async function makeSummary(userId: string, winner: WinnerState): Promise<
         case WinnerState.AI:
             instructionSystemMessage += `
             The AI (YOU) won the game! Be a bit humiliating!`;
-            console.log("AI won");
             break;
         case WinnerState.HUMAN:
             instructionSystemMessage += `
             The human won the game! Be humble!`;
-            console.log("Human won");
             break;
         case WinnerState.GIVENUP:
             instructionSystemMessage += `
             It was probably a hard game for both of you. No one won!`;
-            console.log("No one won");
             break;
         default:
             instructionSystemMessage += `
