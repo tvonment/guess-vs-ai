@@ -53,7 +53,7 @@ export async function selectWord(category: Category) {
     const userMessage =
         {
             role: "user",
-            content: "Choose a word from the category '" + category.name + "'."
+            content: `Choose a word from the category '${category.name}'.`
         } as Message;
     try {
         const gptResponse = await gptCall([systemMessageText, ...fewShotMessages, userMessage], 0.7);

@@ -364,7 +364,7 @@ export async function winCheck(guess: string, word: string): Promise<boolean> {
 
     const userMessage: Message = {
         role: "user",
-        content: guess + " Correct Word" + word
+        content: guess + " Correct Word: " + word
     }
 
     try {
