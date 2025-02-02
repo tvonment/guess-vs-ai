@@ -1,12 +1,14 @@
 import { Message } from "@/model/Message";
 import { gptCall } from "./oaiService";
 import { Category } from "@/model/Categories";
-import { getCategory, getFilteredAiChatHistory, getGameStatus } from "./cosmosService";
+import { getCategory, getFilteredAiChatHistory, getGameStatus, getOpponent } from "./cosmosService";
 import { Answer } from "@/model/Answer";
 import { WinnerState } from "@/model/WinnerState";
+import { Opponent } from "@/model/Opponent";
 
 export async function makeGuess(userId: string): Promise<Message> {
     const category = await getCategory(userId) as Category;
+    const opponent = await getOpponent(userId) as Opponent;
     const possibleAnswers = Object.values(Answer).join(", ");
 
     const instructionSystemMessage = `
@@ -28,7 +30,7 @@ export async function makeGuess(userId: string): Promise<Message> {
 
     try {
         const filteredChatHistory = await getFilteredAiChatHistory(userId);
-        return await gptCall([startSystemMessage, ...filteredChatHistory, endSystemMessage]);
+        return await gptCall([startSystemMessage, ...filteredChatHistory, endSystemMessage], opponent);
     } catch (error: unknown) {
         console.error("Error:", error);
         throw new Error("An error occurred");
@@ -59,16 +61,14 @@ export async function makeHumiliation(userId: string): Promise<Message> {
     };
 
     try {
-        return await gptCall([systemMessage, userMessage]
-
-        );
+        return await gptCall([systemMessage, userMessage], game.opponent);
     } catch (error: unknown) {
         console.error("Error:", error);
         throw new Error("An error occurred");
     }
 }
 
-export async function startMessage(category: Category): Promise<Message> {
+export async function startMessage(category: Category, opponent: Opponent): Promise<Message> {
     const instructionSystemMessage = `You are playing a game of guess what. You play against a human and you are eager to win You play in the category: '${category.name}'!`;
 
     const instructionMessage = `Create an opening line that statet, that you are ready to start the game. You can be as creative as you want but a reference to the category '${category.name}' would be nice! Do NOT ask a question! Give the turn to the human!`;
@@ -84,7 +84,7 @@ export async function startMessage(category: Category): Promise<Message> {
     };
 
     try {
-        return await gptCall([systemMessage, userMessage]);
+        return await gptCall([systemMessage, userMessage], opponent);
     } catch (error: unknown) {
         console.error("Error:", error);
         throw new Error("An error occurred");
@@ -140,7 +140,7 @@ export async function makeSummary(userId: string, winner: WinnerState): Promise<
     };
 
     try {
-        const response = await gptCall([systemMessage, userMessage], 0.5, 1000, 1);
+        const response = await gptCall([systemMessage, userMessage], game.opponent, 0.5, 1000, 1);
         response.role = "system";
         return response;
     } catch (error: unknown) {

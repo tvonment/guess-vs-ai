@@ -267,11 +267,13 @@ button:hover {
   padding: 1rem;
 }
 
+.opponent.human,
 .counter.human {
   color: #ADD8E6;
   /* lightblue */
 }
 
+.opponent.ai,
 .counter.ai {
   color: #FFC864;
   /* rgba(255, 200, 100, 1) */

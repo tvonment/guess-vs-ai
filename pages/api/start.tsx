@@ -7,18 +7,21 @@ import { characterCheck } from "@/services/characterCheckService";
 import { Counter } from "@/model/Counter";
 import { Message } from "@/model/Message";
 import { startMessage } from "@/services/aiMessagesServcie";
+import { Opponent, Opponents } from "@/model/Opponent";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { userId } = req.body;
     const { categoryName } = req.body;
     const { userWord } = req.body;
+    const { opponentName } = req.body
+    const opponent = Opponents.find((o) => o.name === opponentName) as Opponent;
     const category = Categories.find((c) => c.name === categoryName) as Category;
     const validWord = await characterCheck(userWord, category);
     if (!validWord) {
         res.status(200).json({ invalid: true, message: `The word you entered is not valid for the '${category.name}' category. Please try again.` });
         return;
     }
-    const aiWord = await selectWord(category);
+    const aiWord = await selectWord(category, opponent);
 
     console.log(`User ID: ${userId}`);
     console.log(`Category: ${category.name}`);
@@ -32,8 +35,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-        const message: Message = await startMessage(category);
-        const game = new Game(userId, [message], userWord, aiWord, category, new Counter(0, 0));
+        const message: Message = await startMessage(category, opponent);
+        const game = new Game(userId, [message], userWord, aiWord, opponent, category, new Counter(0, 0));
         await startGame(game);
         res.status(200).json({ message: message });
     } catch (error: unknown) {

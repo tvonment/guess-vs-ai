@@ -7,11 +7,13 @@ import { TurnState } from "@/model/TurnState";
 import { Counter } from "@/model/Counter";
 import { ModalState } from "@/model/ModalState";
 import { FooterText } from "./Footer";
+import { Opponent } from "@/model/Opponent";
 
 interface MenuProps {
     onCloseMenu: () => void;
     onMenuOpenModal: (content: ModalState) => void;
     onRestart: () => void;
+    opponent: Opponent;
     feedbackSent: boolean;
     isGameScreen: boolean;
     userWord: string;
@@ -19,7 +21,7 @@ interface MenuProps {
     turn: TurnState;
 }
 
-export default function Menu({ onCloseMenu, onMenuOpenModal, onRestart, feedbackSent, userWord, counter, isGameScreen, turn }: MenuProps) {
+export default function Menu({ onCloseMenu, onMenuOpenModal, onRestart, opponent, feedbackSent, userWord, counter, isGameScreen, turn }: MenuProps) {
 
     return (
         <>
@@ -32,7 +34,7 @@ export default function Menu({ onCloseMenu, onMenuOpenModal, onRestart, feedback
                 </div>
                 {isGameScreen && (
                     <div className="flex-1 overflow-y-auto">
-                        <GameInfo userWord={userWord} counter={counter} />
+                        <GameInfo userWord={userWord} counter={counter} opponent={opponent} />
                         <GameButtons openModal={onMenuOpenModal} turn={turn} onRestart={onRestart} feedbackSent={feedbackSent} />
                     </div>
                 )}

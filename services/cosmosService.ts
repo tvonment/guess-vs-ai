@@ -8,6 +8,7 @@ import { Counter } from "@/model/Counter";
 import { WinnerState } from "@/model/WinnerState";
 import { makeSummary } from "./aiMessagesServcie";
 import { CategoryWins, Statistics, DetailedStatistics, GameStatistics } from "@/model/Statistics";
+import { Opponent } from "@/model/Opponent";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
 const COSMOS_DB_DATABASE_NAME = process.env.COSMOS_DB_DATABASE_NAME || "";
@@ -97,6 +98,16 @@ export async function getAiWord(userId: string): Promise<string> {
     }).fetchNext();
     const dbitem: { aiWord: string } = db.resources[0];
     return dbitem.aiWord;
+}
+
+export async function getOpponent(userId: string): Promise<Opponent> {
+    const opponentQuery = `SELECT c.opponent FROM c WHERE c.id = @userId`;
+    const db = await container.items.query({
+        query: opponentQuery,
+        parameters: [{ name: "@userId", value: userId }]
+    }).fetchNext();
+    const dbitem: { opponent: Opponent } = db.resources[0];
+    return dbitem.opponent;
 }
 
 export async function getCategory(userId: string): Promise<Category> {

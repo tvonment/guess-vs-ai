@@ -7,13 +7,15 @@ import { faGamepad, faX } from "@fortawesome/free-solid-svg-icons";
 import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 import Image from 'next/image';
 import { Message } from "@/model/Message";
+import { Opponent } from "@/model/Opponent";
 
 interface WordSelectionProps {
     onStartGame: (userId: string, userWord: string, startMessage: Message) => void;
     category: Category;
+    opponent: Opponent;
 }
 
-export default function WordSelection({ category, onStartGame }: WordSelectionProps) {
+export default function WordSelection({ opponent, category, onStartGame }: WordSelectionProps) {
     const [userWord, setUserWord] = useState(""); // State for character input
     const [errorMessage, setErrorMessage] = useState(""); // State for error message
     const [loading, setLoading] = useState(false); // State for loading state
@@ -30,7 +32,7 @@ export default function WordSelection({ category, onStartGame }: WordSelectionPr
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ userId: generatedUserId, categoryName: category.name, userWord: userWord }),
+                body: JSON.stringify({ userId: generatedUserId, opponentName: opponent.name, categoryName: category.name, userWord: userWord }),
             });
             const data = await response.json();
 
