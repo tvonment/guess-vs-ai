@@ -1,6 +1,6 @@
 export enum OpponentName {
     OpenAIGPT4o = "OpenAI GPT-4o",
-    OpenAIGPTo1Mini = "OpenAI GPT-o1-mini",
+    OpenAIGPTo1Mini = "OpenAI o1-mini",
     DeepSeekR1 = "DeepSeek R1"
 }
 

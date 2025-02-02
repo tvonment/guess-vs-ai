@@ -56,7 +56,7 @@ export default function OpponentSelection({ onSetOpponent }: OpponentSelectionPr
 
                             <div className="flex flex-col items-center flex-grow">
                                 <span className="text-center text-3xl">{opponent.name}</span>
-                                <span className="text-center text-xl">{opponent.description}</span>
+                                <span className="text-center text-xl hidden md:inline">{opponent.description}</span>
                             </div>
 
                         </button>
