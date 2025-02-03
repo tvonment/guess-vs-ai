@@ -3,7 +3,7 @@
 import { Category, Categories } from "@/model/Categories";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGamepad } from "@fortawesome/free-solid-svg-icons";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface CategorySelectionProps {
     onSetCategory: (theme: Category) => void;
@@ -12,6 +12,7 @@ interface CategorySelectionProps {
 export default function CategorySelection({ onSetCategory }: CategorySelectionProps) {
 
     const categories = Categories;
+    const [hoveredCategory, setHoveredCategory] = useState(null as Category | null);
 
     useEffect(() => {
         const handleResize = () => {
@@ -49,14 +50,47 @@ export default function CategorySelection({ onSetCategory }: CategorySelectionPr
             <div className="w-2/3">
                 <div className="grid grid-cols-1 mb-4 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xl">
                     {categories.map((category) => (
-                        <button
-                            className={`btn-orange category-button font-bold flex items-center justify-between p-4 h-24 ${category.type}`}
-                            onClick={() => onSetCategory(category)}
-                            key={category.name}>
-                            <FontAwesomeIcon icon={category.icon} className="icon-margin-small" />
-                            <span className="mx-2 text-center text-3xl">{category.name}</span>
-                            <FontAwesomeIcon icon={category.icon} className="icon-margin-small" />
-                        </button>
+                        <div
+                            key={category.name}
+                            className="relative"
+                            onMouseEnter={() => {
+                                if (category.subcategories?.length) {
+                                    setHoveredCategory(category);
+                                }
+                            }}
+                            onMouseLeave={() => {
+                                setHoveredCategory(null);
+                            }}>
+                            <button
+                                className={`w-full btn-orange category-button font-bold flex items-center justify-between p-4 h-24 ${category.type}`}
+                                disabled={!!category.subcategories?.length}
+                                onClick={() => {
+                                    if (!category.subcategories?.length) {
+                                        onSetCategory(category);
+                                    }
+                                }}>
+                                <FontAwesomeIcon icon={category.icon} className="icon-margin-small" />
+                                <span className="mx-2 text-center text-3xl">{category.name}</span>
+                                <FontAwesomeIcon icon={category.icon} className="icon-margin-small" />
+                            </button>
+                            {hoveredCategory?.name === category.name && category.subcategories && (
+                                <div className="absolute top-full mt-1 w-full bg-white shadow-md rounded p-2 z-10">
+                                    <button
+                                        className="w-full text-left px-2 py-1 hover:bg-gray-200"
+                                        onClick={() => onSetCategory(category)}>
+                                        {category.name} (Full Universe)
+                                    </button>
+                                    {category.subcategories.map((sub) => (
+                                        <button
+                                            key={sub.name}
+                                            className="w-full text-left px-2 py-1 hover:bg-gray-200"
+                                            onClick={() => onSetCategory(sub)}>
+                                            {sub.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     ))}
                     <button
                         className="btn-orange opacity-50 category-button font-bold p-4 h-24 text-center"

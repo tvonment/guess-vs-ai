@@ -13,14 +13,60 @@ export const Categories: Category[] = [
         description: "Select a character from any movie or series within the Marvel Universe.",
         type: CategoryType.Theme,
         icon: faShield as IconProp,
-        image: "/images/shield.webp"
+        image: "/images/shield.webp",
+        subcategories: [
+            {
+                name: "Infinity Saga",
+                description: "Characters from the Infinity Saga, including Iron Man, Captain America, Thanos and more.",
+                type: CategoryType.Theme,
+                icon: faShield as IconProp,
+                image: "/images/shield.webp"
+            }
+        ]
     },
     {
         name: "Star Wars",
         description: "Choose a character from the Star Wars saga, including films, series, and expanded universe.",
         type: CategoryType.Theme,
         icon: faJedi as IconProp,
-        image: "/images/stormtrooper.png"
+        image: "/images/stormtrooper.png",
+        subcategories: [
+            {
+                name: "Original Trilogy",
+                description: "Characters from the original Star Wars trilogy, including A New Hope, The Empire Strikes Back, and Return of the Jedi.",
+                type: CategoryType.Theme,
+                icon: faJedi as IconProp,
+                image: "/images/stormtrooper.png",
+            },
+            {
+                name: "Prequel Trilogy",
+                description: "Characters from the prequel Star Wars trilogy, including The Phantom Menace, Attack of the Clones, and Revenge of the Sith.",
+                type: CategoryType.Theme,
+                icon: faJedi as IconProp,
+                image: "/images/stormtrooper.png",
+            },
+            {
+                name: "Sequel Trilogy",
+                description: "Characters from the sequel Star Wars trilogy, including The Force Awakens, The Last Jedi, and The Rise of Skywalker.",
+                type: CategoryType.Theme,
+                icon: faJedi as IconProp,
+                image: "/images/stormtrooper.png",
+            },
+            {
+                name: "Skywalker Saga",
+                description: "Characters from the entire Skywalker saga, including all three trilogies.",
+                type: CategoryType.Theme,
+                icon: faJedi as IconProp,
+                image: "/images/stormtrooper.png",
+            },
+            {
+                name: "The Mandalorian",
+                description: "Characters from the Disney+ series The Mandalorian, including Din Djarin, Grogu, and Moff Gideon.",
+                type: CategoryType.Theme,
+                icon: faJedi as IconProp,
+                image: "/images/stormtrooper.png",
+            }
+        ]
     },
     {
         name: "Harry Potter",
@@ -79,6 +125,7 @@ export class Category {
     type: CategoryType;
     icon: IconProp;
     image: string;
+    subcategories?: Category[] = [];
 
     constructor(name: string, description: string, type: CategoryType, icon: IconProp, image: string) {
         this.name = name;

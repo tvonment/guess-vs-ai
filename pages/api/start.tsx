@@ -9,13 +9,24 @@ import { Message } from "@/model/Message";
 import { startMessage } from "@/services/aiMessagesServcie";
 import { Opponent, Opponents } from "@/model/Opponent";
 
+function findCategoryByName(name: string): Category | undefined {
+    for (const c of Categories) {
+        if (c.name === name) return c;
+        if (c.subcategories) {
+            const sub = c.subcategories.find((s) => s.name === name);
+            if (sub) return sub;
+        }
+    }
+    return undefined;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { userId } = req.body;
     const { categoryName } = req.body;
     const { userWord } = req.body;
     const { opponentName } = req.body
     const opponent = Opponents.find((o) => o.name === opponentName) as Opponent;
-    const category = Categories.find((c) => c.name === categoryName) as Category;
+    const category = findCategoryByName(categoryName) as Category;
     const validWord = await characterCheck(userWord, category);
     if (!validWord) {
         res.status(200).json({ invalid: true, message: `The word you entered is not valid for the '${category.name}' category. Please try again.` });
