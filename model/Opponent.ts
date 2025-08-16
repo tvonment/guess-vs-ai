@@ -1,25 +1,29 @@
 export enum OpponentName {
     OpenAIGPT4o = "OpenAI GPT-4o",
-    OpenAIGPTo1Mini = "OpenAI o1-mini",
-    DeepSeekR1 = "DeepSeek R1"
+    OpenAIGPT5 = "OpenAI GPT-5",
+    Grok = "Grok 3"
 }
 
 export const Opponents: Opponent[] = [
     {
         name: OpponentName.OpenAIGPT4o,
-        description: "Fast multimodal LLM, not reasoning.",
-        image: "/images/openai.png"
+        description: "Original Research Opponent",
+        image: "/images/openai.png",
+        inference_model: "openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview"
     },
     {
-        name: OpponentName.OpenAIGPTo1Mini,
-        description: "Reasoning LLM, slower but deeper.",
-        image: "/images/openai.png"
+        name: OpponentName.OpenAIGPT5,
+        description: "Challange the new GPT 5 Model",
+        image: "/images/openai.png",
+        inference_model: "openai/deployments/gpt-5-chat/chat/completions?api-version=2025-01-01-preview"
     },
     {
-        name: OpponentName.DeepSeekR1,
-        description: "New reasoning LLM, very slow but thoughtful.",
-        image: "/images/deepseek.png"
+        name: OpponentName.Grok,
+        description: "Challange Elon's Grok Model",
+        image: "/images/grok.png",
+        inference_model: "models/chat/completions?api-version=2024-05-01-preview"
     }
+
 ];
 
 
@@ -27,9 +31,11 @@ export class Opponent {
     name: OpponentName;
     description: string;
     image: string;
-    constructor(name: OpponentName, image: string, description: string) {
+    inference_model: string;
+    constructor(name: OpponentName, image: string, description: string, inference_model: string) {
         this.name = name;
         this.description = description;
         this.image = image;
+        this.inference_model = inference_model;
     }
 }

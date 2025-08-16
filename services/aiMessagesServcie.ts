@@ -32,12 +32,12 @@ export async function makeGuess(userId: string): Promise<Message> {
         const filteredChatHistory = await getFilteredAiChatHistory(userId);
         return await gptCall([startSystemMessage, ...filteredChatHistory, endSystemMessage], opponent);
     } catch (error: unknown) {
-        console.error("Error:", error);
-        throw new Error("An error occurred");
+        console.error("Error in makeGuess:", error);
+        throw error; // Re-throw the original error instead of masking it
     }
 }
 
-export async function makeHumiliation(userId: string): Promise<Message> {
+export async function makePlayfulComment(userId: string): Promise<Message> {
     const game = await getGameStatus(userId);
 
     let instructionSystemMessage = `
@@ -48,7 +48,7 @@ export async function makeHumiliation(userId: string): Promise<Message> {
         instructionSystemMessage += `
         - ${message.role}: ${message.content}`;
     }
-    const instructionMessage = `Create a short comment to humiliate the human. You can be as creative as you want but a reference to the category '${game.category.name}' would be nice!`;
+    const instructionMessage = `Create a short, playful and competitive comment to encourage the human to do better. Keep it lighthearted and fun, perhaps with a friendly joke or witty remark. You can be creative and include a reference to the category '${game.category.name}' if you like!`;
 
     const systemMessage = {
         role: "system",
@@ -63,8 +63,8 @@ export async function makeHumiliation(userId: string): Promise<Message> {
     try {
         return await gptCall([systemMessage, userMessage], game.opponent);
     } catch (error: unknown) {
-        console.error("Error:", error);
-        throw new Error("An error occurred");
+        console.error("Error in makePlayfulComment:", error);
+        throw error; // Re-throw the original error instead of masking it
     }
 }
 
@@ -86,8 +86,8 @@ export async function startMessage(category: Category, opponent: Opponent): Prom
     try {
         return await gptCall([systemMessage, userMessage], opponent);
     } catch (error: unknown) {
-        console.error("Error:", error);
-        throw new Error("An error occurred");
+        console.error("Error in startMessage:", error);
+        throw error; // Re-throw the original error instead of masking it
     }
 }
 
@@ -98,7 +98,7 @@ export async function makeSummary(userId: string, winner: WinnerState): Promise<
     You were playing a game of 'Guess vs AI' a social deduction word guessing game. You played against a human and you were eager to win. The game is over now!
     The game was played in the category: '${game.category.name}'! 
     
-    The human aked ${game.counter.human} questions and the AI asked ${game.counter.ai} questions.
+    The human asked ${game.counter.human} questions and the AI asked ${game.counter.ai} questions.
     
     The game went like this:
     `;
@@ -111,15 +111,15 @@ export async function makeSummary(userId: string, winner: WinnerState): Promise<
     switch (winner) {
         case WinnerState.AI:
             instructionSystemMessage += `
-            The AI (YOU) won the game! Be a bit humiliating!`;
+            The AI (YOU) won the game! Be playful and celebratory, but keep it lighthearted!`;
             break;
         case WinnerState.HUMAN:
             instructionSystemMessage += `
-            The human won the game! Be humble!`;
+            The human won the game! Be gracious and congratulatory!`;
             break;
         case WinnerState.GIVENUP:
             instructionSystemMessage += `
-            It was probably a hard game for both of you. No one won!`;
+            It was probably a challenging game for both of you. No one won!`;
             break;
         default:
             instructionSystemMessage += `
@@ -127,7 +127,7 @@ export async function makeSummary(userId: string, winner: WinnerState): Promise<
             break;
     }
 
-    const instructionMessage = `Create a short summary of the game. You can be as creative as you want but a reference to the category '${game.category.name}' - '${game.category.description}' would be nice!`;
+    const instructionMessage = `Create a short, fun summary of the game. Keep it positive and entertaining, with a reference to the category '${game.category.name}' - '${game.category.description}' if possible!`;
 
     const systemMessage = {
         role: "system",
@@ -144,7 +144,7 @@ export async function makeSummary(userId: string, winner: WinnerState): Promise<
         response.role = "system";
         return response;
     } catch (error: unknown) {
-        console.error("Error:", error);
-        throw new Error("An error occurred");
+        console.error("Error in makeSummary:", error);
+        throw error; // Re-throw the original error instead of masking it
     }
 }

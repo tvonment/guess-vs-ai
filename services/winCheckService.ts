@@ -1,5 +1,5 @@
 import { Message } from "@/model/Message";
-import { gptMiniCall } from "./oaiService";
+import { gptSmallCall } from "./oaiService";
 
 const winCheckSystemMessage = `
 You are a game referee verifying if a user's guess is a perfect match for the correct answer. 
@@ -368,7 +368,7 @@ export async function winCheck(guess: string, word: string): Promise<boolean> {
     }
 
     try {
-        const gptResponse = await gptMiniCall([systemMessage, ...fewShotMessages, userMessage]);
+        const gptResponse = await gptSmallCall([systemMessage, ...fewShotMessages, userMessage]);
         console.log("Win Check:", guess, word, gptResponse.content);
         if (gptResponse.content === "win") {
             return true;

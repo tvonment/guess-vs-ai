@@ -3,7 +3,7 @@ import { addToHistory, finishGame, getWinningWords, increaseCounter } from "./co
 import { winCheck } from "./winCheckService";
 import { verifyHumanQuestion } from "./humanQuestionVerificationService";
 import { TurnState } from "@/model/TurnState";
-import { makeGuess, makeHumiliation } from "./aiMessagesServcie";
+import { makeGuess, makePlayfulComment } from "./aiMessagesServcie";
 import { TurnResponse } from "@/model/TurnResponse";
 import { WinnerState } from "@/model/WinnerState";
 
@@ -43,9 +43,9 @@ export async function aiGuessTurn(userId: string): Promise<TurnResponse> {
         return new TurnResponse([guessResponse], TurnState.FINISHED, WinnerState.AI, finished.counter, finished.summary, finished.aiWord);
     } else {
         if (counter.ai % 5 === 0) {
-            const humiliation = await makeHumiliation(userId);
-            await addToHistory(userId, humiliation);
-            return new TurnResponse([humiliation, guessResponse], TurnState.AI, WinnerState.PLAYING, counter);
+            const playfulComment = await makePlayfulComment(userId);
+            await addToHistory(userId, playfulComment);
+            return new TurnResponse([playfulComment, guessResponse], TurnState.AI, WinnerState.PLAYING, counter);
         }
         return new TurnResponse([guessResponse], TurnState.AI, WinnerState.PLAYING, counter);
     }

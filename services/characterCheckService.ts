@@ -1,5 +1,5 @@
 import { Category } from "@/model/Categories";
-import { gptMiniCall } from "./oaiService";
+import { gptSmallCall } from "./oaiService";
 import { Message } from "@/model/Message";
 
 export async function characterCheck(word: string, category: Category): Promise<boolean> {
@@ -156,7 +156,7 @@ export async function characterCheck(word: string, category: Category): Promise<
             content: `Word: ${word} - Category: ${category.name} - Description: ${category.description}`
         } as Message;
     try {
-        const gptResponse = await gptMiniCall([systemMessageText, ...fewShotMessages, userMessage], 0);
+        const gptResponse = await gptSmallCall([systemMessageText, ...fewShotMessages, userMessage], 0);
         const response = gptResponse.content;
         if (response === "yes") {
             return true;
