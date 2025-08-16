@@ -1,7 +1,7 @@
 export enum OpponentName {
     OpenAIGPT4o = "OpenAI GPT-4o",
-    OpenAIGPT5 = "OpenAI GPT-5",
-    Grok = "Grok 3"
+    OpenAIGPT5 = "OpenAI GPT-5 (Preview)",
+    Grok = "Grok 3 (Preview)"
 }
 
 export const Opponents: Opponent[] = [
