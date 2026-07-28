@@ -1,10 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { TurnState } from "@/model/TurnState";
 import { aiGuessTurn, humanGuessTurn } from "@/services/turnService";
-import { TurnResponse } from '@/model/TurnResponse';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { text, userId } = req.body;
+    if (req.method !== "POST") {
+        res.status(405).json({ error: "Method not allowed" });
+        return;
+    }
+
+    const { text, userId } = req.body ?? {};
+    if (typeof userId !== "string" || !userId || typeof text !== "string" || !text.trim()) {
+        res.status(400).json({ error: "Missing required parameters: userId and text" });
+        return;
+    }
 
     try {
         const humanGuess = await humanGuessTurn(userId, text);
@@ -14,10 +22,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return;
         }
 
-        const aiGuess = await aiGuessTurn(userId) as TurnResponse;
+        const aiGuess = await aiGuessTurn(userId);
         aiGuess.messages = [...humanGuess.messages, ...aiGuess.messages];
         res.status(200).json(aiGuess);
-
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {

@@ -9,14 +9,15 @@ interface HelpProps {
 }
 
 export default function Help({ onClose, category }: HelpProps) {
-    const helpText = categoryHelpTexts.find((item) => item.name === category?.name)?.help;
+    const helpText = categoryHelpTexts.find((item) => item.name === category?.name)?.help
+        ?? "Start broad (era, type, origin), then narrow down step by step.";
 
     return (
         <div className="p-4">
             <h2 className="text-xl font-bold mb-4">Help</h2>
             <p className="mb-4">Ask <strong>Yes/No Questions</strong> to get to the AIs character.</p>
             <p className="mb-4">{helpText}</p>
-            <p className="mb-4">Ask your Questions carefully, if the answer is a <strong>{Answer.YES}</strong> or <strong>{Answer.PROBABLY_YES}</strong> you get another turn.</p>
+            <p className="mb-4">Ask your Questions carefully, only if the answer is a <strong>{Answer.YES}</strong> do you get another turn.</p>
             <div className="flex justify-end space-x-4">
                 <button className="btn-orange" onClick={onClose}>
                     <FontAwesomeIcon icon={faThumbsUp} className="icon-margin" />
@@ -30,7 +31,7 @@ export default function Help({ onClose, category }: HelpProps) {
 
 const categoryHelpTexts = [
     {
-        name: "Marvel",
+        name: "Marvel Universe",
         help: "Try asking about their superpowers, their team affiliation, or the movies they appear in."
     },
     {

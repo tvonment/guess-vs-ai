@@ -44,8 +44,9 @@ npm run dev                  # http://localhost:3000
 |---|---|
 | `NEXT_PUBLIC_ENVIRONMENT` | `LOCAL` / `DEV` / `TEST` — shows the corner version ribbon (unset/`PROD` shows nothing) |
 | `AZURE_AI_FOUNDRY_API_KEY` | API key of the Azure AI Foundry resource |
-| `AZURE_AI_FOUNDRY_ENDPOINT` | Base URL, e.g. `https://<resource>.cognitiveservices.azure.com/` |
-| `AZURE_AI_FOUNDRY_VERIFICATION_MODEL` | Deployment path for validation calls (see `.env.example`) |
+| `AZURE_AI_FOUNDRY_ENDPOINT` | Base URL, e.g. `https://<resource>.cognitiveservices.azure.com/` — calls use the Foundry v1 API (`{endpoint}/openai/v1/chat/completions`) |
+| `AI_GAME_MODEL` | Deployment name of the gameplay model (e.g. `gpt-5.6-terra`) |
+| `AI_VALIDATION_MODEL` | Deployment name of the validation model (e.g. `gpt-5.6-luna`) |
 | `COSMOS_DB_CONNECTION_STRING` | Cosmos DB connection string |
 | `COSMOS_DB_DATABASE_NAME` | Cosmos database name |
 | `COSMOS_DB_CONTAINER_NAME` | Games container name (the `feedback` container is fixed by name) |

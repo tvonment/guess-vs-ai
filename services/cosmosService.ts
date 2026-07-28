@@ -2,13 +2,11 @@ import { CosmosClient } from "@azure/cosmos";
 import { Message } from "@/model/Message";
 import { Answer } from "@/model/Answer";
 import { Categories, Category } from "@/model/Categories";
-import { Game, ReportedIssue } from "@/model/Game";
+import { CategoryRef, Game, ReportedIssue } from "@/model/Game";
 import { Feedback } from "@/model/Feedback";
 import { Counter } from "@/model/Counter";
 import { WinnerState } from "@/model/WinnerState";
-import { makeSummary } from "./aiMessagesService";
 import { CategoryWins, Statistics, DetailedStatistics, GameStatistics } from "@/model/Statistics";
-import { Opponent } from "@/model/Opponent";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
 const COSMOS_DB_DATABASE_NAME = process.env.COSMOS_DB_DATABASE_NAME || "";
@@ -26,7 +24,7 @@ async function getChatHistory(userId: string): Promise<Message[]> {
         query: historyQuery,
         parameters: [{ name: "@userId", value: userId }]
     }).fetchNext();
-    const dbitem: { id: string, messages: Message[], userWord: string, aiWord: string, category: string } = db.resources[0];
+    const dbitem: { messages: Message[] } = db.resources[0];
 
     return dbitem.messages as Message[]
 }
@@ -64,19 +62,21 @@ export async function startGame(gameStatus: Game) {
     await container.items.create(gameStatus);
 }
 
+// The AI's guessing thread: its own questions plus the human's button answers.
+// The human's free-text questions and the AI's answers to them are excluded.
 export async function getFilteredAiChatHistory(userId: string): Promise<Message[]> {
-    // Retrieve chat history from Cosmos DB
     const messages = await getChatHistory(userId);
+    const isAnswerValue = (content: string) => {
+        const normalized = content.replace(/[^a-zA-Z' ]/g, "").trim().toLowerCase();
+        return Object.values(Answer).some((answer) => answer.toLowerCase() === normalized);
+    };
     return messages.filter(entry => {
-        // remove special characters
         if (entry.role === 'assistant') {
-            entry.content = entry.content.replace(/[^a-zA-Z ]/g, "");
-            return !Object.values(Answer).includes(entry.content as Answer);
+            return !isAnswerValue(entry.content);
         } else if (entry.role === 'user') {
-            return Object.values(Answer).includes(entry.content as Answer);
-        } else if (entry.role === 'system') {
-            return true;
+            return isAnswerValue(entry.content);
         }
+        return entry.role === 'system';
     });
 }
 
@@ -90,33 +90,13 @@ export async function getWinningWords(userId: string): Promise<{ userWord: strin
     return { userWord: dbitem.userWord, aiWord: dbitem.aiWord };
 }
 
-export async function getAiWord(userId: string): Promise<string> {
-    const historyQuery = `SELECT c.aiWord FROM c WHERE c.id = @userId`;
-    const db = await container.items.query({
-        query: historyQuery,
-        parameters: [{ name: "@userId", value: userId }]
-    }).fetchNext();
-    const dbitem: { aiWord: string } = db.resources[0];
-    return dbitem.aiWord;
-}
-
-export async function getOpponent(userId: string): Promise<Opponent> {
-    const opponentQuery = `SELECT c.opponent FROM c WHERE c.id = @userId`;
-    const db = await container.items.query({
-        query: opponentQuery,
-        parameters: [{ name: "@userId", value: userId }]
-    }).fetchNext();
-    const dbitem: { opponent: Opponent } = db.resources[0];
-    return dbitem.opponent;
-}
-
-export async function getCategory(userId: string): Promise<Category> {
+export async function getCategory(userId: string): Promise<CategoryRef> {
     const categoryQuery = `SELECT c.category FROM c WHERE c.id = @userId`;
     const db = await container.items.query({
         query: categoryQuery,
         parameters: [{ name: "@userId", value: userId }]
     }).fetchNext();
-    const dbitem: { category: Category } = db.resources[0];
+    const dbitem: { category: CategoryRef } = db.resources[0];
     return dbitem.category;
 }
 
@@ -132,13 +112,14 @@ export async function addToHistory(userId: string, message: Message): Promise<Me
     }
 }
 
-export async function getUsedCharacters(category: Category): Promise<string[]> {
+export async function getUsedCharacters(categoryName: string): Promise<string[]> {
     try {
-        // Retrieve chat history from Cosmos DB
-        const query = `SELECT c.aiWord FROM c WHERE c.category.name = @categoryName`;
+        // Bounded to the 50 most recent games so the word-selection prompt
+        // cannot grow without limit as more games are played.
+        const query = `SELECT TOP 50 c.aiWord FROM c WHERE c.category.name = @categoryName ORDER BY c._ts DESC`;
         const db = await container.items.query({
             query: query,
-            parameters: [{ name: "@categoryName", value: category.name }]
+            parameters: [{ name: "@categoryName", value: categoryName }]
         }).fetchAll();
         const usedCharacters: { aiWord: string }[] = db.resources;
         const usedCharactersArray: string[] = usedCharacters.map((item) => item.aiWord);
@@ -154,35 +135,15 @@ export async function getUsedCharacters(category: Category): Promise<string[]> {
     }
 }
 
-export async function finishGame(userId: string, winner: WinnerState): Promise<{ aiWord: string, counter: Counter, summary: Message }> {
+export async function finishGame(userId: string, winner: WinnerState, summary: Message): Promise<{ aiWord: string, counter: Counter, summary: Message }> {
     const gameStatus = await getGameStatus(userId);
 
     gameStatus.winner = winner;
-    gameStatus.summary = await makeSummary(userId, winner);
+    gameStatus.summary = summary;
+    gameStatus.finishedAt = new Date().toISOString();
+    await updateGame(gameStatus);
 
-    try {
-        await updateGame(gameStatus);
-    } catch (error: unknown) {
-        console.error("Error:", error);
-        if (error instanceof Error) {
-            console.error(error.message);
-        } else {
-            console.error("An error occurred");
-        }
-    }
-
-    try {
-        const aiWord = await getAiWord(userId);
-        return { aiWord: aiWord, counter: gameStatus.counter, summary: gameStatus.summary };
-    } catch (error: unknown) {
-        console.error("Error:", error);
-        if (error instanceof Error) {
-            console.error(error.message);
-        } else {
-            console.error("An error occurred");
-        }
-        throw "An error occurred";
-    }
+    return { aiWord: gameStatus.aiWord, counter: gameStatus.counter, summary: summary };
 }
 
 export async function reportIssue(userId: string, reportedIssue: ReportedIssue): Promise<string> {

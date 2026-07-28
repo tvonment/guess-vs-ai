@@ -26,12 +26,9 @@ import { PageState } from '@/model/PageState';
 import { ModalState } from '@/model/ModalState';
 import StatisticsModal from './components/modal/StatisticsModal';
 import Install from './components/modal/Install';
-import { Opponent } from '@/model/Opponent';
-import OpponentSelection from './components/OpponentSelection';
 
 export default function MainPage() {
     const [currentPage, setCurrentPage] = useState<PageState>(PageState.HOME);
-    const [opponent, setOpponent] = useState<Opponent>();
     const [category, setCategory] = useState<Category>();
     const [userWord, setUserWord] = useState<string>("");
     const [userId, setUserId] = useState<string>("");
@@ -119,7 +116,6 @@ export default function MainPage() {
     }
 
     const handleStart = () => {
-        setOpponent(undefined);
         setCategory(undefined);
         setUserWord("");
         setUserId("");
@@ -129,13 +125,8 @@ export default function MainPage() {
         setCounter(new Counter(0, 0));
         setSummary({ role: 'system', content: '' });
         setTurn(TurnState.LOADING);
-        setCurrentPage(PageState.OPPONENT_SELECTION);
-        closeModal();
-    };
-
-    const handleSetOpponent = (selectedOpponent: Opponent) => {
-        setOpponent(selectedOpponent);
         setCurrentPage(PageState.CATEGORY_SELECTION);
+        closeModal();
     };
 
     const handleSetCategory = (selectedCategory: Category) => {
@@ -162,11 +153,8 @@ export default function MainPage() {
 
     const handleNavigateBack = () => {
         switch (currentPage) {
-            case PageState.OPPONENT_SELECTION:
-                setCurrentPage(PageState.HOME);
-                break;
             case PageState.CATEGORY_SELECTION:
-                setCurrentPage(PageState.OPPONENT_SELECTION);
+                setCurrentPage(PageState.HOME);
                 break;
             case PageState.WORD_SELECTION:
                 setCurrentPage(PageState.CATEGORY_SELECTION);
@@ -194,13 +182,12 @@ export default function MainPage() {
         <>
             <Header currentPage={currentPage} onClick={handleLogo} onToggleMenu={toggleMenu} onNavigateBack={() => handleNavigateBack()} />
             {currentPage === PageState.HOME && <Home onNavigate={handleStart} />}
-            {currentPage === PageState.OPPONENT_SELECTION && <OpponentSelection onSetOpponent={handleSetOpponent} />}
             {currentPage === PageState.CATEGORY_SELECTION && <CategorySelection onSetCategory={handleSetCategory} />}
-            {currentPage === PageState.WORD_SELECTION && category && opponent && <WordSelection onStartGame={handleOnStartGame} opponent={opponent} category={category} />}
-            {currentPage === PageState.GAME && opponent && category && userId && <Game opponent={opponent} category={category} userId={userId} userWord={userWord} startMessage={startMessage} feedbackSent={feedbackSent} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onSetCounter={setCounter} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} onRestart={handleStart} />}
+            {currentPage === PageState.WORD_SELECTION && category && <WordSelection onStartGame={handleOnStartGame} category={category} />}
+            {currentPage === PageState.GAME && category && userId && <Game category={category} userId={userId} userWord={userWord} startMessage={startMessage} feedbackSent={feedbackSent} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onSetCounter={setCounter} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} onRestart={handleStart} />}
             <Footer openModal={openModal} />
             {showMenu && (
-                <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} opponent={opponent!} counter={counter} feedbackSent={feedbackSent} isGameScreen={currentPage === 'game'} turn={turn} onRestart={handleStart} />
+                <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} counter={counter} feedbackSent={feedbackSent} isGameScreen={currentPage === 'game'} turn={turn} onRestart={handleStart} />
             )}
             <VersionFlag />
             <Modal content={modalContent} onClose={closeModal} renderContent={renderModalContent} />

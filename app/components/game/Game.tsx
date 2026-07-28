@@ -14,10 +14,8 @@ import { TurnResponse } from "@/model/TurnResponse";
 import { WinnerState } from "@/model/WinnerState";
 import { Counter } from "@/model/Counter";
 import { ModalState } from "@/model/ModalState";
-import { Opponent } from "@/model/Opponent";
 
 type GameProps = {
-    opponent: Opponent;
     category: Category;
     userId: string;
     userWord: string;
@@ -35,7 +33,7 @@ type GameProps = {
     openModal: (content: ModalState) => void;
 };
 
-export default function Game({ opponent, category, userId, userWord, counter, turn, aiWord, summary, startMessage, feedbackSent, onRestart, onSetWinner, openModal, onSetTurn, onSetCounter }: GameProps) {
+export default function Game({ category, userId, userWord, counter, turn, aiWord, summary, startMessage, feedbackSent, onRestart, onSetWinner, openModal, onSetTurn, onSetCounter }: GameProps) {
     const [messages, setMessages] = useState<Message[]>([startMessage]);
 
     useEffect(() => {
@@ -110,7 +108,7 @@ export default function Game({ opponent, category, userId, userWord, counter, tu
             </div>
             <div className="col-span-1 md:col-span-2">
                 <div className="hidden md:block">
-                    <GameInfo userWord={userWord} counter={counter} opponent={opponent} />
+                    <GameInfo userWord={userWord} counter={counter} />
                     <GameNotes />
                     <GameButtons openModal={openModal} turn={turn} feedbackSent={feedbackSent} onRestart={onRestart} />
                 </div>
