@@ -7,7 +7,7 @@ The prompts live in code — this file documents the strategy so it has one plac
 | Tier | Env var | Deployment (default) | Used for |
 |---|---|---|---|
 | `game` | `AI_GAME_MODEL` | `gpt-5.6-terra` | Word selection, questions/guesses, opening line, playful comments, summary |
-| `validation` | `AI_VALIDATION_MODEL` | `gpt-5.6-luna` | Win check, category check, answering the human's questions |
+| `validation` | `AI_VALIDATION_MODEL` | `gpt-5.6-luna` | Win check, category check, answering the human's questions, Classroom learn fact |
 
 All calls go through `services/llmService.ts` → Foundry v1 API (`{endpoint}/openai/v1/chat/completions`, deployment name in the `model` body field, no `api-version`). Only `messages`, `max_completion_tokens`, `reasoning_effort`, and `response_format` are sent — GPT-5.x deployments reject `temperature`/`top_p`.
 
@@ -34,3 +34,4 @@ Three values: **Yes / No / I Don't Know** (`model/Answer.ts`). Only a plain "Yes
 - `makeGuess` — system sandwich: rules + answer vocabulary, then filtered history, then a "output only the question or guess" task message. `reasoning_effort: "low"`.
 - `selectWord` — pick a recognizable-but-not-obvious word; excludes the 50 most recently used AI words for the category (bounded query). Output: bare word only.
 - `startMessage` / `makePlayfulComment` / `makeSummary` — creative one-offs, `reasoning_effort: "none"`. The summary renders through the `system` message style and is the only 800-token call.
+- `makeLearnFact` — Classroom-only post-game educational blurb about both secret words (validation tier, 400 tokens, `reasoning_effort: "none"`); stored as `learnFact` on the game doc and shown in the game-over modal.

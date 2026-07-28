@@ -12,7 +12,9 @@ Do not pick any of these already-used words: ${usedWords.join(", ")}.` : ""}
 Respond with only the chosen word — no quotes, no punctuation, no explanation.`);
     const userMessage = new Message("user", `Choose your secret word from the category '${category.name}'.`);
 
-    const result = await chatCompletion("game", [systemMessage, userMessage], { maxTokens: 200, reasoningEffort: "low" });
+    // Generous combined budget: with reasoning enabled, reasoning tokens draw
+    // from max_completion_tokens before the (tiny) visible answer.
+    const result = await chatCompletion("game", [systemMessage, userMessage], { maxTokens: 1000, reasoningEffort: "low" });
     const word = result.message.content.trim().replace(/^["']+|["'.]+$/g, "").trim();
     if (!word) {
         throw new Error("AI word selection returned an empty word");

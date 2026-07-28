@@ -54,18 +54,19 @@ export async function chatCompletion(tier: LlmTier, messages: Message[], options
         body.response_format = options.responseFormat;
     }
 
-    const response = await fetchWithRetry(CHAT_COMPLETIONS_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "api-key": API_KEY,
-        },
-        body: JSON.stringify(body),
-    });
+    let data = await requestChatCompletion(body);
+    let choice = data.choices?.[0];
 
-    const data = await response.json();
-    const choice = data.choices?.[0];
-    if (!choice?.message || typeof choice.message.content !== "string" || choice.message.content === "") {
+    // With reasoning enabled, max_completion_tokens is a combined budget that
+    // reasoning tokens draw from first — if it is exhausted mid-reasoning the
+    // API returns 200 with empty content. Retry once without reasoning.
+    if (!hasContent(choice) && choice?.finish_reason === "length" && body.reasoning_effort && body.reasoning_effort !== "none") {
+        console.warn(`[llm] ${tier} reasoning exhausted the token budget, retrying without reasoning`);
+        data = await requestChatCompletion({ ...body, reasoning_effort: "none" });
+        choice = data.choices?.[0];
+    }
+
+    if (!hasContent(choice)) {
         throw new Error(`LLM response for '${tier}' had no message content (finish_reason: ${choice?.finish_reason})`);
     }
 
@@ -87,12 +88,32 @@ export function jsonSchemaFormat(name: string, schema: object): object {
     return { type: "json_schema", json_schema: { name, strict: true, schema } };
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function hasContent(choice: any): boolean {
+    return typeof choice?.message?.content === "string" && choice.message.content !== "";
+}
+
+async function requestChatCompletion(body: Record<string, unknown>): Promise<any> {
+    const response = await fetchWithRetry(CHAT_COMPLETIONS_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "api-key": API_KEY,
+        },
+        body: JSON.stringify(body),
+    });
+    return response.json();
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 function retryDelayMs(attempt: number, response?: Response): number {
     const retryAfter = response?.headers.get("retry-after");
     if (retryAfter) {
         const seconds = Number(retryAfter);
         if (!Number.isNaN(seconds) && seconds > 0) {
-            return seconds * 1000;
+            // Capped so a generous Retry-After can't stall an API route past
+            // the platform's execution window.
+            return Math.min(seconds * 1000, 8_000);
         }
     }
     return 500 * 2 ** attempt + Math.random() * 250;

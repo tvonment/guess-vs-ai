@@ -56,38 +56,28 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
         }
     };
 
-    // Retries transient failures so a flaky connection doesn't strand the game
-    // in the loading state.
-    const retryApiCall = async (apiCall: () => Promise<Response>, maxRetries: number = 2): Promise<TurnResponse> => {
-        let lastError: Error | null = null;
-        for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
-            try {
-                const response = await apiCall();
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return await response.json() as TurnResponse;
-            } catch (error) {
-                lastError = error as Error;
-                console.warn(`API call attempt ${attempt}/${maxRetries + 1} failed:`, error);
-                if (attempt <= maxRetries) {
-                    await new Promise(resolve => setTimeout(resolve, 500 * attempt));
-                }
-            }
+    // Turn POSTs are NOT idempotent — the server persists the player's action
+    // before the AI work that can fail — so they are sent exactly once and
+    // never auto-retried (the server already retries its flaky LLM/DB hops).
+    // Failures restore the turn so the player can retry visibly.
+    const postTurn = async (url: string, body: object): Promise<TurnResponse> => {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-        throw lastError ?? new Error("API call failed");
+        return await response.json() as TurnResponse;
     };
 
     const handleAnswerClick = async (answer: Answer) => {
         onSetTurn(TurnState.LOADING); // Show loading spinner
         try {
-            const data = await retryApiCall(() => fetch('/api/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId: userId, answer: answer }),
-            }));
+            const data = await postTurn('/api/save', { userId: userId, answer: answer });
             await handleResponse(data);
         } catch (error) {
             console.error("Error saving answer:", error);
@@ -100,13 +90,7 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
         const newMessage = new Message("user", input);
         setMessages(prevMessages => [...prevMessages, newMessage]); // Use functional update
         try {
-            const data = await retryApiCall(() => fetch('/api/humanguess', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId: userId, text: input }), // Use input value
-            }));
+            const data = await postTurn('/api/humanguess', { userId: userId, text: input });
             await handleResponse(data);
         } catch (error) {
             console.error("Error sending question:", error);

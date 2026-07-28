@@ -1,6 +1,6 @@
 import { CosmosClient } from "@azure/cosmos";
 import { Message } from "@/model/Message";
-import { Answer } from "@/model/Answer";
+import { Answer, LegacyAnswerValues } from "@/model/Answer";
 import { CategoryRef, Game, ReportedIssue } from "@/model/Game";
 import { Feedback } from "@/model/Feedback";
 import { Counter } from "@/model/Counter";
@@ -87,9 +87,10 @@ export async function startGame(gameStatus: Game) {
 // The human's free-text questions and the AI's answers to them are excluded.
 export async function getFilteredAiChatHistory(userId: string): Promise<Message[]> {
     const messages = await getChatHistory(userId);
+    const answerValues = [...Object.values(Answer), ...LegacyAnswerValues].map((answer) => answer.toLowerCase());
     const isAnswerValue = (content: string) => {
         const normalized = content.replace(/[^a-zA-Z' ]/g, "").trim().toLowerCase();
-        return Object.values(Answer).some((answer) => answer.toLowerCase() === normalized);
+        return answerValues.includes(normalized);
     };
     return messages.filter(entry => {
         if (entry.role === 'assistant') {
@@ -123,6 +124,13 @@ export async function getCategory(userId: string): Promise<CategoryRef> {
 
 export async function addToHistory(userId: string, message: Message): Promise<Message> {
     const game = await getGameStatus(userId);
+    const last = game.messages[game.messages.length - 1];
+    if (last && last.role === message.role && last.content === message.content) {
+        // Duplicate submit (e.g. a manual retry after a failed turn) — the
+        // message is already persisted; adjacent identical messages never
+        // occur in a legitimate game flow.
+        return message;
+    }
     game.messages.push(message);
     try {
         await updateGame(game);

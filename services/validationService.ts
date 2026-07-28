@@ -32,14 +32,20 @@ function parseBooleanResult(content: string): boolean {
     return content.trim().toLowerCase().startsWith("true");
 }
 
-// Did this message name the secret word? Fuzzy on spelling, strict on identity.
+// Is this message a GUESS that identifies the secret word? Fuzzy on spelling,
+// strict on identity — and merely mentioning the word inside an attribute or
+// relation question is NOT a guess.
 export async function checkWin(guess: string, word: string): Promise<boolean> {
     const system = new Message("system",
         `You are the referee of a word-guessing game. The secret word is "${word}".
-Decide whether the player's message clearly names the secret word.
-- result = true if the message names the secret word (or a well-known alias for it), even with minor spelling mistakes.
-- result = false if the message only describes attributes, mentions only the franchise or context, names something else, or is a question that does not name the word itself.
-Being close is not enough: the exact entity must be named.`);
+Decide whether the player's message is a GUESS that identifies the secret word — not merely a mention of it.
+- result = true only if the message asserts or guesses that the secret word IS the named entity (e.g. "Is it X?", "Is your word X?", "My guess is X", or just "X" on its own), allowing minor spelling mistakes or a well-known alias.
+- result = false if the message only describes attributes, names something else, or names the entity merely as a reference point inside a question about attributes or relations.
+Examples with secret word "Albert Einstein":
+- "Is it Albert Einstein?" -> true
+- "Einstien?" -> true (misspelled direct guess)
+- "Did they ever work with Albert Einstein?" -> false (mentioned, not guessed)
+- "Is your word a famous physicist?" -> false`);
     const user = new Message("user", guess);
 
     const result = await chatCompletion("validation", [system, user], {

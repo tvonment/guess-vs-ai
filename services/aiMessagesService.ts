@@ -19,7 +19,9 @@ The human answers only with '${Answer.YES}', '${Answer.NO}' or '${Answer.I_DONT_
         `Category: '${category.name} — ${category.description}'. Output only your next yes/no question or your guess, nothing else.`);
 
     const history = await getFilteredAiChatHistory(userId);
-    const result = await chatCompletion("game", [instructions, ...history, task], { maxTokens: 400, reasoningEffort: "low" });
+    // Generous combined budget: reasoning tokens draw from max_completion_tokens
+    // before the short visible question.
+    const result = await chatCompletion("game", [instructions, ...history, task], { maxTokens: 1200, reasoningEffort: "low" });
     return result.message;
 }
 

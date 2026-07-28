@@ -19,7 +19,6 @@
     "react": "^18",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18",
-    "react-transition-group": "^4.4.5",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
@@ -27,7 +26,6 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/react-transition-group": "^4.4.11",
     "@types/uuid": "^10.0.0",
     "@types/webpack": "^5.28.5",
     "eslint": "^8",
