@@ -141,6 +141,24 @@ button,
   transition: transform 0.3s;
 }
 
+.btn-ghost {
+    background: none;
+    color: #9babb7;
+    font-size: 0.95rem;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.btn-ghost:hover {
+    color: #f7fefd;
+}
+
+/* Study Buddy mini-chat: wider bubbles than the main game window */
+.helper-chat .message-content {
+    max-width: 85%;
+}
+
 .btn-blue {
   background-color: #4863A0;
   font-size: 1.2rem;

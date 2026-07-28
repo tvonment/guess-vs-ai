@@ -7,7 +7,6 @@ import GameHeader from "./GameHeader";
 import GameWindow from "./GameWindow";
 import GameInputs from "./GameInputs";
 import GameInfo from "./GameInfo";
-import GameNotes from "./GameNotes";
 import GameButtons from "./GameButtons";
 import Image from 'next/image';
 import { TurnResponse } from "@/model/TurnResponse";
@@ -125,7 +124,6 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
             <div className="col-span-1 md:col-span-2">
                 <div className="hidden md:block">
                     <GameInfo userWord={userWord} counter={counter} />
-                    <GameNotes />
                     <GameButtons openModal={openModal} turn={turn} feedbackSent={feedbackSent} onRestart={onRestart} />
                 </div>
             </div>
