@@ -17,20 +17,37 @@ const database = client.database(COSMOS_DB_DATABASE_NAME);
 const container = database.container(COSMOS_DB_CONTAINER_NAME);
 const feedbackContainer = database.container("feedback");
 
+// Retries transient Cosmos failures with linear backoff before giving up.
+async function retryOperation<T>(operation: () => Promise<T>, maxRetries: number = 3, delay: number = 500): Promise<T> {
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            return await operation();
+        } catch (error: unknown) {
+            lastError = error;
+            console.warn(`Database operation attempt ${attempt}/${maxRetries} failed:`, error instanceof Error ? error.message : error);
+            if (attempt < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, delay * attempt));
+            }
+        }
+    }
+    throw lastError instanceof Error ? lastError : new Error("Database operation failed after retries");
+}
+
 async function getChatHistory(userId: string): Promise<Message[]> {
     // Retrieve chat history from Cosmos DB
     const historyQuery = `SELECT c.messages FROM c WHERE c.id = @userId`;
-    const db = await container.items.query({
+    const db = await retryOperation(() => container.items.query({
         query: historyQuery,
         parameters: [{ name: "@userId", value: userId }]
-    }).fetchNext();
+    }).fetchNext());
     const dbitem: { messages: Message[] } = db.resources[0];
 
     return dbitem.messages as Message[]
 }
 
 async function updateGame(game: Game) {
-    await container.items.upsert(game);
+    await retryOperation(() => container.items.upsert(game));
 }
 
 export async function increaseCounter(userId: string, player: string): Promise<Counter> {
@@ -47,11 +64,15 @@ export async function increaseCounter(userId: string, player: string): Promise<C
 export async function getGameStatus(userId: string): Promise<Game> {
     try {
         const statusQuery = `SELECT * FROM c WHERE c.id = @userId`;
-        const db = await container.items.query({
+        const db = await retryOperation(() => container.items.query({
             query: statusQuery,
             parameters: [{ name: "@userId", value: userId }]
-        }).fetchNext();
-        return db.resources[0] as Game;
+        }).fetchNext());
+        const game = db.resources[0] as Game | undefined;
+        if (!game) {
+            throw new Error(`No game found for id '${userId}'`);
+        }
+        return game;
     } catch (error: unknown) {
         console.error("Error:", error);
         throw error;
@@ -59,7 +80,7 @@ export async function getGameStatus(userId: string): Promise<Game> {
 }
 
 export async function startGame(gameStatus: Game) {
-    await container.items.create(gameStatus);
+    await retryOperation(() => container.items.create(gameStatus));
 }
 
 // The AI's guessing thread: its own questions plus the human's button answers.
@@ -82,20 +103,20 @@ export async function getFilteredAiChatHistory(userId: string): Promise<Message[
 
 export async function getWinningWords(userId: string): Promise<{ userWord: string, aiWord: string }> {
     const historyQuery = `SELECT c.userWord, c.aiWord FROM c WHERE c.id = @userId`;
-    const db = await container.items.query({
+    const db = await retryOperation(() => container.items.query({
         query: historyQuery,
         parameters: [{ name: "@userId", value: userId }]
-    }).fetchNext();
+    }).fetchNext());
     const dbitem: { userWord: string, aiWord: string } = db.resources[0];
     return { userWord: dbitem.userWord, aiWord: dbitem.aiWord };
 }
 
 export async function getCategory(userId: string): Promise<CategoryRef> {
     const categoryQuery = `SELECT c.category FROM c WHERE c.id = @userId`;
-    const db = await container.items.query({
+    const db = await retryOperation(() => container.items.query({
         query: categoryQuery,
         parameters: [{ name: "@userId", value: userId }]
-    }).fetchNext();
+    }).fetchNext());
     const dbitem: { category: CategoryRef } = db.resources[0];
     return dbitem.category;
 }

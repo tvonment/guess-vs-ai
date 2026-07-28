@@ -3,7 +3,16 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { userId, reportedIssue } = req.body;
+    if (req.method !== "POST") {
+        res.status(405).json({ error: "Method not allowed" });
+        return;
+    }
+
+    const { userId, reportedIssue } = req.body ?? {};
+    if (typeof userId !== "string" || !userId || !reportedIssue || typeof reportedIssue !== "object") {
+        res.status(400).json({ error: "Missing required parameters: userId and reportedIssue" });
+        return;
+    }
 
     try {
         const response = await reportIssue(userId, reportedIssue);
