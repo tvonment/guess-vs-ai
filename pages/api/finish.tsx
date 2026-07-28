@@ -1,16 +1,24 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { finishGame } from "@/services/cosmosService";
+import { finishTurn } from "@/services/turnService";
 import { TurnResponse } from '@/model/TurnResponse';
 import { TurnState } from '@/model/TurnState';
 import { WinnerState } from '@/model/WinnerState';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { userId } = req.body;
+    if (req.method !== "POST") {
+        res.status(405).json({ error: "Method not allowed" });
+        return;
+    }
+
+    const { userId } = req.body ?? {};
+    if (typeof userId !== "string" || !userId) {
+        res.status(400).json({ error: "Missing required parameter: userId" });
+        return;
+    }
 
     try {
-        const { aiWord, counter, summary } = await finishGame(userId, WinnerState.GIVENUP);
-        res.status(200).json(new TurnResponse([], TurnState.FINISHED, WinnerState.GIVENUP, counter, summary, aiWord));
-        return;
+        const { aiWord, counter, summary, learnFact } = await finishTurn(userId, WinnerState.GIVENUP);
+        res.status(200).json(new TurnResponse([], TurnState.FINISHED, WinnerState.GIVENUP, counter, summary, aiWord, learnFact));
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {

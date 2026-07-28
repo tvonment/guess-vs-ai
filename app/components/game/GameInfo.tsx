@@ -1,19 +1,18 @@
 import { Counter } from "@/model/Counter";
-import { Opponent } from "@/model/Opponent";
+import { AI_DISPLAY_NAME } from "@/model/Ai";
 
 interface GameInfoProps {
     userWord: string;
     counter: Counter;
-    opponent: Opponent;
 }
 
-export default function GameInfo({ userWord, counter, opponent }: GameInfoProps) {
+export default function GameInfo({ userWord, counter }: GameInfoProps) {
     return (
         <>
             <div className="flex flex-row gap-4 mb-4 h-20 text-white">
                 <div className="box-blue p-2 rounded-lg shadow flex-1 flex items-center justify-center">
                     <h2 className="text-center">
-                        <p className="text-2xl font-extrabold"><span className="opponent human">You</span> vs <span className="opponent ai">{opponent.name}</span></p>
+                        <p className="text-2xl font-extrabold"><span className="opponent human">You</span> vs <span className="opponent ai">{AI_DISPLAY_NAME}</span></p>
                     </h2>
                 </div>
             </div >

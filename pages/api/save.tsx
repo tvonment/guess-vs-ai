@@ -8,22 +8,29 @@ import { TurnResponse } from '@/model/TurnResponse';
 import { WinnerState } from '@/model/WinnerState';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { userId } = req.body;
-    const answer = req.body.answer as Answer;
-    const answerMessage = { role: "user", content: answer } as Message;
+    if (req.method !== "POST") {
+        res.status(405).json({ error: "Method not allowed" });
+        return;
+    }
+
+    const { userId, answer } = req.body ?? {};
+    if (typeof userId !== "string" || !userId || !Object.values(Answer).includes(answer as Answer)) {
+        res.status(400).json({ error: "Missing required parameters: userId and a valid answer" });
+        return;
+    }
+
+    const answerMessage = new Message("user", answer as Answer);
 
     try {
-        // Append new user message to chat history
-        const response = await addToHistory(userId, answerMessage)
-        if (answer === Answer.YES || answer === Answer.PROBABLY_YES) {
+        const response = await addToHistory(userId, answerMessage);
+        if (answer === Answer.YES) {
+            // A plain "Yes" lets the AI keep its turn and ask again.
             const aiGuess = await aiGuessTurn(userId);
             aiGuess.messages = [answerMessage, ...aiGuess.messages];
             res.status(200).json(aiGuess);
             return;
-        } else {
-            res.status(200).json(new TurnResponse([response], TurnState.HUMAN, WinnerState.PLAYING));
-            return;
         }
+        res.status(200).json(new TurnResponse([response], TurnState.HUMAN, WinnerState.PLAYING));
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {

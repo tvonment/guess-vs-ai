@@ -1,5 +1,5 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faShield, faJedi, faWandSparkles, faPaw, faBook, faFlag, faCloudBolt, faBasketball, faCalendar } from "@fortawesome/free-solid-svg-icons";
+import { faShield, faJedi, faWandSparkles, faPaw, faBook, faFlag, faCloudBolt, faBasketball, faCalendar, faMonument } from "@fortawesome/free-solid-svg-icons";
 
 export enum CategoryType {
     Featured = "Featured",
@@ -7,7 +7,8 @@ export enum CategoryType {
     Theme = "Theme"
 }
 
-export const Categories: Category[] = [
+// Pop culture & icons — the "Nerd Zone" section.
+export const NerdZoneCategories: Category[] = [
     {
         name: "Marvel Universe",
         description: "Select a character from any movie or series within the Marvel Universe.",
@@ -83,6 +84,24 @@ export const Categories: Category[] = [
         image: "/images/Guess vs AI logo.png"
     },
     {
+        name: "Iconic Sports Athletes",
+        description: "Choose an iconic sports athlete from any sport, such as Michael Jordan, Serena Williams, or Usain Bolt.",
+        type: CategoryType.Featured,
+        icon: faBasketball as IconProp,
+        image: "/images/Guess vs AI logo.png"
+    },
+    {
+        name: "Ancient Gods",
+        description: "Choose a god or goddess from an ancient mythology, such as Greek, Roman, or Norse.",
+        type: CategoryType.Featured,
+        icon: faCloudBolt as IconProp,
+        image: "/images/gods.png",
+    }
+];
+
+// Learning-oriented topics — the "Classroom" section.
+export const ClassroomCategories: Category[] = [
+    {
         name: "Historical Figures",
         description: "Pick a famous historical figure from any era, such as Cleopatra, Einstein, or Mandela.",
         type: CategoryType.Theme,
@@ -97,13 +116,6 @@ export const Categories: Category[] = [
         image: "/images/timeline.png"
     },
     {
-        name: "Iconic Sports Athletes",
-        description: "Choose an iconic sports athlete from any sport, such as Michael Jordan, Serena Williams, or Usain Bolt.",
-        type: CategoryType.Featured,
-        icon: faBasketball as IconProp,
-        image: "/images/Guess vs AI logo.png"
-    },
-    {
         name: "Countries",
         description: "Select a country from around the world.",
         type: CategoryType.Featured,
@@ -111,13 +123,32 @@ export const Categories: Category[] = [
         image: "/images/earth.png"
     },
     {
-        name: "Ancient Gods",
-        description: "Choose a god or goddess from an ancient mythology, such as Greek, Roman, or Norse.",
+        name: "World War II",
+        description: "Pick an event or person from World War II, from D-Day to Winston Churchill.",
         type: CategoryType.Featured,
-        icon: faCloudBolt as IconProp,
-        image: "/images/gods.png",
+        icon: faMonument as IconProp,
+        image: "/images/timeline.png",
+        subcategories: [
+            {
+                name: "WW2 Events",
+                description: "Significant events of World War II, such as D-Day, the Battle of Stalingrad, or the attack on Pearl Harbor.",
+                type: CategoryType.Featured,
+                icon: faMonument as IconProp,
+                image: "/images/timeline.png",
+            },
+            {
+                name: "WW2 People",
+                description: "Key figures of World War II, such as Winston Churchill, Franklin D. Roosevelt, or Erwin Rommel.",
+                type: CategoryType.Featured,
+                icon: faMonument as IconProp,
+                image: "/images/timeline.png",
+            }
+        ]
     }
 ];
+
+// Flat list across all sections (category names are unique game-wide).
+export const Categories: Category[] = [...NerdZoneCategories, ...ClassroomCategories];
 
 export class Category {
     name: string;

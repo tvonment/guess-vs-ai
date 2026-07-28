@@ -1,7 +1,7 @@
 import { Environments, EnvironmentType } from "@/model/Environments";
 
 export default function VersionFlag() {
-    const envType: EnvironmentType = process.env.ENVIRONMENT as EnvironmentType;
+    const envType: EnvironmentType = process.env.NEXT_PUBLIC_ENVIRONMENT as EnvironmentType;
     const env = Environments.find(e => e.type === envType);
 
     return (

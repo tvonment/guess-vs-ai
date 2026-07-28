@@ -1,14 +1,12 @@
 import { CosmosClient } from "@azure/cosmos";
 import { Message } from "@/model/Message";
-import { Answer } from "@/model/Answer";
-import { Categories, Category } from "@/model/Categories";
-import { Game, ReportedIssue } from "@/model/Game";
+import { Answer, LegacyAnswerValues } from "@/model/Answer";
+import { CategoryRef, Game, ReportedIssue } from "@/model/Game";
 import { Feedback } from "@/model/Feedback";
 import { Counter } from "@/model/Counter";
 import { WinnerState } from "@/model/WinnerState";
-import { makeSummary } from "./aiMessagesServcie";
-import { CategoryWins, Statistics, DetailedStatistics, GameStatistics } from "@/model/Statistics";
-import { Opponent } from "@/model/Opponent";
+import { CategoryWins, SectionWins, Statistics } from "@/model/Statistics";
+import { Sections, findCategory } from "@/model/Sections";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING || "";
 const COSMOS_DB_DATABASE_NAME = process.env.COSMOS_DB_DATABASE_NAME || "";
@@ -19,20 +17,37 @@ const database = client.database(COSMOS_DB_DATABASE_NAME);
 const container = database.container(COSMOS_DB_CONTAINER_NAME);
 const feedbackContainer = database.container("feedback");
 
+// Retries transient Cosmos failures with linear backoff before giving up.
+async function retryOperation<T>(operation: () => Promise<T>, maxRetries: number = 3, delay: number = 500): Promise<T> {
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            return await operation();
+        } catch (error: unknown) {
+            lastError = error;
+            console.warn(`Database operation attempt ${attempt}/${maxRetries} failed:`, error instanceof Error ? error.message : error);
+            if (attempt < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, delay * attempt));
+            }
+        }
+    }
+    throw lastError instanceof Error ? lastError : new Error("Database operation failed after retries");
+}
+
 async function getChatHistory(userId: string): Promise<Message[]> {
     // Retrieve chat history from Cosmos DB
     const historyQuery = `SELECT c.messages FROM c WHERE c.id = @userId`;
-    const db = await container.items.query({
+    const db = await retryOperation(() => container.items.query({
         query: historyQuery,
         parameters: [{ name: "@userId", value: userId }]
-    }).fetchNext();
-    const dbitem: { id: string, messages: Message[], userWord: string, aiWord: string, category: string } = db.resources[0];
+    }).fetchNext());
+    const dbitem: { messages: Message[] } = db.resources[0];
 
     return dbitem.messages as Message[]
 }
 
 async function updateGame(game: Game) {
-    await container.items.upsert(game);
+    await retryOperation(() => container.items.upsert(game));
 }
 
 export async function increaseCounter(userId: string, player: string): Promise<Counter> {
@@ -49,11 +64,15 @@ export async function increaseCounter(userId: string, player: string): Promise<C
 export async function getGameStatus(userId: string): Promise<Game> {
     try {
         const statusQuery = `SELECT * FROM c WHERE c.id = @userId`;
-        const db = await container.items.query({
+        const db = await retryOperation(() => container.items.query({
             query: statusQuery,
             parameters: [{ name: "@userId", value: userId }]
-        }).fetchNext();
-        return db.resources[0] as Game;
+        }).fetchNext());
+        const game = db.resources[0] as Game | undefined;
+        if (!game) {
+            throw new Error(`No game found for id '${userId}'`);
+        }
+        return game;
     } catch (error: unknown) {
         console.error("Error:", error);
         throw error;
@@ -61,67 +80,57 @@ export async function getGameStatus(userId: string): Promise<Game> {
 }
 
 export async function startGame(gameStatus: Game) {
-    await container.items.create(gameStatus);
+    await retryOperation(() => container.items.create(gameStatus));
 }
 
+// The AI's guessing thread: its own questions plus the human's button answers.
+// The human's free-text questions and the AI's answers to them are excluded.
 export async function getFilteredAiChatHistory(userId: string): Promise<Message[]> {
-    // Retrieve chat history from Cosmos DB
     const messages = await getChatHistory(userId);
+    const answerValues = [...Object.values(Answer), ...LegacyAnswerValues].map((answer) => answer.toLowerCase());
+    const isAnswerValue = (content: string) => {
+        const normalized = content.replace(/[^a-zA-Z' ]/g, "").trim().toLowerCase();
+        return answerValues.includes(normalized);
+    };
     return messages.filter(entry => {
-        // remove special characters
         if (entry.role === 'assistant') {
-            entry.content = entry.content.replace(/[^a-zA-Z ]/g, "");
-            return !Object.values(Answer).includes(entry.content as Answer);
+            return !isAnswerValue(entry.content);
         } else if (entry.role === 'user') {
-            return Object.values(Answer).includes(entry.content as Answer);
-        } else if (entry.role === 'system') {
-            return true;
+            return isAnswerValue(entry.content);
         }
+        return entry.role === 'system';
     });
 }
 
 export async function getWinningWords(userId: string): Promise<{ userWord: string, aiWord: string }> {
     const historyQuery = `SELECT c.userWord, c.aiWord FROM c WHERE c.id = @userId`;
-    const db = await container.items.query({
+    const db = await retryOperation(() => container.items.query({
         query: historyQuery,
         parameters: [{ name: "@userId", value: userId }]
-    }).fetchNext();
+    }).fetchNext());
     const dbitem: { userWord: string, aiWord: string } = db.resources[0];
     return { userWord: dbitem.userWord, aiWord: dbitem.aiWord };
 }
 
-export async function getAiWord(userId: string): Promise<string> {
-    const historyQuery = `SELECT c.aiWord FROM c WHERE c.id = @userId`;
-    const db = await container.items.query({
-        query: historyQuery,
-        parameters: [{ name: "@userId", value: userId }]
-    }).fetchNext();
-    const dbitem: { aiWord: string } = db.resources[0];
-    return dbitem.aiWord;
-}
-
-export async function getOpponent(userId: string): Promise<Opponent> {
-    const opponentQuery = `SELECT c.opponent FROM c WHERE c.id = @userId`;
-    const db = await container.items.query({
-        query: opponentQuery,
-        parameters: [{ name: "@userId", value: userId }]
-    }).fetchNext();
-    const dbitem: { opponent: Opponent } = db.resources[0];
-    return dbitem.opponent;
-}
-
-export async function getCategory(userId: string): Promise<Category> {
+export async function getCategory(userId: string): Promise<CategoryRef> {
     const categoryQuery = `SELECT c.category FROM c WHERE c.id = @userId`;
-    const db = await container.items.query({
+    const db = await retryOperation(() => container.items.query({
         query: categoryQuery,
         parameters: [{ name: "@userId", value: userId }]
-    }).fetchNext();
-    const dbitem: { category: Category } = db.resources[0];
+    }).fetchNext());
+    const dbitem: { category: CategoryRef } = db.resources[0];
     return dbitem.category;
 }
 
 export async function addToHistory(userId: string, message: Message): Promise<Message> {
     const game = await getGameStatus(userId);
+    const last = game.messages[game.messages.length - 1];
+    if (last && last.role === message.role && last.content === message.content) {
+        // Duplicate submit (e.g. a manual retry after a failed turn) — the
+        // message is already persisted; adjacent identical messages never
+        // occur in a legitimate game flow.
+        return message;
+    }
     game.messages.push(message);
     try {
         await updateGame(game);
@@ -132,13 +141,14 @@ export async function addToHistory(userId: string, message: Message): Promise<Me
     }
 }
 
-export async function getUsedCharacters(category: Category): Promise<string[]> {
+export async function getUsedCharacters(categoryName: string): Promise<string[]> {
     try {
-        // Retrieve chat history from Cosmos DB
-        const query = `SELECT c.aiWord FROM c WHERE c.category.name = @categoryName`;
+        // Bounded to the 50 most recent games so the word-selection prompt
+        // cannot grow without limit as more games are played.
+        const query = `SELECT TOP 50 c.aiWord FROM c WHERE c.category.name = @categoryName ORDER BY c._ts DESC`;
         const db = await container.items.query({
             query: query,
-            parameters: [{ name: "@categoryName", value: category.name }]
+            parameters: [{ name: "@categoryName", value: categoryName }]
         }).fetchAll();
         const usedCharacters: { aiWord: string }[] = db.resources;
         const usedCharactersArray: string[] = usedCharacters.map((item) => item.aiWord);
@@ -154,35 +164,18 @@ export async function getUsedCharacters(category: Category): Promise<string[]> {
     }
 }
 
-export async function finishGame(userId: string, winner: WinnerState): Promise<{ aiWord: string, counter: Counter, summary: Message }> {
+export async function finishGame(userId: string, winner: WinnerState, summary: Message, learnFact?: string): Promise<{ aiWord: string, counter: Counter, summary: Message, learnFact?: string }> {
     const gameStatus = await getGameStatus(userId);
 
     gameStatus.winner = winner;
-    gameStatus.summary = await makeSummary(userId, winner);
-
-    try {
-        await updateGame(gameStatus);
-    } catch (error: unknown) {
-        console.error("Error:", error);
-        if (error instanceof Error) {
-            console.error(error.message);
-        } else {
-            console.error("An error occurred");
-        }
+    gameStatus.summary = summary;
+    gameStatus.finishedAt = new Date().toISOString();
+    if (learnFact) {
+        gameStatus.learnFact = learnFact;
     }
+    await updateGame(gameStatus);
 
-    try {
-        const aiWord = await getAiWord(userId);
-        return { aiWord: aiWord, counter: gameStatus.counter, summary: gameStatus.summary };
-    } catch (error: unknown) {
-        console.error("Error:", error);
-        if (error instanceof Error) {
-            console.error(error.message);
-        } else {
-            console.error("An error occurred");
-        }
-        throw "An error occurred";
-    }
+    return { aiWord: gameStatus.aiWord, counter: gameStatus.counter, summary: summary, learnFact: learnFact };
 }
 
 export async function reportIssue(userId: string, reportedIssue: ReportedIssue): Promise<string> {
@@ -221,25 +214,6 @@ export async function writeFeedback(feedback: Feedback): Promise<string> {
     }
 }
 
-export async function getFeedback(): Promise<Feedback[]> {
-    try {
-        const query = `SELECT * FROM c`;
-        const db = await feedbackContainer.items.query({
-            query: query
-        }).fetchAll();
-        return db.resources as Feedback[];
-    }
-    catch (error: unknown) {
-        console.error("Error:", error);
-        if (error instanceof Error) {
-            console.error(error.message);
-        } else {
-            console.error("An error occurred");
-        }
-        throw "An error occurred";
-    }
-}
-
 export async function getIssues(): Promise<{ id: string, issues: ReportedIssue[] }[]> {
     try {
         const query = `SELECT c.id, c.issues FROM c WHERE c.issues != null`;
@@ -270,153 +244,106 @@ function getMedian(arr: number[]): number {
     }
 }
 
+type StatsRow = { winner?: string, counter?: Counter, categoryName?: string };
+
+function questionStats(games: StatsRow[], side: "ai" | "human"): { min: number, max: number, med: number, avg: number } {
+    const counts = games
+        .map((game) => game.counter?.[side])
+        .filter((count): count is number => typeof count === "number");
+    if (counts.length === 0) {
+        return { min: 0, max: 0, med: 0, avg: 0 };
+    }
+    return {
+        min: Math.min(...counts),
+        max: Math.max(...counts),
+        med: getMedian(counts),
+        avg: counts.reduce((sum, count) => sum + count, 0) / counts.length,
+    };
+}
+
 export async function getStatistics(): Promise<Statistics> {
     try {
-        const startedQuery = `SELECT VALUE COUNT(1) FROM c`;
-        const startedResult = await container.items.query({
-            query: startedQuery
-        }).fetchAll();
-        const startedCount = startedResult.resources[0];
+        // One projected scan replaces the previous 3 + 2-per-category queries,
+        // and never pulls transcripts into memory.
+        const query = `SELECT c.winner, c.counter, c.category.name AS categoryName FROM c`;
+        const db = await container.items.query({ query: query }).fetchAll();
+        const rows = db.resources as StatsRow[];
 
-        const givenUpQuery = `SELECT VALUE COUNT(1) FROM c WHERE c.winner = '${WinnerState.GIVENUP}'`;
-        const givenUpResult = await container.items.query({
-            query: givenUpQuery
-        }).fetchAll();
-        const givenUpCount = givenUpResult.resources[0];
+        // Older documents may reference subcategories as their own category —
+        // resolve every leaf name to its top-level category and section.
+        const hierarchy = new Map<string, { topLevelName: string, sectionName: string } | null>();
+        const resolve = (leafName?: string) => {
+            if (!leafName) return null;
+            if (!hierarchy.has(leafName)) {
+                const found = findCategory(leafName);
+                hierarchy.set(leafName, found
+                    ? { topLevelName: found.parentName ?? found.category.name, sectionName: found.sectionName }
+                    : null);
+            }
+            return hierarchy.get(leafName) ?? null;
+        };
 
-        const statisticsQuery = `SELECT * FROM c WHERE c.winner IN ('${WinnerState.AI}', '${WinnerState.HUMAN}')`;
-        const db = await container.items.query({
-            query: statisticsQuery
-        }).fetchAll();
-        const totalGames = db.resources.length;
-
-        const aiWins = db.resources.filter((game: Game) => game.winner === WinnerState.AI);
-        const humanWins = db.resources.filter((game: Game) => game.winner === WinnerState.HUMAN);
-
-        const totalAIWins = aiWins.length;
-        const totalHumanWins = humanWins.length;
-
-        const minQuestionCountAI = aiWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.ai), Number.MAX_VALUE);
-        const maxQuestionCountAI = aiWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.ai), 0);
-        const medQuestionCountAI = aiWins.length > 0 ? getMedian(aiWins.map(win => win.counter.ai)) : 0;
-        const avgQuestionCountAI = aiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / aiWins.length;
-
-        const minQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.human), Number.MAX_VALUE);
-        const maxQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.human), 0);
-        const medQuestionCountHuman = humanWins.length > 0 ? getMedian(humanWins.map(win => win.counter.human)) : 0;
-        const avgQuestionCountHuman = humanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / humanWins.length;
+        const aiWins = rows.filter((row) => row.winner === WinnerState.AI);
+        const humanWins = rows.filter((row) => row.winner === WinnerState.HUMAN);
+        const givenUp = rows.filter((row) => row.winner === WinnerState.GIVENUP);
+        const aiQuestions = questionStats(aiWins, "ai");
+        const humanQuestions = questionStats(humanWins, "human");
 
         const winsByCategory: CategoryWins[] = [];
-        const categories: Category[] = Categories;
+        const winsBySection: SectionWins[] = [];
+        for (const section of Sections) {
+            const inSection = rows.filter((row) => resolve(row.categoryName)?.sectionName === section.name);
+            winsBySection.push({
+                sectionName: section.name,
+                aiWins: inSection.filter((row) => row.winner === WinnerState.AI).length,
+                humanWins: inSection.filter((row) => row.winner === WinnerState.HUMAN).length,
+                givenUp: inSection.filter((row) => row.winner === WinnerState.GIVENUP).length,
+                started: inSection.length,
+            });
 
-        await Promise.all(
-            categories.map(async (category: Category) => {
-                const startedQuery = `SELECT VALUE COUNT(1) FROM c WHERE c.category.name = '${category.name}'`;
-                const startedResult = await container.items.query({
-                    query: startedQuery
-                }).fetchAll();
-                const startedCount = startedResult.resources[0];
-
-                const givenUpQuery = `SELECT VALUE COUNT(1) FROM c WHERE c.category.name = '${category.name}' AND c.winner = '${WinnerState.GIVENUP}'`;
-                const givenUpResult = await container.items.query({
-                    query: givenUpQuery
-                }).fetchAll();
-                const givenUpCount = givenUpResult.resources[0];
-
-                const categoryAiWins = aiWins.filter((game: Game) => game.category.name === category.name);
-                const categoryHumanWins = humanWins.filter((game: Game) => game.category.name === category.name);
-                const categoryWins: CategoryWins = {
+            for (const category of section.categories) {
+                const inCategory = rows.filter((row) => resolve(row.categoryName)?.topLevelName === category.name);
+                const categoryAiWins = inCategory.filter((row) => row.winner === WinnerState.AI);
+                const categoryHumanWins = inCategory.filter((row) => row.winner === WinnerState.HUMAN);
+                const categoryAiQuestions = questionStats(categoryAiWins, "ai");
+                const categoryHumanQuestions = questionStats(categoryHumanWins, "human");
+                winsByCategory.push({
                     category: category,
                     aiWins: categoryAiWins.length,
                     humanWins: categoryHumanWins.length,
-                    givenUp: givenUpCount,
-                    started: startedCount,
-                    minQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.ai), Number.MAX_VALUE) : 0,
-                    maxQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.ai), 0) : 0,
-                    medQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins[Math.floor(categoryAiWins.length / 2)].counter.ai : 0,
-                    avgQuestionCountAI: categoryAiWins.length > 0 ? categoryAiWins.reduce((acc: number, game: Game) => acc + game.counter.ai, 0) / categoryAiWins.length : 0,
-                    minQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins.reduce((acc: number, game: Game) => Math.min(acc, game.counter.human), Number.MAX_VALUE) : 0,
-                    maxQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins.reduce((acc: number, game: Game) => Math.max(acc, game.counter.human), 0) : 0,
-                    medQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins[Math.floor(categoryHumanWins.length / 2)].counter.human : 0,
-                    avgQuestionCountHuman: categoryHumanWins.length > 0 ? categoryHumanWins.reduce((acc: number, game: Game) => acc + game.counter.human, 0) / categoryHumanWins.length : 0
-                };
-                winsByCategory.push(categoryWins);
-            })
-        );
+                    givenUp: inCategory.filter((row) => row.winner === WinnerState.GIVENUP).length,
+                    started: inCategory.length,
+                    minQuestionCountAI: categoryAiQuestions.min,
+                    maxQuestionCountAI: categoryAiQuestions.max,
+                    medQuestionCountAI: categoryAiQuestions.med,
+                    avgQuestionCountAI: categoryAiQuestions.avg,
+                    minQuestionCountHuman: categoryHumanQuestions.min,
+                    maxQuestionCountHuman: categoryHumanQuestions.max,
+                    medQuestionCountHuman: categoryHumanQuestions.med,
+                    avgQuestionCountHuman: categoryHumanQuestions.avg,
+                });
+            }
+        }
 
         return {
-            totalGames: totalGames,
-            totalAIWins: totalAIWins,
-            totalHumanWins: totalHumanWins,
-            totalGivenUp: givenUpCount,
-            totalStarted: startedCount,
-            minQuestionCountHuman: minQuestionCountHuman,
-            maxQuestionCountHuman: maxQuestionCountHuman,
-            medQuestionCountHuman: medQuestionCountHuman,
-            avgQuestionCountHuman: avgQuestionCountHuman,
-            minQuestionCountAI: minQuestionCountAI,
-            maxQuestionCountAI: maxQuestionCountAI,
-            medQuestionCountAI: medQuestionCountAI,
-            avgQuestionCountAI: avgQuestionCountAI,
-            winsByCategory: winsByCategory
-        } as Statistics;
-    } catch (error: unknown) {
-        console.error("Error:", error);
-        if (error instanceof Error) {
-            console.error(error.message);
-        } else {
-            console.error("An error occurred");
-        }
-        throw "An error occurred";
-    }
-}
-
-async function getGameStatistics(): Promise<GameStatistics[]> {
-    try {
-        const query = `SELECT * FROM c WHERE c.winner IN ('${WinnerState.AI}', '${WinnerState.HUMAN}')`;
-        const db = await container.items.query({
-            query: query
-        }).fetchAll();
-        const games: Game[] = db.resources;
-        const gameStatistics: GameStatistics[] = games.map((game: Game) => {
-            return {
-                id: game.id,
-                userWord: game.userWord,
-                aiWord: game.aiWord,
-                categoryName: game.category.name,
-                winner: game.winner,
-                counter: game.counter,
-                messages: game.messages,
-            } as GameStatistics;
-        });
-        return gameStatistics;
-    } catch (error: unknown) {
-        console.error("Error:", error);
-        if (error instanceof Error) {
-            console.error(error.message);
-        } else {
-            console.error("An error occurred");
-        }
-        throw "An error occurred";
-    }
-}
-
-export async function getDetailedStatistics(): Promise<DetailedStatistics> {
-    try {
-        const basicStatistics = await getStatistics();
-        const gamesStatistics = await getGameStatistics();
-        const detailedStatistics: DetailedStatistics = {
-            basic: basicStatistics,
-            games: gamesStatistics
+            totalGames: aiWins.length + humanWins.length,
+            totalAIWins: aiWins.length,
+            totalHumanWins: humanWins.length,
+            totalGivenUp: givenUp.length,
+            totalStarted: rows.length,
+            minQuestionCountHuman: humanQuestions.min,
+            maxQuestionCountHuman: humanQuestions.max,
+            medQuestionCountHuman: humanQuestions.med,
+            avgQuestionCountHuman: humanQuestions.avg,
+            minQuestionCountAI: aiQuestions.min,
+            maxQuestionCountAI: aiQuestions.max,
+            medQuestionCountAI: aiQuestions.med,
+            avgQuestionCountAI: aiQuestions.avg,
+            winsByCategory: winsByCategory,
+            winsBySection: winsBySection,
         };
-        return detailedStatistics;
     } catch (error: unknown) {
-        console.error("Error:", error);
-        if (error instanceof Error) {
-            console.error(error.message);
-        } else {
-            console.error("An error occurred");
-        }
-        throw "An error occurred";
+        console.error("Error computing statistics:", error);
+        throw error instanceof Error ? error : new Error("Failed to compute statistics");
     }
 }

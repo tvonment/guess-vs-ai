@@ -14,10 +14,8 @@ import { TurnResponse } from "@/model/TurnResponse";
 import { WinnerState } from "@/model/WinnerState";
 import { Counter } from "@/model/Counter";
 import { ModalState } from "@/model/ModalState";
-import { Opponent } from "@/model/Opponent";
 
 type GameProps = {
-    opponent: Opponent;
     category: Category;
     userId: string;
     userWord: string;
@@ -30,12 +28,12 @@ type GameProps = {
     onRestart: () => void;
     onSetSummary: (summary: Message) => void;
     onSetTurn: (turn: TurnState) => void;
-    onSetWinner: (winner: string, aiWord: string, summary: Message) => void;
+    onSetWinner: (winner: string, aiWord: string, summary: Message, learnFact?: string) => void;
     onSetCounter: (counter: Counter) => void;
     openModal: (content: ModalState) => void;
 };
 
-export default function Game({ opponent, category, userId, userWord, counter, turn, aiWord, summary, startMessage, feedbackSent, onRestart, onSetWinner, openModal, onSetTurn, onSetCounter }: GameProps) {
+export default function Game({ category, userId, userWord, counter, turn, aiWord, summary, startMessage, feedbackSent, onRestart, onSetWinner, openModal, onSetTurn, onSetCounter }: GameProps) {
     const [messages, setMessages] = useState<Message[]>([startMessage]);
 
     useEffect(() => {
@@ -49,38 +47,55 @@ export default function Game({ opponent, category, userId, userWord, counter, tu
     }, [summary]);
 
     const floatMessages = async (newMessages: Message[]) => {
+        if (!newMessages || !Array.isArray(newMessages) || newMessages.length === 0) {
+            return;
+        }
         for (let i = 0; i < newMessages.length; i++) {
             setMessages(prevMessages => [...prevMessages, newMessages[i]]); // Use functional update
             await new Promise(r => setTimeout(r, 500));
         }
     };
 
-    const handleAnswerClick = async (answer: Answer) => {
-        onSetTurn(TurnState.LOADING); // Show loading spinner
-        const response = await fetch('/api/save', {
+    // Turn POSTs are NOT idempotent — the server persists the player's action
+    // before the AI work that can fail — so they are sent exactly once and
+    // never auto-retried (the server already retries its flaky LLM/DB hops).
+    // Failures restore the turn so the player can retry visibly.
+    const postTurn = async (url: string, body: object): Promise<TurnResponse> => {
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ userId: userId, answer: answer }),
+            body: JSON.stringify(body),
         });
-        const data = await response.json() as TurnResponse;
-        await handleResponse(data);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json() as TurnResponse;
+    };
+
+    const handleAnswerClick = async (answer: Answer) => {
+        onSetTurn(TurnState.LOADING); // Show loading spinner
+        try {
+            const data = await postTurn('/api/save', { userId: userId, answer: answer });
+            await handleResponse(data);
+        } catch (error) {
+            console.error("Error saving answer:", error);
+            onSetTurn(TurnState.AI); // bring the answer buttons back so the player can retry
+        }
     };
 
     const handleHumanGuess = async (input: string) => {
         onSetTurn(TurnState.LOADING); // Show loading spinner
         const newMessage = new Message("user", input);
         setMessages(prevMessages => [...prevMessages, newMessage]); // Use functional update
-        const response = await fetch('/api/humanguess', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId: userId, text: input }), // Use input value
-        });
-        const data = await response.json() as TurnResponse;
-        await handleResponse(data);
+        try {
+            const data = await postTurn('/api/humanguess', { userId: userId, text: input });
+            await handleResponse(data);
+        } catch (error) {
+            console.error("Error sending question:", error);
+            onSetTurn(TurnState.HUMAN); // give the input back so the player can retry
+        }
     };
 
     const handleResponse = async (data: TurnResponse) => {
@@ -91,8 +106,7 @@ export default function Game({ opponent, category, userId, userWord, counter, tu
         if (counter) { onSetCounter(counter) };
         await floatMessages(newMessages);
         onSetTurn(turn);
-        console.log("Winner:", winner);
-        if (winner && data.aiWord && data.summary) { onSetWinner(winner, data.aiWord, data.summary); }
+        if (winner && data.aiWord && data.summary) { onSetWinner(winner, data.aiWord, data.summary, data.learnFact); }
     }
 
     return (
@@ -110,7 +124,7 @@ export default function Game({ opponent, category, userId, userWord, counter, tu
             </div>
             <div className="col-span-1 md:col-span-2">
                 <div className="hidden md:block">
-                    <GameInfo userWord={userWord} counter={counter} opponent={opponent} />
+                    <GameInfo userWord={userWord} counter={counter} />
                     <GameNotes />
                     <GameButtons openModal={openModal} turn={turn} feedbackSent={feedbackSent} onRestart={onRestart} />
                 </div>

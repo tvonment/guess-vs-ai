@@ -19,7 +19,7 @@ export default function Home({ onNavigate }: HomeScreenProps) {
             <div className="flex p-10 pt-3 pb-3 flex-col items-center text-center">
                 <h2 className="text-orange text-2xl md:text-4xl font-bold mb-4">Challenge the AI in our question game!</h2>
                 <h3 className="text-white text-lg md:text-2xl mb-2">Choose a character of one of our categories and outguess the AI.</h3>
-                <h3 className="text-white text-lg md:text-2xl mb-2">Ask <strong>Yes/No Questions</strong> to narrow down the Character, but choose carefully, if the answer is a <strong>{Answer.YES}</strong> or <strong>{Answer.PROBABLY_YES}</strong> you get another turn.</h3>
+                <h3 className="text-white text-lg md:text-2xl mb-2">Ask <strong>Yes/No Questions</strong> to narrow down the Character, but choose carefully, only if the answer is a <strong>{Answer.YES}</strong> do you get another turn.</h3>
                 <h3 className="text-white text-lg md:text-2xl mb-6">Think you can deduce its choice before it does yours?</h3>
                 <button className="btn-orange md:mt-10 py-6 px-6 rounded-lg shadow flex items-center justify-between text-3xl font-extrabold" onClick={onNavigate}>
                     <FontAwesomeIcon icon={faGamepad} className="icon-margin" />

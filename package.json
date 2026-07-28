@@ -6,12 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "startAzure": "./node_modules/next/dist/bin/next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@azure/cosmos": "^4.1.1",
-    "@azure/openai": "^2.0.0-beta.2",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
@@ -21,21 +19,17 @@
     "react": "^18",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18",
-    "react-router-dom": "^6.28.0",
-    "react-transition-group": "^4.4.5",
-    "uuid": "^10.0.0",
-    "workbox-webpack-plugin": "^7.3.0"
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@types/next-pwa": "^5.6.9",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/react-transition-group": "^4.4.11",
     "@types/uuid": "^10.0.0",
     "@types/webpack": "^5.28.5",
     "eslint": "^8",
-    "eslint-config-next": "14.2.10",
+    "eslint-config-next": "^15.1.2",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"

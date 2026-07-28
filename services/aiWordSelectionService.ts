@@ -1,67 +1,23 @@
-import { Category } from "@/model/Categories";
 import { getUsedCharacters } from "./cosmosService";
-import { gptCall } from "./oaiService";
+import { chatCompletion } from "./llmService";
 import { Message } from "@/model/Message";
-import { Opponent } from "@/model/Opponent";
 
-export async function selectWord(category: Category, opponent: Opponent): Promise<string> {
-    const usedCharacters: string[] = await getUsedCharacters(category);
-    console.log("Used Characters:", usedCharacters);
+export async function selectWord(category: { name: string; description: string }): Promise<string> {
+    const usedWords = await getUsedCharacters(category.name);
 
-    const systemMessageText = { role: "system", content: `We are going to play a game of word selection. You will play against a human. The human already chose a word from the category '${category.name}' - ${category.description}. You have to choose a word of your own. Try your best to get a word that is difficult to guess. These are the words that have already been used: ${usedCharacters.join(", ")}. Good luck! Answer only with the name you choose. No Reasoning required.` } as Message;
-    const fewShotMessages: Message[] = [
-        {
-            role: "user",
-            content: "Choose a word from the category 'Any Animal'."
-        },
-        {
-            role: "assistant",
-            content: "elephant"
-        },
-        {
-            role: "user",
-            content: "Choose a word from the category 'University Object'."
-        },
-        {
-            role: "assistant",
-            content: "chair"
-        },
-        {
-            role: "user",
-            content: "Choose a word from the category 'Food'."
-        },
-        {
-            role: "assistant",
-            content: "apple"
-        },
-        {
-            role: "user",
-            content: "Choose a word from the category 'Harry Potter'."
-        },
-        {
-            role: "assistant",
-            content: "harry potter"
-        },
-        {
-            role: "user",
-            content: "Choose a word from the category 'University Object'."
-        },
-        {
-            role: "assistant",
-            content: "pen"
-        }
-    ]
-    const userMessage =
-        {
-            role: "user",
-            content: `Choose a word from the category '${category.name}'.`
-        } as Message;
-    try {
-        const gptResponse = await gptCall([systemMessageText, ...fewShotMessages, userMessage], opponent, 0.7);
-        const word = gptResponse.content;
-        return word;
-    } catch (error) {
-        console.error("Error selecting word:", error);
-        throw error;
+    const systemMessage = new Message("system",
+        `We are playing 'Guess vs AI', a word-guessing game. Pick the secret word you will defend, from the category '${category.name}' — ${category.description}
+Choose something recognizable that clearly fits the category, but not the most obvious pick, so it is challenging to guess.${usedWords.length > 0 ? `
+Do not pick any of these already-used words: ${usedWords.join(", ")}.` : ""}
+Respond with only the chosen word — no quotes, no punctuation, no explanation.`);
+    const userMessage = new Message("user", `Choose your secret word from the category '${category.name}'.`);
+
+    // Generous combined budget: with reasoning enabled, reasoning tokens draw
+    // from max_completion_tokens before the (tiny) visible answer.
+    const result = await chatCompletion("game", [systemMessage, userMessage], { maxTokens: 1000, reasoningEffort: "low" });
+    const word = result.message.content.trim().replace(/^["']+|["'.]+$/g, "").trim();
+    if (!word) {
+        throw new Error("AI word selection returned an empty word");
     }
+    return word;
 }

@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from 'react';
 
 interface ConfirmProps {
-    onConfirm: (winner: string, aiWord: string, summary: Message) => void;
+    onConfirm: (winner: string, aiWord: string, summary: Message, learnFact?: string) => void;
     onClose: () => void;
     userId: string;
 }
@@ -28,7 +28,7 @@ export default function Confirm({ onConfirm, onClose, userId }: ConfirmProps) {
             const summary = data.summary;
             const winnerState = data.winnerState;
             if (aiWord && summary && winnerState) {
-                onConfirm(winnerState, aiWord, summary);
+                onConfirm(winnerState, aiWord, summary, data.learnFact);
             }
         } catch (error) {
             console.error('Error fetching AI word:', error);

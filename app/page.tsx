@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from 'react';
 
 import Home from './components/Home';
+import SectionSelection from './components/SectionSelection';
 import CategorySelection from './components/CategorySelection';
 import Game from './components/game/Game';
 import { Category } from '@/model/Categories';
+import { Section } from '@/model/Sections';
 import WordSelection from './components/WordSelection';
 import Modal from './components/modal/Modal';
 import Faq from './components/modal/Faq';
@@ -26,17 +28,16 @@ import { PageState } from '@/model/PageState';
 import { ModalState } from '@/model/ModalState';
 import StatisticsModal from './components/modal/StatisticsModal';
 import Install from './components/modal/Install';
-import { Opponent } from '@/model/Opponent';
-import OpponentSelection from './components/OpponentSelection';
 
 export default function MainPage() {
     const [currentPage, setCurrentPage] = useState<PageState>(PageState.HOME);
-    const [opponent, setOpponent] = useState<Opponent>();
+    const [section, setSection] = useState<Section>();
     const [category, setCategory] = useState<Category>();
     const [userWord, setUserWord] = useState<string>("");
     const [userId, setUserId] = useState<string>("");
     const [winner, setWinner] = useState<string>("");
     const [aiWord, setAiWord] = useState<string>("");
+    const [learnFact, setLearnFact] = useState<string>("");
     const [modalContent, setModalContent] = useState<ModalState | null>(null);
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const [counter, setCounter] = useState<Counter>(new Counter(0, 0));
@@ -97,7 +98,7 @@ export default function MainPage() {
             case ModalState.REPORT_GAMEOVER:
                 return <ReportIssue onClose={closeModal} gameStatus='gameover' userId={userId} />;
             case ModalState.GAME_OVER:
-                return <GameOverModal onClose={closeModal} winner={winner} aiWord={aiWord} summary={summary} openModal={openModal} />;
+                return <GameOverModal onClose={closeModal} winner={winner} aiWord={aiWord} summary={summary} learnFact={learnFact} openModal={openModal} />;
             case ModalState.FEEDBACK:
                 return <FeedbackForm onClose={closeModal} userId={userId} onFeedbackSent={handleFeedbackSent} />;
             case ModalState.INSTALL:
@@ -119,22 +120,23 @@ export default function MainPage() {
     }
 
     const handleStart = () => {
-        setOpponent(undefined);
+        setSection(undefined);
         setCategory(undefined);
         setUserWord("");
         setUserId("");
         setWinner("");
         setAiWord("");
+        setLearnFact("");
         setFeedbackSent(false);
         setCounter(new Counter(0, 0));
         setSummary({ role: 'system', content: '' });
         setTurn(TurnState.LOADING);
-        setCurrentPage(PageState.OPPONENT_SELECTION);
+        setCurrentPage(PageState.SECTION_SELECTION);
         closeModal();
     };
 
-    const handleSetOpponent = (selectedOpponent: Opponent) => {
-        setOpponent(selectedOpponent);
+    const handleSetSection = (selectedSection: Section) => {
+        setSection(selectedSection);
         setCurrentPage(PageState.CATEGORY_SELECTION);
     };
 
@@ -151,22 +153,22 @@ export default function MainPage() {
         setTurn(TurnState.HUMAN);
     }
 
-    const handleGameOver = async (winner: string, aiWord: string, summary: Message) => {
+    const handleGameOver = async (winner: string, aiWord: string, summary: Message, learnFact?: string) => {
         setWinner(winner);
         setAiWord(aiWord);
+        setLearnFact(learnFact ?? "");
         setTurn(TurnState.FINISHED);
         setSummary(summary);
-        console.log("Game over with winner:", winner);
         openModal(ModalState.GAME_OVER);
     }
 
     const handleNavigateBack = () => {
         switch (currentPage) {
-            case PageState.OPPONENT_SELECTION:
+            case PageState.SECTION_SELECTION:
                 setCurrentPage(PageState.HOME);
                 break;
             case PageState.CATEGORY_SELECTION:
-                setCurrentPage(PageState.OPPONENT_SELECTION);
+                setCurrentPage(PageState.SECTION_SELECTION);
                 break;
             case PageState.WORD_SELECTION:
                 setCurrentPage(PageState.CATEGORY_SELECTION);
@@ -194,13 +196,13 @@ export default function MainPage() {
         <>
             <Header currentPage={currentPage} onClick={handleLogo} onToggleMenu={toggleMenu} onNavigateBack={() => handleNavigateBack()} />
             {currentPage === PageState.HOME && <Home onNavigate={handleStart} />}
-            {currentPage === PageState.OPPONENT_SELECTION && <OpponentSelection onSetOpponent={handleSetOpponent} />}
-            {currentPage === PageState.CATEGORY_SELECTION && <CategorySelection onSetCategory={handleSetCategory} />}
-            {currentPage === PageState.WORD_SELECTION && category && opponent && <WordSelection onStartGame={handleOnStartGame} opponent={opponent} category={category} />}
-            {currentPage === PageState.GAME && opponent && category && userId && <Game opponent={opponent} category={category} userId={userId} userWord={userWord} startMessage={startMessage} feedbackSent={feedbackSent} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onSetCounter={setCounter} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} onRestart={handleStart} />}
+            {currentPage === PageState.SECTION_SELECTION && <SectionSelection onSetSection={handleSetSection} />}
+            {currentPage === PageState.CATEGORY_SELECTION && section && <CategorySelection section={section} onSetCategory={handleSetCategory} />}
+            {currentPage === PageState.WORD_SELECTION && category && <WordSelection onStartGame={handleOnStartGame} category={category} />}
+            {currentPage === PageState.GAME && category && userId && <Game category={category} userId={userId} userWord={userWord} startMessage={startMessage} feedbackSent={feedbackSent} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onSetCounter={setCounter} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} onRestart={handleStart} />}
             <Footer openModal={openModal} />
             {showMenu && (
-                <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} opponent={opponent!} counter={counter} feedbackSent={feedbackSent} isGameScreen={currentPage === 'game'} turn={turn} onRestart={handleStart} />
+                <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} counter={counter} feedbackSent={feedbackSent} isGameScreen={currentPage === 'game'} turn={turn} onRestart={handleStart} />
             )}
             <VersionFlag />
             <Modal content={modalContent} onClose={closeModal} renderContent={renderModalContent} />
