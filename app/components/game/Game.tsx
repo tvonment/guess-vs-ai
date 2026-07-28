@@ -7,6 +7,7 @@ import GameHeader from "./GameHeader";
 import GameWindow from "./GameWindow";
 import GameInputs from "./GameInputs";
 import GameInfo from "./GameInfo";
+import GameHelper from "./GameHelper";
 import GameButtons from "./GameButtons";
 import Image from 'next/image';
 import { TurnResponse } from "@/model/TurnResponse";
@@ -30,9 +31,11 @@ type GameProps = {
     onSetWinner: (winner: string, aiWord: string, summary: Message, learnFact?: string) => void;
     onSetCounter: (counter: Counter) => void;
     openModal: (content: ModalState) => void;
+    helperMessages: Message[];
+    onHelperMessagesChange: (messages: Message[]) => void;
 };
 
-export default function Game({ category, userId, userWord, counter, turn, aiWord, summary, startMessage, feedbackSent, onRestart, onSetWinner, openModal, onSetTurn, onSetCounter }: GameProps) {
+export default function Game({ category, userId, userWord, counter, turn, aiWord, summary, startMessage, feedbackSent, onRestart, onSetWinner, openModal, onSetTurn, onSetCounter, helperMessages, onHelperMessagesChange }: GameProps) {
     const [messages, setMessages] = useState<Message[]>([startMessage]);
 
     useEffect(() => {
@@ -124,6 +127,7 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
             <div className="col-span-1 md:col-span-2">
                 <div className="hidden md:block">
                     <GameInfo userWord={userWord} counter={counter} />
+                    <GameHelper userId={userId} messages={helperMessages} onMessagesChange={onHelperMessagesChange} />
                     <GameButtons openModal={openModal} turn={turn} feedbackSent={feedbackSent} onRestart={onRestart} />
                 </div>
             </div>
