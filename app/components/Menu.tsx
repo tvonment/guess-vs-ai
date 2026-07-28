@@ -1,11 +1,13 @@
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import GameInfo from './game/GameInfo';
+import GameHelper from './game/GameHelper';
 import GameButtons from './game/GameButtons';
 import FooterButtons from './FooterButtons';
 import { TurnState } from "@/model/TurnState";
 import { Counter } from "@/model/Counter";
 import { ModalState } from "@/model/ModalState";
+import { Message } from "@/model/Message";
 import { FooterText } from "./Footer";
 
 interface MenuProps {
@@ -17,9 +19,12 @@ interface MenuProps {
     userWord: string;
     counter: Counter;
     turn: TurnState;
+    userId: string;
+    helperMessages: Message[];
+    onHelperMessagesChange: (messages: Message[]) => void;
 }
 
-export default function Menu({ onCloseMenu, onMenuOpenModal, onRestart, feedbackSent, userWord, counter, isGameScreen, turn }: MenuProps) {
+export default function Menu({ onCloseMenu, onMenuOpenModal, onRestart, feedbackSent, userWord, counter, isGameScreen, turn, userId, helperMessages, onHelperMessagesChange }: MenuProps) {
 
     return (
         <>
@@ -33,6 +38,7 @@ export default function Menu({ onCloseMenu, onMenuOpenModal, onRestart, feedback
                 {isGameScreen && (
                     <div className="flex-1 overflow-y-auto">
                         <GameInfo userWord={userWord} counter={counter} />
+                        <GameHelper userId={userId} messages={helperMessages} onMessagesChange={onHelperMessagesChange} />
                         <GameButtons openModal={onMenuOpenModal} turn={turn} onRestart={onRestart} feedbackSent={feedbackSent} />
                     </div>
                 )}

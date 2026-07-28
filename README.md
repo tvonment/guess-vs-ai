@@ -10,11 +10,12 @@ A word-guessing duel against an AI: you and the AI each pick a secret word from 
 - The AI picks its own secret word for the same category.
 - Take turns: you answer the AI's questions with Yes / No / I Don't Know buttons; the AI answers your free-text questions. A "Yes" lets the asker keep their turn.
 - First to name the other's exact word wins. An LLM referee judges guesses (tolerant of typos, strict on identity).
+- The **Study Buddy** sidebar helper answers factual questions about your own word (doc-grounded via the Microsoft Learn MCP server for Azure Services games) — but refuses to help with the game itself.
 
 ## Tech stack
 
 - **Next.js 15** — App Router for the UI (`app/`), Pages Router for the API (`pages/api/`)
-- **Azure AI Foundry** — LLM chat completions (gameplay + validation models), called via `fetch` from `services/`
+- **Azure AI Foundry** — LLM chat completions (gameplay + validation models), called via `fetch` from `services/`; the Study Buddy helper uses the **Vercel AI SDK** (`ai` + `@ai-sdk/azure` + `@ai-sdk/mcp`) for its tool loop against the MS Learn MCP server
 - **Azure Cosmos DB** — game documents and feedback (`services/cosmosService.ts`)
 - **Azure Static Web Apps** — hosting, deployed by `.github/workflows/production-pipeline.yml` on push/PR to `main`
 - **Tailwind 3** + custom classes in `app/globals.css`, `next-pwa` for the PWA layer

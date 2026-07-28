@@ -38,6 +38,7 @@ export default function MainPage() {
     const [winner, setWinner] = useState<string>("");
     const [aiWord, setAiWord] = useState<string>("");
     const [learnFact, setLearnFact] = useState<string>("");
+    const [helperMessages, setHelperMessages] = useState<Message[]>([]);
     const [modalContent, setModalContent] = useState<ModalState | null>(null);
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const [counter, setCounter] = useState<Counter>(new Counter(0, 0));
@@ -127,6 +128,7 @@ export default function MainPage() {
         setWinner("");
         setAiWord("");
         setLearnFact("");
+        setHelperMessages([]);
         setFeedbackSent(false);
         setCounter(new Counter(0, 0));
         setSummary({ role: 'system', content: '' });
@@ -199,10 +201,10 @@ export default function MainPage() {
             {currentPage === PageState.SECTION_SELECTION && <SectionSelection onSetSection={handleSetSection} />}
             {currentPage === PageState.CATEGORY_SELECTION && section && <CategorySelection section={section} onSetCategory={handleSetCategory} />}
             {currentPage === PageState.WORD_SELECTION && category && <WordSelection onStartGame={handleOnStartGame} category={category} />}
-            {currentPage === PageState.GAME && category && userId && <Game category={category} userId={userId} userWord={userWord} startMessage={startMessage} feedbackSent={feedbackSent} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onSetCounter={setCounter} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} onRestart={handleStart} />}
+            {currentPage === PageState.GAME && category && userId && <Game category={category} userId={userId} userWord={userWord} startMessage={startMessage} feedbackSent={feedbackSent} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onSetCounter={setCounter} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} onRestart={handleStart} helperMessages={helperMessages} onHelperMessagesChange={setHelperMessages} />}
             <Footer openModal={openModal} />
             {showMenu && (
-                <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} counter={counter} feedbackSent={feedbackSent} isGameScreen={currentPage === 'game'} turn={turn} onRestart={handleStart} />
+                <Menu onCloseMenu={closeMenu} onMenuOpenModal={handleMenuOpenModal} userWord={userWord} counter={counter} feedbackSent={feedbackSent} isGameScreen={currentPage === 'game'} turn={turn} onRestart={handleStart} userId={userId} helperMessages={helperMessages} onHelperMessagesChange={setHelperMessages} />
             )}
             <VersionFlag />
             <Modal content={modalContent} onClose={closeModal} renderContent={renderModalContent} />

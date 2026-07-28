@@ -37,3 +37,10 @@ Three values: **Yes / No / I Don't Know** (`model/Answer.ts`). Only a plain "Yes
 - `selectWord` — pick a recognizable-but-not-obvious word; excludes the 50 most recently used AI words for the category (bounded query). Output: bare word only.
 - `startMessage` / `makePlayfulComment` / `makeSummary` — creative one-offs, `reasoning_effort: "none"`. The summary renders through the `system` message style and is the only 800-token call.
 - `makeLearnFact` — Classroom-only post-game educational blurb about both secret words (validation tier, 400 tokens, `reasoning_effort: "none"`); stored as `learnFact` on the game doc and shown in the game-over modal.
+
+## Study Buddy helper (`services/helperService.ts`)
+
+The sidebar helper is the app's one **agentic** path and runs on the **Vercel AI SDK** (`generateText` + `@ai-sdk/mcp`), while the deterministic game core stays on `llmService`. It answers factual questions about the **player's own word** on the game model (gpt-5.4, `reasoningEffort: "low"`, ≤4 steps, 25 s deadline).
+
+- **Guardrails**: the API route passes only `userWord` + `category` into the prompt — never the AI's word or the game transcript (structural: the helper can't leak what it never receives). The system prompt additionally refuses question-formulating, guessing strategy, and opponent-word speculation. Client history is sanitized server-side (user/assistant roles only, capped length).
+- **Knowledge sources** (`model/HelperSources.ts`): top-level category → MCP server. Currently `Azure Services` → MS Learn (`https://learn.microsoft.com/api/mcp`, tools allowlisted to docs/code search + fetch, results truncated to 6 k chars). Adding a source for another topic is a config entry. If the MCP server is unreachable the helper degrades to plain model knowledge — it never hard-fails.

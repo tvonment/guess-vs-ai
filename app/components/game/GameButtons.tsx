@@ -49,42 +49,36 @@ export default function GameButtons({ openModal, turn, feedbackSent, onRestart }
                             <span className="mx-2 text-center">Help</span>
                             <FontAwesomeIcon icon={faQuestion} className="icon-margin-small hidden sm:inline" />
                         </button>
-                        <button className="btn-blue p-3 rounded-lg shadow flex-1 flex items-center justify-between" onClick={handleIssueReport}>
-                            <FontAwesomeIcon icon={faBug} className="icon-margin-small" />
-                            <span className="mx-2 text-center">Report Issue</span>
-                            <FontAwesomeIcon icon={faBug} className="icon-margin-small hidden sm:inline" />
+                        <button className="btn-red p-3 rounded-lg shadow flex-1 flex items-center justify-between" onClick={handleGiveUp}>
+                            <FontAwesomeIcon icon={faHand} className="icon-margin-small mirror-icon" />
+                            <span className="mx-2 text-center">Give up</span>
+                            <FontAwesomeIcon icon={faHand} className="icon-margin-small hidden sm:inline" />
                         </button>
                     </div>
-                    <button className="btn-red p-3 rounded-lg shadow w-full flex items-center justify-between" onClick={handleGiveUp}>
-                        <FontAwesomeIcon icon={faHand} className="icon-margin-small mirror-icon" />
-                        <span className="mx-2 text-center">Give up</span>
-                        <FontAwesomeIcon icon={faHand} className="icon-margin-small hidden sm:inline" />
+                    <button className="btn-ghost self-center" onClick={handleIssueReport}>
+                        <FontAwesomeIcon icon={faBug} className="icon-margin-small" />
+                        <span className="mx-1">Report an issue</span>
                     </button>
                 </>
             ) : (
                 <>
-
-                    {!feedbackSent && (
-                        <button className="btn-blue p-3 rounded-lg shadow w-full flex flex items-center justify-between" onClick={handleFeedback}>
-                            <FontAwesomeIcon icon={faHeart} className="icon-margin-small" />
-                            <span className="mx-2 text-center">Feedback</span>
-                            <FontAwesomeIcon icon={faHeart} className="icon-margin-small hidden sm:inline" />
-                        </button>
-                    )}
-                    <div className="flex flex-row gap-4 w-full">
-                        <button className="btn-red p-3 rounded-lg shadow flex-1 flex items-center justify-between" onClick={handleIssueReport}>
+                    <button className="btn-orange p-3 rounded-lg shadow w-full flex items-center justify-between" onClick={handleAgain}>
+                        <FontAwesomeIcon icon={faRotateLeft} className="icon-margin-small" />
+                        <span className="mx-2 text-center">Again</span>
+                        <FontAwesomeIcon icon={faRotateLeft} className="icon-margin-small hidden sm:inline" />
+                    </button>
+                    <div className="flex flex-row justify-center gap-6 w-full">
+                        {!feedbackSent && (
+                            <button className="btn-ghost" onClick={handleFeedback}>
+                                <FontAwesomeIcon icon={faHeart} className="icon-margin-small" />
+                                <span className="mx-1">Leave feedback</span>
+                            </button>
+                        )}
+                        <button className="btn-ghost" onClick={handleIssueReport}>
                             <FontAwesomeIcon icon={faBug} className="icon-margin-small" />
-                            <span className="mx-2 text-center">Report Issue</span>
-                            <FontAwesomeIcon icon={faBug} className="icon-margin-small hidden sm:inline" />
-
-                        </button>
-                        <button className="btn-orange p-3 rounded-lg shadow flex-1 items-center justify-between" onClick={handleAgain}>
-                            <FontAwesomeIcon icon={faRotateLeft} className="icon-margin-small" />
-                            <span className="mx-2 text-center">Again</span>
-                            <FontAwesomeIcon icon={faRotateLeft} className="icon-margin-small hidden sm:inline" />
+                            <span className="mx-1">Report an issue</span>
                         </button>
                     </div>
-
                 </>
             )}
         </div>
