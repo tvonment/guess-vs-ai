@@ -6,14 +6,16 @@ The prompts live in code — this file documents the strategy so it has one plac
 
 | Tier | Env var | Deployment (default) | Used for |
 |---|---|---|---|
-| `game` | `AI_GAME_MODEL` | `gpt-5.6-terra` | Word selection, questions/guesses, opening line, playful comments, summary |
-| `validation` | `AI_VALIDATION_MODEL` | `gpt-5.6-luna` | Win check, category check, answering the human's questions, Classroom learn fact |
+| `game` | `AI_GAME_MODEL` | `gpt-5.4` | Word selection, questions/guesses, opening line, playful comments, summary |
+| `validation` | `AI_VALIDATION_MODEL` | `gpt-5.4-mini` | Win check, category check, answering the human's questions, Classroom learn fact |
+
+Deployments are provisioned by `infra/main.bicep` (deployment names are parameters there and must match these env vars).
 
 All calls go through `services/llmService.ts` → Foundry v1 API (`{endpoint}/openai/v1/chat/completions`, deployment name in the `model` body field, no `api-version`). Only `messages`, `max_completion_tokens`, `reasoning_effort`, and `response_format` are sent — GPT-5.x deployments reject `temperature`/`top_p`.
 
 ## Design principles (v3)
 
-- **No few-shot.** v2 burned ~1,300 tokens on win-check examples and ~850 on category-check examples per call; GPT-5.6 follows concise instructions reliably. v2's examples also referenced categories that no longer existed.
+- **No few-shot blocks.** v2 burned ~1,300 tokens on win-check examples and ~850 on category-check examples per call; GPT-5.x follows concise instructions reliably (the win check keeps a handful of inline contrastive examples to separate guessing from mentioning). v2's examples also referenced categories that no longer existed.
 - **Validators are structured, minimal-token calls on the validation model** with `reasoning_effort: "none"` and a strict JSON schema. Parsing is defensive (`services/validationService.ts`), never a `===` on raw model text.
 - **The game history itself is the AI's context** for question-asking (`getFilteredAiChatHistory`: the AI's questions + the human's button answers only).
 

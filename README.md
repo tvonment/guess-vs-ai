@@ -27,6 +27,7 @@ app/components/     Screens, game UI, modals
 model/              Types and static data (categories, answers, game document shape)
 pages/api/          API routes: start, humanguess, save, finish, statistics, feedback, issues, report
 services/           LLM calls, prompts, turn logic, Cosmos access
+infra/              Bicep IaC for the Foundry model deployments
 archive/            Retired deep-analytics notebook (kept for reference, unused)
 ```
 
@@ -45,8 +46,8 @@ npm run dev                  # http://localhost:3000
 | `NEXT_PUBLIC_ENVIRONMENT` | `LOCAL` / `DEV` / `TEST` — shows the corner version ribbon (unset/`PROD` shows nothing) |
 | `AZURE_AI_FOUNDRY_API_KEY` | API key of the Azure AI Foundry resource |
 | `AZURE_AI_FOUNDRY_ENDPOINT` | Base URL, e.g. `https://<resource>.cognitiveservices.azure.com/` — calls use the Foundry v1 API (`{endpoint}/openai/v1/chat/completions`) |
-| `AI_GAME_MODEL` | Deployment name of the gameplay model (e.g. `gpt-5.6-terra`) |
-| `AI_VALIDATION_MODEL` | Deployment name of the validation model (e.g. `gpt-5.6-luna`) |
+| `AI_GAME_MODEL` | Deployment name of the gameplay model (e.g. `gpt-5.4`) |
+| `AI_VALIDATION_MODEL` | Deployment name of the validation model (e.g. `gpt-5.4-mini`) |
 | `COSMOS_DB_CONNECTION_STRING` | Cosmos DB connection string |
 | `COSMOS_DB_DATABASE_NAME` | Cosmos database name |
 | `COSMOS_DB_CONTAINER_NAME` | Games container name (the `feedback` container is fixed by name) |
@@ -60,3 +61,11 @@ npm run dev                  # http://localhost:3000
 ## Deployment
 
 Pushing to `main` (or opening a PR against it) triggers the Azure Static Web Apps workflow. Secrets/vars are configured in the GitHub repo settings (`GVA-Prod` environment): the env vars above plus `AZURE_STATIC_WEB_APPS_API_TOKEN_*`.
+
+The Foundry model deployments (`gpt-5.4` + `gpt-5.4-mini`) are provisioned as code:
+
+```bash
+az deployment group create -g <resource-group> -f infra/main.bicep -p accountName=guess-vs-ai-resource
+```
+
+`infra/main.bicep` can also create a fresh project-based Foundry account (`createAccount=true`); its outputs map 1:1 to the `AZURE_AI_FOUNDRY_ENDPOINT` / `AI_GAME_MODEL` / `AI_VALIDATION_MODEL` env vars.
