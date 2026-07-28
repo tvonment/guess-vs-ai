@@ -47,6 +47,18 @@ export async function startMessage(category: { name: string; description: string
     return result.message;
 }
 
+// Post-game educational blurb for Classroom games, stored on the game document
+// and shown on the game-over screen.
+export async function makeLearnFact(aiWord: string, userWord: string, category: { name: string; description: string }): Promise<string> {
+    const systemMessage = new Message("system",
+        `You write short educational blurbs for a learning game. The round was played in the category '${category.name}' — ${category.description}`);
+    const userMessage = new Message("user",
+        `The round featured "${aiWord}" and "${userWord}". Write 2-3 interesting, accurate sentences about each — one short paragraph per word, separated by a blank line. Plain text only, no headings.`);
+
+    const result = await chatCompletion("validation", [systemMessage, userMessage], { maxTokens: 400, reasoningEffort: "none" });
+    return result.message.content.trim();
+}
+
 export async function makeSummary(userId: string, winner: WinnerState): Promise<Message> {
     const game = await getGameStatus(userId);
 

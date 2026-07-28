@@ -37,6 +37,7 @@ export default function MainPage() {
     const [userId, setUserId] = useState<string>("");
     const [winner, setWinner] = useState<string>("");
     const [aiWord, setAiWord] = useState<string>("");
+    const [learnFact, setLearnFact] = useState<string>("");
     const [modalContent, setModalContent] = useState<ModalState | null>(null);
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const [counter, setCounter] = useState<Counter>(new Counter(0, 0));
@@ -97,7 +98,7 @@ export default function MainPage() {
             case ModalState.REPORT_GAMEOVER:
                 return <ReportIssue onClose={closeModal} gameStatus='gameover' userId={userId} />;
             case ModalState.GAME_OVER:
-                return <GameOverModal onClose={closeModal} winner={winner} aiWord={aiWord} summary={summary} openModal={openModal} />;
+                return <GameOverModal onClose={closeModal} winner={winner} aiWord={aiWord} summary={summary} learnFact={learnFact} openModal={openModal} />;
             case ModalState.FEEDBACK:
                 return <FeedbackForm onClose={closeModal} userId={userId} onFeedbackSent={handleFeedbackSent} />;
             case ModalState.INSTALL:
@@ -125,6 +126,7 @@ export default function MainPage() {
         setUserId("");
         setWinner("");
         setAiWord("");
+        setLearnFact("");
         setFeedbackSent(false);
         setCounter(new Counter(0, 0));
         setSummary({ role: 'system', content: '' });
@@ -151,12 +153,12 @@ export default function MainPage() {
         setTurn(TurnState.HUMAN);
     }
 
-    const handleGameOver = async (winner: string, aiWord: string, summary: Message) => {
+    const handleGameOver = async (winner: string, aiWord: string, summary: Message, learnFact?: string) => {
         setWinner(winner);
         setAiWord(aiWord);
+        setLearnFact(learnFact ?? "");
         setTurn(TurnState.FINISHED);
         setSummary(summary);
-        console.log("Game over with winner:", winner);
         openModal(ModalState.GAME_OVER);
     }
 

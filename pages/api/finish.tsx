@@ -17,8 +17,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-        const { aiWord, counter, summary } = await finishTurn(userId, WinnerState.GIVENUP);
-        res.status(200).json(new TurnResponse([], TurnState.FINISHED, WinnerState.GIVENUP, counter, summary, aiWord));
+        const { aiWord, counter, summary, learnFact } = await finishTurn(userId, WinnerState.GIVENUP);
+        res.status(200).json(new TurnResponse([], TurnState.FINISHED, WinnerState.GIVENUP, counter, summary, aiWord, learnFact));
     } catch (error: unknown) {
         console.error("Error:", error);
         if (error instanceof Error) {

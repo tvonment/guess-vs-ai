@@ -1,5 +1,6 @@
 import React from 'react';
 import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart';
+import { faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import GameOverWinner from './GameOverWinner';
 import { Message } from '@/model/Message';
@@ -10,12 +11,13 @@ type GameOverProps = {
     winner: string;
     aiWord: string;
     summary: Message;
+    learnFact?: string;
     onClose: () => void;
     openModal: (content: ModalState) => void;
 };
 
 
-export default function GameOverModal({ winner, aiWord, summary, openModal }: GameOverProps) {
+export default function GameOverModal({ winner, aiWord, summary, learnFact, openModal }: GameOverProps) {
     const handleFeedback = () => {
         openModal(ModalState.FEEDBACK);
     };
@@ -37,6 +39,15 @@ export default function GameOverModal({ winner, aiWord, summary, openModal }: Ga
         <main className="w-full overflow-hidden">
             {renderContent()}
             <p className="summary text-center mt-4">{summary.content}</p>
+            {learnFact && (
+                <div className="box-blue p-4 rounded-lg mt-4 text-white text-left">
+                    <p className="font-bold mb-2">
+                        <FontAwesomeIcon icon={faGraduationCap} className="icon-margin-small" />
+                        <span className="mx-2">Did you know?</span>
+                    </p>
+                    <p className="whitespace-pre-line">{learnFact}</p>
+                </div>
+            )}
             <div className="flex justify-center space-x-4 mt-3">
                 <button className="btn-blue p-3 rounded-lg shadow flex items-center justify-between w-48 transform transition-transform duration-300 hover:scale-105" onClick={handleFeedback}>
                     <FontAwesomeIcon icon={faHeart} className="icon-margin-small" />

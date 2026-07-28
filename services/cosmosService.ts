@@ -135,15 +135,18 @@ export async function getUsedCharacters(categoryName: string): Promise<string[]>
     }
 }
 
-export async function finishGame(userId: string, winner: WinnerState, summary: Message): Promise<{ aiWord: string, counter: Counter, summary: Message }> {
+export async function finishGame(userId: string, winner: WinnerState, summary: Message, learnFact?: string): Promise<{ aiWord: string, counter: Counter, summary: Message, learnFact?: string }> {
     const gameStatus = await getGameStatus(userId);
 
     gameStatus.winner = winner;
     gameStatus.summary = summary;
     gameStatus.finishedAt = new Date().toISOString();
+    if (learnFact) {
+        gameStatus.learnFact = learnFact;
+    }
     await updateGame(gameStatus);
 
-    return { aiWord: gameStatus.aiWord, counter: gameStatus.counter, summary: summary };
+    return { aiWord: gameStatus.aiWord, counter: gameStatus.counter, summary: summary, learnFact: learnFact };
 }
 
 export async function reportIssue(userId: string, reportedIssue: ReportedIssue): Promise<string> {

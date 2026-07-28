@@ -28,7 +28,7 @@ type GameProps = {
     onRestart: () => void;
     onSetSummary: (summary: Message) => void;
     onSetTurn: (turn: TurnState) => void;
-    onSetWinner: (winner: string, aiWord: string, summary: Message) => void;
+    onSetWinner: (winner: string, aiWord: string, summary: Message, learnFact?: string) => void;
     onSetCounter: (counter: Counter) => void;
     openModal: (content: ModalState) => void;
 };
@@ -89,8 +89,7 @@ export default function Game({ category, userId, userWord, counter, turn, aiWord
         if (counter) { onSetCounter(counter) };
         await floatMessages(newMessages);
         onSetTurn(turn);
-        console.log("Winner:", winner);
-        if (winner && data.aiWord && data.summary) { onSetWinner(winner, data.aiWord, data.summary); }
+        if (winner && data.aiWord && data.summary) { onSetWinner(winner, data.aiWord, data.summary, data.learnFact); }
     }
 
     return (
