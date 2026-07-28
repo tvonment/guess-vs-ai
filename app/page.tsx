@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from 'react';
 
 import Home from './components/Home';
+import SectionSelection from './components/SectionSelection';
 import CategorySelection from './components/CategorySelection';
 import Game from './components/game/Game';
 import { Category } from '@/model/Categories';
+import { Section } from '@/model/Sections';
 import WordSelection from './components/WordSelection';
 import Modal from './components/modal/Modal';
 import Faq from './components/modal/Faq';
@@ -29,6 +31,7 @@ import Install from './components/modal/Install';
 
 export default function MainPage() {
     const [currentPage, setCurrentPage] = useState<PageState>(PageState.HOME);
+    const [section, setSection] = useState<Section>();
     const [category, setCategory] = useState<Category>();
     const [userWord, setUserWord] = useState<string>("");
     const [userId, setUserId] = useState<string>("");
@@ -116,6 +119,7 @@ export default function MainPage() {
     }
 
     const handleStart = () => {
+        setSection(undefined);
         setCategory(undefined);
         setUserWord("");
         setUserId("");
@@ -125,8 +129,13 @@ export default function MainPage() {
         setCounter(new Counter(0, 0));
         setSummary({ role: 'system', content: '' });
         setTurn(TurnState.LOADING);
-        setCurrentPage(PageState.CATEGORY_SELECTION);
+        setCurrentPage(PageState.SECTION_SELECTION);
         closeModal();
+    };
+
+    const handleSetSection = (selectedSection: Section) => {
+        setSection(selectedSection);
+        setCurrentPage(PageState.CATEGORY_SELECTION);
     };
 
     const handleSetCategory = (selectedCategory: Category) => {
@@ -153,8 +162,11 @@ export default function MainPage() {
 
     const handleNavigateBack = () => {
         switch (currentPage) {
-            case PageState.CATEGORY_SELECTION:
+            case PageState.SECTION_SELECTION:
                 setCurrentPage(PageState.HOME);
+                break;
+            case PageState.CATEGORY_SELECTION:
+                setCurrentPage(PageState.SECTION_SELECTION);
                 break;
             case PageState.WORD_SELECTION:
                 setCurrentPage(PageState.CATEGORY_SELECTION);
@@ -182,7 +194,8 @@ export default function MainPage() {
         <>
             <Header currentPage={currentPage} onClick={handleLogo} onToggleMenu={toggleMenu} onNavigateBack={() => handleNavigateBack()} />
             {currentPage === PageState.HOME && <Home onNavigate={handleStart} />}
-            {currentPage === PageState.CATEGORY_SELECTION && <CategorySelection onSetCategory={handleSetCategory} />}
+            {currentPage === PageState.SECTION_SELECTION && <SectionSelection onSetSection={handleSetSection} />}
+            {currentPage === PageState.CATEGORY_SELECTION && section && <CategorySelection section={section} onSetCategory={handleSetCategory} />}
             {currentPage === PageState.WORD_SELECTION && category && <WordSelection onStartGame={handleOnStartGame} category={category} />}
             {currentPage === PageState.GAME && category && userId && <Game category={category} userId={userId} userWord={userWord} startMessage={startMessage} feedbackSent={feedbackSent} onSetWinner={handleGameOver} openModal={openModal} counter={counter} aiWord={aiWord} onSetCounter={setCounter} turn={turn} summary={summary} onSetSummary={handleSetSummary} onSetTurn={handleSetTurn} onRestart={handleStart} />}
             <Footer openModal={openModal} />

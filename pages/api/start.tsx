@@ -2,20 +2,11 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { selectWord } from "@/services/aiWordSelectionService";
 import { startGame } from "@/services/cosmosService";
 import { CategoryRef, Game } from "@/model/Game";
-import { Category, Categories } from "@/model/Categories";
+import { findCategory } from "@/model/Sections";
 import { checkWordInCategory } from "@/services/validationService";
 import { Counter } from "@/model/Counter";
 import { startMessage } from "@/services/aiMessagesService";
 import { modelIdOf } from "@/services/llmService";
-
-function findCategoryByName(name: string): { category: Category, parentName: string | null } | undefined {
-    for (const c of Categories) {
-        if (c.name === name) return { category: c, parentName: null };
-        const sub = c.subcategories?.find((s) => s.name === name);
-        if (sub) return { category: sub, parentName: c.name };
-    }
-    return undefined;
-}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {
@@ -29,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return;
     }
 
-    const found = findCategoryByName(categoryName);
+    const found = findCategory(categoryName);
     if (!found) {
         res.status(400).json({ error: `Unknown category '${categoryName}'` });
         return;
@@ -38,6 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         name: found.category.name,
         description: found.category.description,
         parentName: found.parentName,
+        sectionName: found.sectionName,
     };
 
     try {

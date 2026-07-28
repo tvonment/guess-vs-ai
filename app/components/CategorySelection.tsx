@@ -1,18 +1,19 @@
 "use client";
 
-import { Category, Categories } from "@/model/Categories";
+import { Category } from "@/model/Categories";
+import { Section } from "@/model/Sections";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 
 interface CategorySelectionProps {
-    onSetCategory: (theme: Category) => void;
+    section: Section;
+    onSetCategory: (category: Category) => void;
 }
 
-export default function CategorySelection({ onSetCategory }: CategorySelectionProps) {
+export default function CategorySelection({ section, onSetCategory }: CategorySelectionProps) {
 
-    const categories = Categories;
-    const [hoveredCategory, setHoveredCategory] = useState(null as Category | null);
+    // Tap-to-expand for categories with subcategories (hover is not available on touch).
+    const [expandedCategory, setExpandedCategory] = useState(null as Category | null);
 
     useEffect(() => {
         const handleResize = () => {
@@ -36,44 +37,37 @@ export default function CategorySelection({ onSetCategory }: CategorySelectionPr
         };
     }, []);
 
+    const handleCategoryClick = (category: Category) => {
+        if (category.subcategories?.length) {
+            setExpandedCategory(expandedCategory?.name === category.name ? null : category);
+        } else {
+            onSetCategory(category);
+        }
+    };
+
     return (
         <main className="w-full flex flex-col items-center md:mt-12 lg:mt-20 xl:mt-24">
             <div className="w-full md:w-2/3">
                 <div id="category-header" className="w-full flex justify-center text-white mb-4">
                     <h1 className="text-center text-xl md:text-4xl font-extrabold flex items-center justify-between py-6">
-                        <FontAwesomeIcon icon={faGamepad} className="icon-margin hidden lg:inline" />
-                        <span className="mx-2 text-center text-6xl">Pick Your Category</span>
-                        <FontAwesomeIcon icon={faGamepad} className="icon-margin hidden lg:inline" />
+                        <FontAwesomeIcon icon={section.icon} className="icon-margin hidden lg:inline" />
+                        <span className="mx-2 text-center text-6xl">{section.name}</span>
+                        <FontAwesomeIcon icon={section.icon} className="icon-margin hidden lg:inline" />
                     </h1>
                 </div>
             </div>
             <div className="w-2/3">
                 <div className="grid grid-cols-1 mb-4 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xl">
-                    {categories.map((category) => (
-                        <div
-                            key={category.name}
-                            className="relative"
-                            onMouseEnter={() => {
-                                if (category.subcategories?.length) {
-                                    setHoveredCategory(category);
-                                }
-                            }}
-                            onMouseLeave={() => {
-                                setHoveredCategory(null);
-                            }}>
+                    {section.categories.map((category) => (
+                        <div key={category.name} className="relative">
                             <button
                                 className={`w-full btn-orange category-button font-bold flex items-center justify-between p-4 h-24 ${category.type}`}
-                                disabled={!!category.subcategories?.length}
-                                onClick={() => {
-                                    if (!category.subcategories?.length) {
-                                        onSetCategory(category);
-                                    }
-                                }}>
+                                onClick={() => handleCategoryClick(category)}>
                                 <FontAwesomeIcon icon={category.icon} className="icon-margin-small" />
                                 <span className="mx-2 text-center text-3xl">{category.name}</span>
                                 <FontAwesomeIcon icon={category.icon} className="icon-margin-small" />
                             </button>
-                            {hoveredCategory?.name === category.name && category.subcategories && (
+                            {expandedCategory?.name === category.name && category.subcategories && (
                                 <div className="absolute top-full mt-1 w-full bg-white shadow-md rounded p-2 z-10">
                                     <button
                                         className="w-full text-left px-2 py-1 hover:bg-gray-200"
