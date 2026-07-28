@@ -6,7 +6,7 @@ import { Game, ReportedIssue } from "@/model/Game";
 import { Feedback } from "@/model/Feedback";
 import { Counter } from "@/model/Counter";
 import { WinnerState } from "@/model/WinnerState";
-import { makeSummary } from "./aiMessagesServcie";
+import { makeSummary } from "./aiMessagesService";
 import { CategoryWins, Statistics, DetailedStatistics, GameStatistics } from "@/model/Statistics";
 import { Opponent } from "@/model/Opponent";
 

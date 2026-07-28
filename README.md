@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Guess vs AI
 
-## Getting Started
+A word-guessing duel against an AI: you and the AI each pick a secret word from a category, then take turns asking yes/no questions to guess the other's word first. Built as a Progressive Web App.
 
-First, run the development server:
+**Live:** https://www.guess-vs-ai.com
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## How it works
+
+- Pick a section and category, enter your secret word (validated by an LLM against the category).
+- The AI picks its own secret word for the same category.
+- Take turns: you answer the AI's questions with Yes / No / I Don't Know buttons; the AI answers your free-text questions. A "Yes" lets the asker keep their turn.
+- First to name the other's exact word wins. An LLM referee judges guesses (tolerant of typos, strict on identity).
+
+## Tech stack
+
+- **Next.js 15** — App Router for the UI (`app/`), Pages Router for the API (`pages/api/`)
+- **Azure AI Foundry** — LLM chat completions (gameplay + validation models), called via `fetch` from `services/`
+- **Azure Cosmos DB** — game documents and feedback (`services/cosmosService.ts`)
+- **Azure Static Web Apps** — hosting, deployed by `.github/workflows/production-pipeline.yml` on push/PR to `main`
+- **Tailwind 3** + custom classes in `app/globals.css`, `next-pwa` for the PWA layer
+
+## Project layout
+
+```
+app/                UI (single-page state machine in app/page.tsx, PageState-driven)
+app/components/     Screens, game UI, modals
+model/              Types and static data (categories, answers, game document shape)
+pages/api/          API routes: start, humanguess, save, finish, statistics, feedback, issues, report
+services/           LLM calls, prompts, turn logic, Cosmos access
+archive/            Retired deep-analytics notebook (kept for reference, unused)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env.local   # then fill in real values
+npm install
+npm run dev                  # http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Environment variables
 
-## Learn More
+| Variable | What it is |
+|---|---|
+| `NEXT_PUBLIC_ENVIRONMENT` | `LOCAL` / `DEV` / `TEST` — shows the corner version ribbon (unset/`PROD` shows nothing) |
+| `AZURE_AI_FOUNDRY_API_KEY` | API key of the Azure AI Foundry resource |
+| `AZURE_AI_FOUNDRY_ENDPOINT` | Base URL, e.g. `https://<resource>.cognitiveservices.azure.com/` |
+| `AZURE_AI_FOUNDRY_VERIFICATION_MODEL` | Deployment path for validation calls (see `.env.example`) |
+| `COSMOS_DB_CONNECTION_STRING` | Cosmos DB connection string |
+| `COSMOS_DB_DATABASE_NAME` | Cosmos database name |
+| `COSMOS_DB_CONTAINER_NAME` | Games container name (the `feedback` container is fixed by name) |
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev` — dev server
+- `npm run build` — production build (also generates the PWA service worker into `public/`)
+- `npm run lint` — ESLint via `next lint`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Pushing to `main` (or opening a PR against it) triggers the Azure Static Web Apps workflow. Secrets/vars are configured in the GitHub repo settings (`GVA-Prod` environment): the env vars above plus `AZURE_STATIC_WEB_APPS_API_TOKEN_*`.

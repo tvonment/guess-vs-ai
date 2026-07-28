@@ -24,7 +24,7 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         env:
-          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+          NEXT_PUBLIC_ENVIRONMENT: ${{ vars.ENVIRONMENT }}
           AZURE_AI_FOUNDRY_API_KEY: ${{ secrets.AZURE_AI_FOUNDRY_API_KEY }}
           AZURE_AI_FOUNDRY_ENDPOINT: ${{ vars.AZURE_AI_FOUNDRY_ENDPOINT }}
           AZURE_AI_FOUNDRY_VERIFICATION_MODEL: ${{ vars.AZURE_AI_FOUNDRY_VERIFICATION_MODEL }}

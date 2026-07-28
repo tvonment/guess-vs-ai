@@ -6,7 +6,7 @@ import { Category, Categories } from "@/model/Categories";
 import { characterCheck } from "@/services/characterCheckService";
 import { Counter } from "@/model/Counter";
 import { Message } from "@/model/Message";
-import { startMessage } from "@/services/aiMessagesServcie";
+import { startMessage } from "@/services/aiMessagesService";
 import { Opponent, Opponents } from "@/model/Opponent";
 
 function findCategoryByName(name: string): Category | undefined {

@@ -3,7 +3,7 @@ import { addToHistory, finishGame, getWinningWords, increaseCounter } from "./co
 import { winCheck } from "./winCheckService";
 import { verifyHumanQuestion } from "./humanQuestionVerificationService";
 import { TurnState } from "@/model/TurnState";
-import { makeGuess, makePlayfulComment } from "./aiMessagesServcie";
+import { makeGuess, makePlayfulComment } from "./aiMessagesService";
 import { TurnResponse } from "@/model/TurnResponse";
 import { WinnerState } from "@/model/WinnerState";
 
