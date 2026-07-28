@@ -1,0 +1,65 @@
+name: Infrastructure Pipeline
+
+# Deploys infra/main.bicep (the Foundry model deployments) through the
+# pipeline — no manual az CLI. PRs get a what-if preview; pushes to main
+# (and manual runs) deploy.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "infra/**"
+      - ".github/workflows/infra-pipeline.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "infra/**"
+      - ".github/workflows/infra-pipeline.yml"
+  workflow_dispatch:
+
+permissions:
+  id-token: write # OIDC login to Azure — no stored credentials
+  contents: read
+
+jobs:
+  infra:
+    runs-on: ubuntu-latest
+    name: AI Model Infrastructure
+    environment: GVA-Prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: What-if preview (pull requests)
+        if: github.event_name == 'pull_request'
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: whatIf
+          name: guess-vs-ai-infra
+          scope: resourceGroup
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: ${{ vars.AZURE_RESOURCE_GROUP }}
+          template-file: ./infra/main.bicep
+          parameters: '{"accountName": "${{ vars.AZURE_AI_FOUNDRY_ACCOUNT_NAME }}"}'
+
+      - name: Deploy (main / manual)
+        if: github.event_name != 'pull_request'
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: create
+          name: guess-vs-ai-infra
+          scope: resourceGroup
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: ${{ vars.AZURE_RESOURCE_GROUP }}
+          template-file: ./infra/main.bicep
+          parameters: '{"accountName": "${{ vars.AZURE_AI_FOUNDRY_ACCOUNT_NAME }}"}'

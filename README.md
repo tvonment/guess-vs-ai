@@ -62,10 +62,21 @@ npm run dev                  # http://localhost:3000
 
 Pushing to `main` (or opening a PR against it) triggers the Azure Static Web Apps workflow. Secrets/vars are configured in the GitHub repo settings (`GVA-Prod` environment): the env vars above plus `AZURE_STATIC_WEB_APPS_API_TOKEN_*`.
 
-The Foundry model deployments (`gpt-5.4` + `gpt-5-mini`) are provisioned as code:
+### Infrastructure (Bicep)
+
+The Foundry model deployments (`gpt-5.4` + `gpt-5-mini`) are provisioned by `infra/main.bicep` through `.github/workflows/infra-pipeline.yml` — pull requests touching `infra/**` get a **what-if** preview, pushes to `main` (or a manual run) deploy. The template can also create a fresh project-based Foundry account (`createAccount=true`); its outputs map 1:1 to the `AZURE_AI_FOUNDRY_ENDPOINT` / `AI_GAME_MODEL` / `AI_VALIDATION_MODEL` env vars.
+
+One-time setup for the pipeline's secretless (OIDC) Azure login — create an app registration with a federated credential for this repo and grant it Contributor on the resource group:
 
 ```bash
-az deployment group create -g <resource-group> -f infra/main.bicep -p accountName=guess-vs-ai-resource
+az ad app create --display-name guess-vs-ai-github
+az ad sp create --id <appId>
+az role assignment create --assignee <appId> --role Contributor \
+  --scope /subscriptions/<subId>/resourceGroups/<rg>
+az ad app federated-credential create --id <appId> --parameters '{
+  "name": "gva-prod", "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:tvonment/guess-vs-ai:environment:GVA-Prod",
+  "audiences": ["api://AzureADTokenExchange"] }'
 ```
 
-`infra/main.bicep` can also create a fresh project-based Foundry account (`createAccount=true`); its outputs map 1:1 to the `AZURE_AI_FOUNDRY_ENDPOINT` / `AI_GAME_MODEL` / `AI_VALIDATION_MODEL` env vars.
+Then set these GitHub **variables** on the `GVA-Prod` environment: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP`, `AZURE_AI_FOUNDRY_ACCOUNT_NAME` (= `guess-vs-ai-resource`).
