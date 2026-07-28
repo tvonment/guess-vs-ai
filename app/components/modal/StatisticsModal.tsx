@@ -1,7 +1,7 @@
 import { Statistics } from "@/model/Statistics";
 import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Chart } from 'chart.js';
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -49,8 +49,8 @@ export default function StatisticsModal() {
             const ctx = chart.ctx;
             const humanIcon = new Image();
             const aiIcon = new Image();
-            humanIcon.src = 'images/user-icon.png'; // Replace with the path to your human icon
-            aiIcon.src = 'images/assistant-icon.png'; // Replace with the path to your AI icon
+            humanIcon.src = '/images/user-icon.png';
+            aiIcon.src = '/images/assistant-icon.png';
 
             const dataset = chart.getDatasetMeta(0).data;
 
@@ -103,6 +103,12 @@ export default function StatisticsModal() {
                         <p className="text-xl font-bold">{statistics?.totalAIWins ? statistics?.totalAIWins + " Games" : "no value"}</p>
                         <p className="col-span-1 text-xl font-bold"><span className="hidden sm:inline">Total </span>Given-Up:</p>
                         <p className="text-xl font-bold">{statistics?.totalGivenUp ? statistics?.totalGivenUp + " Games" : "no value"}</p>
+                        {statistics?.winsBySection?.map((sectionWins) => (
+                            <React.Fragment key={sectionWins.sectionName}>
+                                <p className="col-span-1 text-xl font-bold">{sectionWins.sectionName}:</p>
+                                <p className="text-xl font-bold">{sectionWins.humanWins} You / {sectionWins.aiWins} AI</p>
+                            </React.Fragment>
+                        ))}
                         <h3 className="col-span-2 text-xl font-bold">Questions used to win: (Player)</h3>
                         <p className="col-span-1">Low:</p>
                         <p>{statistics?.minQuestionCountHuman && statistics?.minQuestionCountHuman > 0 ? statistics?.minQuestionCountHuman + " Questions" : "no value"}</p>
@@ -123,7 +129,7 @@ export default function StatisticsModal() {
                         <p>{statistics?.medQuestionCountAI ? statistics?.medQuestionCountAI + " Questions" : "no value"}</p>
                     </div>
                     {statistics?.winsByCategory?.map((categoryWins) => (
-                        <>
+                        <React.Fragment key={categoryWins.category.name}>
                             <h3 className="box-blue text-xl text-center text-white flex items-center justify-between font-bold">
                                 <FontAwesomeIcon icon={categoryWins.category.icon} className="icon-margin" />
                                 {categoryWins.category.name}
@@ -153,7 +159,7 @@ export default function StatisticsModal() {
                                 <p className="col-span-1">Median:</p>
                                 <p>{categoryWins.medQuestionCountAI ? categoryWins.medQuestionCountAI + " Questions" : "no value"}</p>
                             </div>
-                        </>
+                        </React.Fragment>
                     ))}
                 </>
             ) : loading ? (
