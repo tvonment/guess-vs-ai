@@ -49,5 +49,9 @@ const categoryHelpTexts = [
     {
         name: "Historical Figures",
         help: "You could ask if they are known for scientific achievements, political influence, or cultural impact."
+    },
+    {
+        name: "Azure Services",
+        help: "Try asking about the service family (compute, data, AI, networking), whether it's serverless or managed, or what workload it's built for."
     }
 ];

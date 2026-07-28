@@ -1,5 +1,5 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faShield, faJedi, faWandSparkles, faPaw, faBook, faFlag, faCloudBolt, faBasketball, faCalendar, faMonument } from "@fortawesome/free-solid-svg-icons";
+import { faShield, faJedi, faWandSparkles, faPaw, faBook, faFlag, faCloudBolt, faBasketball, faCalendar, faMonument, faCloud } from "@fortawesome/free-solid-svg-icons";
 
 export enum CategoryType {
     Featured = "Featured",
@@ -121,6 +121,36 @@ export const ClassroomCategories: Category[] = [
         type: CategoryType.Featured,
         icon: faFlag as IconProp,
         image: "/images/earth.png"
+    },
+    {
+        name: "Azure Services",
+        description: "Pick any Microsoft Azure service, such as Azure Functions, Cosmos DB, or Key Vault.",
+        type: CategoryType.Featured,
+        icon: faCloud as IconProp,
+        image: "/images/Guess vs AI logo.png",
+        subcategories: [
+            {
+                name: "Compute & Hosting",
+                description: "Azure compute and hosting services, such as Virtual Machines, App Service, Azure Kubernetes Service, or Container Apps.",
+                type: CategoryType.Featured,
+                icon: faCloud as IconProp,
+                image: "/images/Guess vs AI logo.png",
+            },
+            {
+                name: "Data & Storage",
+                description: "Azure data and storage services, such as Cosmos DB, Azure SQL Database, Blob Storage, or Event Hubs.",
+                type: CategoryType.Featured,
+                icon: faCloud as IconProp,
+                image: "/images/Guess vs AI logo.png",
+            },
+            {
+                name: "AI & Machine Learning",
+                description: "Azure AI services, such as AI Foundry, Azure OpenAI, AI Search, or Azure Machine Learning.",
+                type: CategoryType.Featured,
+                icon: faCloud as IconProp,
+                image: "/images/Guess vs AI logo.png",
+            }
+        ]
     },
     {
         name: "World War II",
