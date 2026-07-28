@@ -48,7 +48,7 @@ export async function chatCompletion(tier: LlmTier, messages: Message[], options
         max_completion_tokens: options.maxTokens ?? DEFAULT_MAX_TOKENS,
     };
     if (options.reasoningEffort) {
-        body.reasoning_effort = options.reasoningEffort;
+        body.reasoning_effort = normalizeReasoningEffort(MODEL_DEPLOYMENTS[tier], options.reasoningEffort);
     }
     if (options.responseFormat) {
         body.response_format = options.responseFormat;
@@ -86,6 +86,17 @@ export async function chatCompletion(tier: LlmTier, messages: Message[], options
 
 export function jsonSchemaFormat(name: string, schema: object): object {
     return { type: "json_schema", json_schema: { name, strict: true, schema } };
+}
+
+// The classic GPT-5 generation (gpt-5, gpt-5-mini, gpt-5-nano — dash, no dot)
+// bottoms out at reasoning_effort "minimal" and rejects the "none" value that
+// GPT-5.1+ models accept.
+function normalizeReasoningEffort(deployment: string, effort: string): string {
+    const isLegacyGpt5 = /^gpt-5(-|$)/.test(deployment);
+    if (isLegacyGpt5 && effort === "none") {
+        return "minimal";
+    }
+    return effort;
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

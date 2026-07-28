@@ -39,13 +39,13 @@ param gameDeploymentName string = 'gpt-5.4'
 param gameCapacity int = 50
 
 @description('OpenAI model for evaluation/validation calls (win check, category check, question answering, learn fact).')
-param validationModelName string = 'gpt-5.4-mini'
+param validationModelName string = 'gpt-5-mini'
 
 @description('Model version for the validation deployment. Empty deploys the current default version.')
 param validationModelVersion string = ''
 
 @description('Deployment name for validation — the value of the app\'s AI_VALIDATION_MODEL env var.')
-param validationDeploymentName string = 'gpt-5.4-mini'
+param validationDeploymentName string = 'gpt-5-mini'
 
 @description('Capacity (thousands of tokens-per-minute) for the validation deployment.')
 param validationCapacity int = 50

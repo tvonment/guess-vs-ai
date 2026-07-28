@@ -7,11 +7,11 @@ The prompts live in code — this file documents the strategy so it has one plac
 | Tier | Env var | Deployment (default) | Used for |
 |---|---|---|---|
 | `game` | `AI_GAME_MODEL` | `gpt-5.4` | Word selection, questions/guesses, opening line, playful comments, summary |
-| `validation` | `AI_VALIDATION_MODEL` | `gpt-5.4-mini` | Win check, category check, answering the human's questions, Classroom learn fact |
+| `validation` | `AI_VALIDATION_MODEL` | `gpt-5-mini` | Win check, category check, answering the human's questions, Classroom learn fact |
 
 Deployments are provisioned by `infra/main.bicep` (deployment names are parameters there and must match these env vars).
 
-All calls go through `services/llmService.ts` → Foundry v1 API (`{endpoint}/openai/v1/chat/completions`, deployment name in the `model` body field, no `api-version`). Only `messages`, `max_completion_tokens`, `reasoning_effort`, and `response_format` are sent — GPT-5.x deployments reject `temperature`/`top_p`.
+All calls go through `services/llmService.ts` → Foundry v1 API (`{endpoint}/openai/v1/chat/completions`, deployment name in the `model` body field, no `api-version`). Only `messages`, `max_completion_tokens`, `reasoning_effort`, and `response_format` are sent — GPT-5.x deployments reject `temperature`/`top_p`. Classic GPT-5-generation deployments (`gpt-5-mini` etc.) don't support `reasoning_effort: "none"`; the client automatically maps it to `"minimal"` for them.
 
 ## Design principles (v3)
 
